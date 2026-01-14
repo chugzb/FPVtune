@@ -6,13 +6,16 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 
 const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
-  throw new Error('DATABASE_URL is not set');
-}
 
-// Disable prefetch as it is not supported for "Transaction" pool mode
-const client = postgres(connectionString, { prepare: false });
-const db = drizzle(client);
+// Create db connection only if DATABASE_URL is set
+// This allows the app to build without a database for features that don't need it
+let db: ReturnType<typeof drizzle> | null = null;
+
+if (connectionString) {
+  // Disable prefetch as it is not supported for "Transaction" pool mode
+  const client = postgres(connectionString, { prepare: false });
+  db = drizzle(client);
+}
 
 /**
  * Connect to Neon Database
@@ -41,4 +44,4 @@ const db = drizzle(client);
  * https://orm.drizzle.team/docs/tutorials/drizzle-with-supabase
  */
 
-export default db;
+export default db as ReturnType<typeof drizzle>;

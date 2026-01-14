@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
   /* config options here */
   devIndicators: false,
 
+  // Required for Cloudflare deployment with OpenNext
+  output: 'standalone',
+
   // https://nextjs.org/docs/architecture/nextjs-compiler#remove-console
   // Remove all console.* calls in production only
   compiler: {
