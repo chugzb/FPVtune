@@ -33,6 +33,7 @@ import {
 import { type Locale, useLocale, useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import { useEffect, useTransition } from 'react';
+import { LocaleSuggestionBanner } from './locale-suggestion-banner';
 
 function HomeLocaleSwitcher() {
   const showLocaleSwitch = Object.keys(websiteConfig.i18n.locales).length > 1;
@@ -98,6 +99,9 @@ export function FPVtuneHome() {
 
   return (
     <div className="min-h-screen bg-[#030304] text-white selection:bg-white selection:text-black">
+      {/* Language Suggestion Banner */}
+      <LocaleSuggestionBanner />
+
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-[#030304]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex justify-between items-center">
@@ -291,7 +295,10 @@ export function FPVtuneHome() {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-12 sm:py-24 border-t border-white/5">
+      <section
+        id="how-it-works"
+        className="py-12 sm:py-24 border-t border-white/5"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-8 sm:mb-16">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-white">
