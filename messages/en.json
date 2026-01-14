@@ -1,0 +1,1327 @@
+{
+  "Metadata": {
+    "name": "FPVTune",
+    "title": "FPVTune - AI-Powered FPV Drone Tuning Assistant",
+    "description": "FPVTune is an AI-powered assistant for FPV drone PID tuning and configuration optimization"
+  },
+  "Common": {
+    "login": "Log in",
+    "logout": "Log out",
+    "signUp": "Sign up",
+    "language": "Switch language",
+    "mode": {
+      "label": "Toggle mode",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "theme": {
+      "label": "Toggle theme",
+      "default": "Default",
+      "blue": "Blue",
+      "green": "Green",
+      "amber": "Amber",
+      "neutral": "Neutral"
+    },
+    "copy": "Copy",
+    "saving": "Saving...",
+    "save": "Save",
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "logoutFailed": "Failed to log out"
+  },
+  "PricingPage": {
+    "title": "Pricing",
+    "description": "Choose the plan that works best for you",
+    "subtitle": "Choose the plan that works best for you",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "PricingCard": {
+      "freePrice": "$0",
+      "perMonth": "/month",
+      "perYear": "/year",
+      "popular": "Popular",
+      "currentPlan": "Current Plan",
+      "yourCurrentPlan": "Your Current Plan",
+      "getStartedForFree": "Get Started For Free",
+      "getLifetimeAccess": "Get Lifetime Access",
+      "getStarted": "Get Started",
+      "notAvailable": "Not Available",
+      "daysTrial": "{days}-day free trial"
+    },
+    "CheckoutButton": {
+      "loading": "Loading...",
+      "checkoutFailed": "Failed to open checkout page"
+    }
+  },
+  "PricePlans": {
+    "free": {
+      "name": "Free",
+      "description": "Basic features for personal use",
+      "features": {
+        "feature-1": "Up to 3 projects",
+        "feature-2": "1 GB storage",
+        "feature-3": "Basic analytics",
+        "feature-4": "Community support"
+      },
+      "limits": {
+        "limit-1": "Custom domains",
+        "limit-2": "Custom branding",
+        "limit-3": "Lifetime updates"
+      }
+    },
+    "pro": {
+      "name": "Pro",
+      "description": "Advanced features for professionals",
+      "features": {
+        "feature-1": "Unlimited projects",
+        "feature-2": "10 GB storage",
+        "feature-3": "Advanced analytics",
+        "feature-4": "Priority support",
+        "feature-5": "Custom domains"
+      },
+      "limits": {
+        "limit-1": "Custom branding",
+        "limit-2": "Lifetime updates"
+      }
+    },
+    "lifetime": {
+      "name": "Lifetime",
+      "description": "Premium features with one-time payment",
+      "features": {
+        "feature-1": "All Pro features",
+        "feature-2": "100 GB storage",
+        "feature-3": "Dedicated support",
+        "feature-4": "Enterprise-grade security",
+        "feature-5": "Advanced integrations",
+        "feature-6": "Custom branding",
+        "feature-7": "Lifetime updates"
+      }
+    }
+  },
+  "NotFoundPage": {
+    "title": "404",
+    "message": "Sorry, the page you are looking for does not exist.",
+    "backToHome": "Back to home"
+  },
+  "ErrorPage": {
+    "title": "Oops! Something went wrong!",
+    "tryAgain": "Try again",
+    "backToHome": "Back to home"
+  },
+  "AboutPage": {
+    "title": "About",
+    "description": "This is FPVTune, an AI SaaS template built with modern technologies, helping you build your SaaS faster and better.",
+    "authorName": "FPVTune",
+    "authorBio": "AI SaaS Boilerplate",
+    "introduction": "👋 Hi there! This is FPVTune, an AI SaaS template built with modern technologies, helping you build your SaaS faster and better. If you have any questions, welcome to contact me.",
+    "talkWithMe": "Talk with me",
+    "followMe": "Follow me on X"
+  },
+  "ChangelogPage": {
+    "title": "Changelog",
+    "description": "Stay up to date with the latest changes in our product",
+    "subtitle": "Stay up to date with the latest changes in our product"
+  },
+  "ContactPage": {
+    "title": "Contact",
+    "description": "We'll help you find the right plan for your business",
+    "subtitle": "We'll help you find the right plan for your business",
+    "form": {
+      "title": "Contact Us",
+      "description": "If you have any questions or feedback, please reach out to our team",
+      "name": "Name",
+      "email": "Email",
+      "message": "Message",
+      "submit": "Submit",
+      "submitting": "Submitting...",
+      "success": "Message sent successfully",
+      "fail": "Failed to send message",
+      "nameMinLength": "Name must be at least 3 characters",
+      "nameMaxLength": "Name must not exceed 30 characters",
+      "emailValidation": "Please enter a valid email address",
+      "messageMinLength": "Message must be at least 10 characters",
+      "messageMaxLength": "Message must not exceed 500 characters"
+    }
+  },
+  "WaitlistPage": {
+    "title": "Waitlist",
+    "description": "Join our waitlist for the launch of our product",
+    "subtitle": "Join our waitlist for the launch of our product",
+    "form": {
+      "title": "Join Our Waitlist",
+      "description": "We will notify you when we launch our product",
+      "email": "Email",
+      "subscribe": "Subscribe",
+      "subscribing": "Subscribing...",
+      "success": "Subscribed successfully",
+      "fail": "Failed to subscribe",
+      "emailValidation": "Please enter a valid email address"
+    }
+  },
+  "Newsletter": {
+    "title": "Newsletter",
+    "subtitle": "Join the community",
+    "description": "Subscribe to our newsletter for the latest news and updates",
+    "form": {
+      "email": "Email",
+      "subscribe": "Subscribe",
+      "subscribing": "Subscribing...",
+      "success": "Subscribed successfully",
+      "fail": "Failed to subscribe",
+      "emailValidation": "Please enter a valid email address"
+    }
+  },
+  "AuthPage": {
+    "login": {
+      "title": "Login",
+      "welcomeBack": "Welcome back",
+      "email": "Email",
+      "password": "Password",
+      "signIn": "Sign In",
+      "signUpHint": "Don't have an account? Sign up",
+      "forgotPassword": "Forgot Password?",
+      "signInWithGoogle": "Sign In with Google",
+      "signInWithGitHub": "Sign In with GitHub",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "or": "Or continue with",
+      "emailRequired": "Please enter your email",
+      "passwordRequired": "Please enter your password"
+    },
+    "register": {
+      "title": "Register",
+      "createAccount": "Create an account",
+      "name": "Name",
+      "email": "Email",
+      "password": "Password",
+      "signUp": "Sign Up",
+      "signInHint": "Already have an account? Sign in",
+      "checkEmail": "Please check your email inbox",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "nameRequired": "Please enter your name",
+      "emailRequired": "Please enter your email",
+      "passwordRequired": "Please enter your password"
+    },
+    "forgotPassword": {
+      "title": "Forgot Password",
+      "email": "Email",
+      "send": "Send reset link",
+      "backToLogin": "Back to login",
+      "checkEmail": "Please check your email inbox",
+      "emailRequired": "Please enter your email"
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "password": "Password",
+      "reset": "Reset password",
+      "backToLogin": "Back to login",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "minLength": "Password must be at least 8 characters"
+    },
+    "error": {
+      "title": "Oops! Something went wrong!",
+      "tryAgain": "Please try again.",
+      "backToLogin": "Back to login",
+      "checkEmail": "Please check your email inbox"
+    },
+    "common": {
+      "termsOfService": "Terms of Service",
+      "privacyPolicy": "Privacy Policy",
+      "byClickingContinue": "By clicking continue, you agree to our ",
+      "and": " and "
+    }
+  },
+  "BlogPage": {
+    "title": "Blog",
+    "description": "Latest news and updates from our team",
+    "subtitle": "Latest news and updates from our team",
+    "author": "Author",
+    "categories": "Categories",
+    "tableOfContents": "Table of Contents",
+    "readTime": "{minutes} min read",
+    "all": "All",
+    "noPostsFound": "No posts found",
+    "allPosts": "All Posts",
+    "morePosts": "More Posts"
+  },
+  "DocsPage": {
+    "toc": "Table of Contents",
+    "search": "Search docs",
+    "lastUpdate": "Last updated on",
+    "searchNoResult": "No results",
+    "previousPage": "Previous",
+    "nextPage": "Next",
+    "chooseLanguage": "Select language",
+    "title": "FPVTune Docs",
+    "homepage": "Homepage",
+    "blog": "Blog"
+  },
+  "Marketing": {
+    "navbar": {
+      "features": {
+        "title": "Features"
+      },
+      "pricing": {
+        "title": "Pricing"
+      },
+      "blog": {
+        "title": "Blog"
+      },
+      "docs": {
+        "title": "Docs"
+      },
+      "ai": {
+        "title": "AI Tools",
+        "items": {
+          "text": {
+            "title": "AI Text",
+            "description": "Show how to use AI to write stunning text"
+          },
+          "image": {
+            "title": "AI Image",
+            "description": "Show how to use AI to generate beautiful images"
+          },
+          "video": {
+            "title": "AI Video",
+            "description": "Show how to use AI to generate amazing videos"
+          },
+          "audio": {
+            "title": "AI Audio",
+            "description": "Show how to use AI to generate wonderful audio"
+          }
+        }
+      },
+      "pages": {
+        "title": "Pages",
+        "items": {
+          "about": {
+            "title": "About",
+            "description": "Learn more about our company, mission, and values"
+          },
+          "contact": {
+            "title": "Contact",
+            "description": "Get in touch with our team for support or inquiries"
+          },
+          "waitlist": {
+            "title": "Waitlist",
+            "description": "Join our waitlist for latest news and updates"
+          },
+          "changelog": {
+            "title": "Changelog",
+            "description": "See the latest updates to our products"
+          },
+          "roadmap": {
+            "title": "Roadmap",
+            "description": "Explore our future plans and upcoming features"
+          },
+          "cookiePolicy": {
+            "title": "Cookie Policy",
+            "description": "How we use the cookies on our website"
+          },
+          "privacyPolicy": {
+            "title": "Privacy Policy",
+            "description": "How we protect and handle your data"
+          },
+          "termsOfService": {
+            "title": "Terms of Service",
+            "description": "The legal agreement between you and our company"
+          }
+        }
+      },
+      "blocks": {
+        "title": "Blocks",
+        "items": {
+          "magicui": {
+            "title": "MagicUI Blocks"
+          },
+          "hero-section": {
+            "title": "Hero Blocks"
+          },
+          "logo-cloud": {
+            "title": "Logo Cloud Blocks"
+          },
+          "integrations": {
+            "title": "Integrations Blocks"
+          },
+          "features": {
+            "title": "Features Blocks"
+          },
+          "content": {
+            "title": "Content Blocks"
+          },
+          "stats": {
+            "title": "Stats Blocks"
+          },
+          "team": {
+            "title": "Team Blocks"
+          },
+          "testimonials": {
+            "title": "Testimonials Blocks"
+          },
+          "callToAction": {
+            "title": "Call to Action Blocks"
+          },
+          "footer": {
+            "title": "Footer Blocks"
+          },
+          "pricing": {
+            "title": "Pricing Blocks"
+          },
+          "comparator": {
+            "title": "Comparator Blocks"
+          },
+          "faq": {
+            "title": "FAQ Blocks"
+          },
+          "login": {
+            "title": "Login Blocks"
+          },
+          "signup": {
+            "title": "Signup Blocks"
+          },
+          "forgot-password": {
+            "title": "Forgot Password Blocks"
+          },
+          "contact": {
+            "title": "Contact Blocks"
+          }
+        }
+      }
+    },
+    "footer": {
+      "tagline": "AI-powered PID tuning for smoother FPV flights",
+      "product": {
+        "title": "Product",
+        "items": {
+          "features": "Features",
+          "pricing": "Pricing",
+          "faq": "FAQ"
+        }
+      },
+      "resources": {
+        "title": "Resources",
+        "items": {
+          "blog": "Blog",
+          "docs": "Documentation",
+          "changelog": "Changelog",
+          "roadmap": "Roadmap"
+        }
+      },
+      "company": {
+        "title": "Company",
+        "items": {
+          "about": "About",
+          "contact": "Contact",
+          "waitlist": "Waitlist"
+        }
+      },
+      "legal": {
+        "title": "Legal",
+        "items": {
+          "cookiePolicy": "Cookie Policy",
+          "privacyPolicy": "Privacy Policy",
+          "termsOfService": "Terms of Service"
+        }
+      }
+    },
+    "avatar": {
+      "dashboard": "Dashboard",
+      "billing": "Billing",
+      "settings": "Settings"
+    }
+  },
+  "Dashboard": {
+    "dashboard": {
+      "title": "Dashboard"
+    },
+    "admin": {
+      "title": "Admin",
+      "users": {
+        "title": "Users"
+      }
+    },
+    "settings": {
+      "title": "Settings",
+      "profile": {
+        "title": "Profile",
+        "description": "Manage your account information",
+        "avatar": {
+          "title": "Avatar",
+          "description": "Click upload button to upload a custom one",
+          "recommendation": "An avatar is optional but strongly recommended",
+          "uploading": "Uploading...",
+          "uploadAvatar": "Upload Avatar",
+          "success": "Avatar updated successfully",
+          "fail": "Failed to update avatar"
+        },
+        "name": {
+          "title": "Name",
+          "description": "Please enter your display name",
+          "placeholder": "Enter your name",
+          "minLength": "Please use 3 characters at minimum",
+          "maxLength": "Please use 30 characters at maximum",
+          "hint": "Please use 3-30 characters for your name",
+          "success": "Name updated successfully",
+          "fail": "Failed to update name",
+          "saving": "Saving...",
+          "save": "Save"
+        }
+      },
+      "billing": {
+        "title": "Billing",
+        "description": "Manage your subscription and billing details",
+        "status": {
+          "active": "Active",
+          "trial": "Trial",
+          "free": "Free",
+          "lifetime": "Lifetime"
+        },
+        "interval": {
+          "month": "month",
+          "year": "year",
+          "oneTime": "one-time"
+        },
+        "currentPlan": {
+          "title": "Current Plan",
+          "description": "Your current plan details",
+          "noPlan": "You have no active plan"
+        },
+        "CustomerPortalButton": {
+          "loading": "Loading...",
+          "createCustomerPortalFailed": "Failed to open Stripe customer portal"
+        },
+        "price": "Price:",
+        "nextBillingDate": "Next billing date:",
+        "trialEnds": "Trial ends:",
+        "freePlanMessage": "You are currently on the free plan with limited features",
+        "lifetimeMessage": "You have lifetime access to all premium features",
+        "manageSubscription": "Manage Subscription and Billing",
+        "manageBilling": "Manage Billing",
+        "upgradePlan": "Upgrade Plan",
+        "retry": "Retry",
+        "errorMessage": "Failed to get data"
+      },
+      "notification": {
+        "title": "Notification",
+        "description": "Manage your notification preferences",
+        "newsletter": {
+          "title": "Newsletter Subscription",
+          "description": "Manage your newsletter subscription preferences",
+          "label": "Subscribe to newsletter",
+          "hint": "You can change your subscription preferences at any time",
+          "emailRequired": "Email is required to subscribe to the newsletter",
+          "subscribeSuccess": "Successfully subscribed to the newsletter",
+          "subscribeFail": "Failed to subscribe to the newsletter",
+          "unsubscribeSuccess": "Successfully unsubscribed from the newsletter",
+          "unsubscribeFail": "Failed to unsubscribe from the newsletter",
+          "error": "An error occurred while updating your subscription"
+        }
+      },
+      "security": {
+        "title": "Security",
+        "description": "Manage your security settings",
+        "updatePassword": {
+          "title": "Change Password",
+          "description": "Enter your current password and a new password",
+          "currentPassword": "Current Password",
+          "currentRequired": "Current password is required",
+          "newPassword": "New Password",
+          "newMinLength": "Password must be at least 8 characters",
+          "hint": "Please use at least 8 characters for password",
+          "showPassword": "Show password",
+          "hidePassword": "Hide password",
+          "success": "Password updated successfully",
+          "fail": "Failed to update password",
+          "saving": "Saving...",
+          "save": "Save"
+        },
+        "resetPassword": {
+          "title": "Reset Password",
+          "description": "Reset password to enable email login",
+          "info": "Resetting your password will allow you to sign in using your email and password in addition to your social login methods. You will receive an email with instructions to reset your password",
+          "button": "Reset Password"
+        },
+        "deleteAccount": {
+          "title": "Delete Account",
+          "description": "Permanently remove your account and all of its contents",
+          "warning": "This action is not reversible, so please continue with caution",
+          "button": "Delete Account",
+          "confirmTitle": "Delete Account",
+          "confirmDescription": "Are you sure you want to delete your account? This action cannot be undone.",
+          "confirm": "Delete",
+          "cancel": "Cancel",
+          "deleting": "Deleting...",
+          "success": "Account deleted successfully",
+          "fail": "Failed to delete account"
+        }
+      }
+    },
+    "upgrade": {
+      "title": "Upgrade",
+      "description": "Upgrade to Pro to access all features",
+      "button": "Upgrade"
+    }
+  },
+  "Mail": {
+    "common": {
+      "team": "{name} Team",
+      "copyright": "©️ {year} All Rights Reserved."
+    },
+    "verifyEmail": {
+      "title": "Hi, {name}.",
+      "body": "Please click the link below to verify your email address.",
+      "confirmEmail": "Confirm email",
+      "subject": "Verify your email"
+    },
+    "forgotPassword": {
+      "title": "Hi, {name}.",
+      "body": "Please click the link below to reset your password.",
+      "resetPassword": "Reset password",
+      "subject": "Reset your password"
+    },
+    "subscribeNewsletter": {
+      "body": "Thank you for subscribing to the newsletter. We will keep you updated with the latest news and updates.",
+      "subject": "Thanks for subscribing"
+    },
+    "contactMessage": {
+      "name": "Name: {name}",
+      "email": "Email: {email}",
+      "message": "Message: {message}",
+      "subject": "Contact Message from Website"
+    }
+  },
+  "HomePage": {
+    "title": "FPVTune",
+    "description": "AI-powered FPV drone PID tuning and configuration optimization assistant",
+    "nav": {
+      "features": "Features",
+      "howItWorks": "How It Works",
+      "startTuning": "Start Tuning"
+    },
+    "landing": {
+      "heroBadge": "AI-Powered Betaflight PID Tuning",
+      "heroTitle1": "Betaflight PID Tuning",
+      "heroTitle2": "Made Simple with AI",
+      "heroDesc": "Upload your Betaflight blackbox logs and get optimized PID settings in seconds. Our AI analyzes gyro noise, identifies resonance frequencies, and generates the perfect tune for your FPV drone.",
+      "startTuningNow": "Start Tuning Now",
+      "stats": {
+        "analysisSpeed": "Analysis Speed",
+        "noiseReduction": "Noise Reduction",
+        "dronesTuned": "Drones Tuned",
+        "compatible": "Compatible"
+      },
+      "whatIsPid": {
+        "title": "What is Betaflight PID Tuning?",
+        "desc1": "is the process of adjusting your flight controller's Proportional, Integral, and Derivative gains to achieve optimal flight performance. Proper PID tuning eliminates oscillations, reduces prop wash, and makes your FPV drone feel locked-in and responsive.",
+        "desc2": "Traditional PID tuning requires hours of test flights, analyzing blackbox logs manually, and making incremental adjustments. Most pilots struggle with understanding gyro noise patterns, filter settings, and the complex relationship between P, I, and D gains.",
+        "desc3": "to automate this entire process. Our neural network has been trained on thousands of blackbox logs from various drone configurations, learning the optimal PID settings for different frame sizes, motor combinations, and flying styles.",
+        "betaflightPidTuning": "Betaflight PID tuning",
+        "fpvtuneUsesAi": "FPVtune uses artificial intelligence"
+      },
+      "problems": {
+        "title": "Common PID Tuning Problems",
+        "propWash": "Prop Wash Oscillation",
+        "propWashDesc": "Vibrations during quick descents or sharp turns caused by turbulent air hitting the propellers.",
+        "hotMotors": "Hot Motors",
+        "hotMotorsDesc": "Excessive D-gain or inadequate filtering causes motors to overheat and reduces their lifespan.",
+        "sluggish": "Sluggish Response",
+        "sluggishDesc": "Low P-gains result in slow, mushy stick response that makes precise flying difficult.",
+        "midThrottle": "Mid-Throttle Oscillation",
+        "midThrottleDesc": "Vibrations at certain throttle positions due to motor resonance frequencies."
+      },
+      "howItWorksSection": {
+        "title": "How AI-Powered Analysis Works",
+        "desc": "FPVtune analyzes your blackbox data using advanced machine learning to generate optimized settings tailored to your specific drone configuration.",
+        "step1Title": "1. Upload Blackbox Log",
+        "step1Desc": "Record a short flight with blackbox logging enabled in Betaflight Configurator. Upload the .BBL or .BFL file to FPVtune. We support Betaflight 4.3, 4.4, and 4.5 log formats.",
+        "step2Title": "2. AI Analysis",
+        "step2Desc": "Our neural network performs spectral analysis on your gyro data, identifies noise frequencies, measures step response, and evaluates your current PID performance against thousands of reference tunes.",
+        "step3Title": "3. Get Optimized Settings",
+        "step3Desc": "Receive optimized PID values, filter settings, and feedforward gains. Copy the generated CLI commands directly into Betaflight Configurator and enjoy a perfectly tuned FPV drone."
+      },
+      "featuresSection": {
+        "title": "Advanced Analysis Features",
+        "desc": "Everything you need to achieve the perfect tune for your FPV drone, from noise analysis to thermal prediction.",
+        "spectral": "Gyro Noise Spectral Analysis",
+        "spectralDesc": "Visualizes gyro noise and D-term resonance across the frequency spectrum. Our AI identifies the exact frequencies where dynamic notch filters should be placed for optimal noise reduction without adding latency.",
+        "cliExport": "One-Click CLI Export",
+        "cliExportDesc": "Generate Betaflight CLI commands instantly. Copy and paste directly into your flight controller for immediate results.",
+        "thermal": "Motor Thermal Prediction",
+        "thermalDesc": "Aggressive PID tuning can overheat motors. Our AI predicts motor temperature based on your noise profile and recommends safe D-gain limits to protect your hardware.",
+        "estMaxTemp": "Est. Max Temp",
+        "dynamicFilter": "Dynamic Filter Tuning",
+        "dynamicFilterDesc": "Automatically configure gyro lowpass, D-term lowpass, and dynamic notch filters. Minimize filtering delay while maintaining clean motor signals for the smoothest possible flight.",
+        "propWashElim": "Prop Wash Elimination",
+        "propWashElimDesc": "Our AI optimizes D_min, D_max, and feedforward settings specifically to eliminate prop wash oscillation during aggressive maneuvers and quick descents."
+      },
+      "supported": {
+        "title": "PID Tuning for Every FPV Drone",
+        "desc": "Whether you fly a tiny whoop, 5-inch freestyle quad, or 7-inch long range build, FPVtune delivers optimized Betaflight PID settings for your specific configuration.",
+        "tinyWhoop": "Tiny Whoop & Toothpick",
+        "freestyle": "Freestyle & Racing",
+        "longRange": "Long Range & Cinematic",
+        "cinelifter": "Cinelifter & X-Class",
+        "escProtocols": "All ESC Protocols",
+        "escProtocolsDesc": "Compatible with DShot150, DShot300, DShot600, and bidirectional DShot for RPM filtering.",
+        "gyroChip": "Any Gyro Chip",
+        "gyroChipDesc": "Works with MPU6000, ICM20689, ICM42688, BMI270, and all other common gyroscopes.",
+        "flyingStyle": "Flying Style Presets",
+        "flyingStyleDesc": "Optimized profiles for freestyle, racing, cinematic, and long-range flying styles."
+      },
+      "whyChoose": {
+        "title": "Why Choose FPVtune?",
+        "desc": "Stop guessing and start flying with confidence. Our AI-powered approach delivers consistent, reliable results that traditional methods cannot match.",
+        "traditional": "Traditional PID Tuning",
+        "traditionalItems": {
+          "item1": "Hours of test flights required",
+          "item2": "Requires deep technical knowledge",
+          "item3": "Manual blackbox log analysis",
+          "item4": "Trial and error approach",
+          "item5": "Risk of damaging motors"
+        },
+        "aiTuning": "FPVtune AI Tuning",
+        "aiTuningItems": {
+          "item1": "Results in under 30 seconds",
+          "item2": "No technical expertise needed",
+          "item3": "Automated spectral analysis",
+          "item4": "Data-driven optimization",
+          "item5": "Safe thermal predictions"
+        }
+      },
+      "guide": {
+        "title": "Complete Betaflight PID Tuning Guide",
+        "desc": "Master the fundamentals of Betaflight PID tuning and understand how each parameter affects your drone's flight characteristics.",
+        "pGain": "Understanding P Gain in Betaflight PID Tuning",
+        "pGainDesc": "The Proportional gain determines how aggressively your drone corrects errors. Higher P values make the quad more responsive but can cause oscillations. In Betaflight PID tuning, finding the right P gain is crucial for achieving crisp stick response without introducing vibrations.",
+        "iGain": "The Role of I Gain in Betaflight PID Tuning",
+        "iGainDesc": "Integral gain helps your drone maintain attitude against external forces like wind. During Betaflight PID tuning, proper I gain settings ensure your quad holds its position without drifting. Too much I gain causes slow oscillations, while too little results in poor hover stability.",
+        "dGain": "D Gain Optimization in Betaflight PID Tuning",
+        "dGainDesc": "Derivative gain dampens oscillations and reduces prop wash. Effective Betaflight PID tuning requires careful D gain adjustment to eliminate bounce-back without overheating motors. FPVtune analyzes your noise profile to recommend optimal D values for your specific setup.",
+        "filter": "Filter Settings in Betaflight PID Tuning",
+        "filterDesc": "Proper filter configuration is essential for successful Betaflight PID tuning. Gyro and D-term lowpass filters remove noise that can cause motor heating. Dynamic notch filters target specific resonance frequencies. FPVtune automatically calculates optimal filter cutoffs based on your blackbox data.",
+        "feedforward": "Feedforward in Modern Betaflight PID Tuning",
+        "feedforwardDesc": "Feedforward anticipates stick movements for instant response. Advanced Betaflight PID tuning includes feedforward optimization to reduce latency and improve stick feel. Our AI analyzes your flying style to recommend feedforward values that match your preferences.",
+        "rpm": "RPM Filtering and Betaflight PID Tuning",
+        "rpmDesc": "Bidirectional DShot enables RPM-based filtering for cleaner motor signals. When performing Betaflight PID tuning with RPM filtering, you can run higher PID gains with less filtering delay. FPVtune detects RPM filter status and adjusts recommendations accordingly."
+      },
+      "faq": {
+        "title": "Betaflight PID Tuning FAQ",
+        "desc": "Common questions about Betaflight PID tuning and how FPVtune can help you achieve the perfect tune.",
+        "q1": "What is the best way to start Betaflight PID tuning?",
+        "a1": "The best approach to Betaflight PID tuning is to start with a clean blackbox log from a hover and light maneuvers. Upload this log to FPVtune for AI analysis. Our system will identify noise patterns and generate optimized PID settings as a starting point for your tune.",
+        "q2": "How long does Betaflight PID tuning usually take?",
+        "a2": "Traditional Betaflight PID tuning can take hours or even days of test flights and adjustments. With FPVtune, you can get optimized PID settings in under 30 seconds. Simply upload your blackbox log and receive instant recommendations tailored to your drone.",
+        "q3": "Can FPVtune help with Betaflight PID tuning for racing drones?",
+        "a3": "Yes, FPVtune supports Betaflight PID tuning for all drone types including racing quads. Our AI has been trained on thousands of racing drone logs and understands the specific requirements for low-latency, high-response tunes that competitive pilots need.",
+        "q4": "Do I need experience with Betaflight PID tuning to use FPVtune?",
+        "a4": "No prior Betaflight PID tuning experience is required. FPVtune is designed for pilots of all skill levels. Our AI handles the complex analysis and provides ready-to-use CLI commands. Just copy and paste into Betaflight Configurator to apply your optimized tune.",
+        "q5": "What Betaflight versions are supported for PID tuning?",
+        "a5": "FPVtune supports Betaflight PID tuning for versions 4.3, 4.4, and 4.5. Our AI understands the differences between firmware versions and generates appropriate settings for your specific Betaflight installation. We regularly update our models to support the latest Betaflight releases."
+      },
+      "cta": {
+        "title": "Ready to Optimize Your Drone?",
+        "desc": "Get AI-optimized Betaflight PID settings in seconds. Pay only when you are satisfied with the analysis results.",
+        "supportedFiles": "Supports .BBL and .BFL files from Betaflight 4.3, 4.4, and 4.5"
+      },
+      "footer": {
+        "tagline": "AI-powered Betaflight PID tuning for FPV pilots worldwide.",
+        "copyright": "FPVtune. All rights reserved."
+      }
+    },
+    "hero": {
+      "badge": "AI-Powered Drone Tuning",
+      "title": "AI-Powered FPV Tuning Assistant",
+      "titleLine1": "AI-Powered FPV",
+      "titleLine2": "Tuning Assistant",
+      "description": "Upload your Blackbox logs and let AI analyze your flight data. Get optimized PID settings, filter recommendations, and rate profiles in seconds.",
+      "introduction": "AI-Powered Drone Tuning",
+      "primary": "Start Tuning",
+      "secondary": "View Docs",
+      "stats": {
+        "logs": "Logs Analyzed",
+        "accuracy": "Accuracy Rate",
+        "speed": "Avg Analysis"
+      }
+    },
+    "logocloud": {
+      "title": "Your favorite companies are our partners"
+    },
+    "integration": {
+      "title": "Integrations",
+      "subtitle": "Integrate with your favorite tools",
+      "description": "Connect seamlessly with popular platforms and services to enhance your workflow.",
+      "learnMore": "Learn More",
+      "items": {
+        "item-1": {
+          "title": "Google Gemini",
+          "description": "Amet praesentium deserunt ex commodi tempore fuga voluptatem."
+        },
+        "item-2": {
+          "title": "Replit",
+          "description": "Amet praesentium deserunt ex commodi tempore fuga voluptatem."
+        },
+        "item-3": {
+          "title": "MagicUI",
+          "description": "Amet praesentium deserunt ex commodi tempore fuga voluptatem."
+        },
+        "item-4": {
+          "title": "VSCodium",
+          "description": "Amet praesentium deserunt ex commodi tempore fuga voluptatem."
+        },
+        "item-5": {
+          "title": "MediaWiki",
+          "description": "Amet praesentium deserunt ex commodi tempore fuga voluptatem."
+        },
+        "item-6": {
+          "title": "Google PaLM",
+          "description": "Amet praesentium deserunt ex commodi tempore fuga voluptatem."
+        }
+      }
+    },
+    "integration2": {
+      "title": "Integrate with your favorite tools",
+      "description": "Connect seamlessly with popular platforms and services to enhance your workflow.",
+      "primaryButton": "Get Started",
+      "secondaryButton": "See Demo"
+    },
+    "features": {
+      "title": "Features",
+      "subtitle": "The features of your product",
+      "description": "Write the description of your product here",
+      "items": {
+        "item-1": {
+          "title": "Product Feature One",
+          "description": "Please write the detailed description of feature one here, make it as detailed as possible, make it more attractive to users"
+        },
+        "item-2": {
+          "title": "Product Feature Two",
+          "description": "Please write the detailed description of feature two here, make it as detailed as possible, make it more attractive to users"
+        },
+        "item-3": {
+          "title": "Product Feature Three",
+          "description": "Please write the detailed description of feature three here, make it as detailed as possible, make it more attractive to users"
+        },
+        "item-4": {
+          "title": "Product Feature Four",
+          "description": "Please write the detailed description of feature four here, make it as detailed as possible, make it more attractive to users"
+        }
+      }
+    },
+    "features2": {
+      "title": "Features2",
+      "subtitle": "The features of your product",
+      "description": "Write the description of your product here",
+      "feature-1": "Product Feature One",
+      "feature-2": "Product Feature Two",
+      "feature-3": "Product Feature Three",
+      "feature-4": "Product Feature Four"
+    },
+    "features3": {
+      "title": "Features3",
+      "subtitle": "The features of your product",
+      "description": "Write the description of your product here",
+      "items": {
+        "item-1": {
+          "title": "Product Feature One",
+          "description": "Please write the detailed description of feature one here"
+        },
+        "item-2": {
+          "title": "Product Feature Two",
+          "description": "Please write the detailed description of feature two here"
+        },
+        "item-3": {
+          "title": "Product Feature Three",
+          "description": "Please write the detailed description of feature three here"
+        },
+        "item-4": {
+          "title": "Product Feature Four",
+          "description": "Please write the detailed description of feature four here"
+        },
+        "item-5": {
+          "title": "Product Feature Five",
+          "description": "Please write the detailed description of feature five here"
+        },
+        "item-6": {
+          "title": "Product Feature Six",
+          "description": "Please write the detailed description of feature six here"
+        }
+      }
+    },
+    "pricing": {
+      "title": "Pricing",
+      "subtitle": "Pricing",
+      "description": "Choose the plan that works best for you"
+    },
+    "faqs": {
+      "title": "FAQ",
+      "subtitle": "Frequently Asked Questions",
+      "items": {
+        "item-1": {
+          "question": "Do you offer a free trial?",
+          "answer": "Yes, we offer a 7-day free trial."
+        },
+        "item-2": {
+          "question": "How do I cancel my subscription?",
+          "answer": "You can cancel your subscription by visiting the billing page."
+        },
+        "item-3": {
+          "question": "Can I change my plan?",
+          "answer": "Yes, you can change your plan at any time by visiting the billing page."
+        },
+        "item-4": {
+          "question": "What is the refund policy?",
+          "answer": "We offer a 30-day money-back guarantee if you are not happy with our product."
+        },
+        "item-5": {
+          "question": "Can't find what you're looking for?",
+          "answer": "Please contact our customer support team at support@fpvtune.com"
+        }
+      }
+    },
+    "testimonials": {
+      "title": "Testimonials",
+      "subtitle": "What our customers are saying",
+      "items": {
+        "item-1": {
+          "name": "Jonathan Yombo",
+          "role": "Software Engineer",
+          "image": "https://randomuser.me/api/portraits/men/1.jpg",
+          "quote": "FPVTune is really extraordinary and very practical, no need to break your head. A real gold mine."
+        },
+        "item-2": {
+          "name": "Yves Kalume",
+          "role": "GDE - Android",
+          "image": "https://randomuser.me/api/portraits/men/6.jpg",
+          "quote": "With no experience in webdesign I just redesigned my entire website in a few minutes with tailwindcss thanks to FPVTune."
+        },
+        "item-3": {
+          "name": "Yucel Faruksahan",
+          "role": "Tailkits Creator",
+          "image": "https://randomuser.me/api/portraits/men/7.jpg",
+          "quote": "Great work on FPVTune template. This is one of the best personal website that I have seen so far :)"
+        },
+        "item-4": {
+          "name": "Anonymous author",
+          "role": "Product Manager",
+          "image": "https://randomuser.me/api/portraits/men/8.jpg",
+          "quote": "I downloaded the one of FPVTune template which is very clear to understand at the start and you could modify the codes/blocks to fit perfectly on your purpose of the page."
+        },
+        "item-5": {
+          "name": "Shekinah Tshiokufila",
+          "role": "Senior Software Engineer",
+          "image": "https://randomuser.me/api/portraits/men/4.jpg",
+          "quote": "FPVTune is redefining the standard of web design, with these blocks it provides an easy and efficient way for those who love beauty but may lack the time to implement it."
+        },
+        "item-6": {
+          "name": "Oketa Fred",
+          "role": "Fullstack Developer",
+          "image": "https://randomuser.me/api/portraits/men/2.jpg",
+          "quote": "I absolutely love FPVTune! The component blocks are beautifully designed and easy to use, which makes creating a great-looking website a breeze."
+        },
+        "item-7": {
+          "name": "Zeki",
+          "role": "Founder of ChatExtend",
+          "image": "https://randomuser.me/api/portraits/men/5.jpg",
+          "quote": "FPVTune is the perfect fusion of simplicity and versatility, enabling us to create UIs that are as stunning as they are user-friendly."
+        },
+        "item-8": {
+          "name": "Joseph Kitheka",
+          "role": "Fullstack Developer",
+          "image": "https://randomuser.me/api/portraits/men/9.jpg",
+          "quote": "FPVTune has transformed the way I develop web applications. Their extensive collection of UI components, blocks, and templates has significantly accelerated my workflow."
+        },
+        "item-9": {
+          "name": "Khatab Wedaa",
+          "role": "MerakiUI Creator",
+          "image": "https://randomuser.me/api/portraits/men/10.jpg",
+          "quote": "FPVTune is an elegant, clean, and responsive tailwind css components it's very helpful to start fast with your project."
+        },
+        "item-10": {
+          "name": "Rodrigo Aguilar",
+          "role": "TailwindAwesome Creator",
+          "image": "https://randomuser.me/api/portraits/men/11.jpg",
+          "quote": "I love FPVTune ❤️. The component blocks are well-structured, simple to use, and beautifully designed. It makes it really easy to have a good-looking website in no time."
+        },
+        "item-11": {
+          "name": "Eric Ampire",
+          "role": "@GoogleDevExpert for Android",
+          "image": "https://randomuser.me/api/portraits/men/12.jpg",
+          "quote": "FPVTune templates are the perfect solution for anyone who wants to create a beautiful and functional website without any web design experience."
+        },
+        "item-12": {
+          "name": "Roland Tubonge",
+          "role": "Software Engineer",
+          "image": "https://randomuser.me/api/portraits/men/13.jpg",
+          "quote": "FPVTune is so well designed that even with a very poor knowledge of web design you can do miracles. Let yourself be seduced!"
+        }
+      }
+    },
+    "stats": {
+      "title": "Stats",
+      "subtitle": "FPVTune in numbers",
+      "description": "FPVTune lets you make AI SaaS in days, simply and effortlessly",
+      "items": {
+        "item-1": {
+          "title": "Stars on GitHub"
+        },
+        "item-2": {
+          "title": "Active Users"
+        },
+        "item-3": {
+          "title": "Powered Apps"
+        }
+      }
+    },
+    "calltoaction": {
+      "title": "Start Tuning Today",
+      "description": "Join thousands of FPV pilots who have optimized their quads with AI-powered tuning. Get smoother flights, better response, and more confidence in the air.",
+      "primaryButton": "Start Free",
+      "secondaryButton": "Learn More"
+    },
+    "tuning": {
+      "title": "Start Tuning",
+      "description": "Upload your Blackbox log file and let AI analyze your flight data",
+      "upload": {
+        "title": "Upload Blackbox Log",
+        "description": "Supports Betaflight, INAV, and Emuflight log files",
+        "dropzone": "Drop your log file here or click to browse",
+        "formats": "Supports .bbl and .bfl files",
+        "analyze": "Analyze Log"
+      },
+      "features": {
+        "pid": {
+          "title": "PID Optimization",
+          "description": "AI analyzes gyro data and motor output to recommend optimal P, I, D values for your specific setup"
+        },
+        "filter": {
+          "title": "Filter Settings",
+          "description": "Get recommended lowpass and notch filter settings based on your motor noise profile"
+        },
+        "rate": {
+          "title": "Rate Profiles",
+          "description": "Generate custom rate curves for freestyle, racing, or cinematic flying styles"
+        }
+      }
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "stepLabel": "Step",
+      "step1": {
+        "title": "Upload Log",
+        "description": "Upload your Blackbox log file from Betaflight, INAV, or Emuflight"
+      },
+      "step2": {
+        "title": "AI Analysis",
+        "description": "Our AI analyzes flight characteristics, identifies issues, and calculates optimal settings"
+      },
+      "step3": {
+        "title": "Get Results",
+        "description": "Download optimized PID values and filter settings ready to apply"
+      }
+    }
+  },
+  "AITextPage": {
+    "title": "AI Text",
+    "description": "FPVTune lets you make AI SaaS in days, simply and effortlessly",
+    "content": "Working in progress"
+  },
+  "AIImagePage": {
+    "title": "AI Image",
+    "description": "FPVTune lets you make AI SaaS in days, simply and effortlessly",
+    "content": "Working in progress"
+  },
+  "AIVideoPage": {
+    "title": "AI Video",
+    "description": "FPVTune lets you make AI SaaS in days, simply and effortlessly",
+    "content": "Working in progress"
+  },
+  "AIAudioPage": {
+    "title": "AI Audio",
+    "description": "FPVTune lets you make AI SaaS in days, simply and effortlessly",
+    "content": "Working in progress"
+  },
+  "TunePage": {
+    "wizard": {
+      "header": {
+        "secureCheckout": "Secure Checkout"
+      },
+      "steps": {
+        "upload": "Upload",
+        "problems": "Problems",
+        "goals": "Goals",
+        "style": "Style",
+        "frame": "Frame",
+        "payment": "Payment"
+      },
+      "upload": {
+        "title": "Upload Your Flight Data",
+        "description": "Upload your Betaflight blackbox log for AI analysis",
+        "blackboxLog": "Blackbox Log",
+        "blackboxRequired": "*",
+        "blackboxHint": ".bbl, .bfl or .txt file from Betaflight",
+        "cliDump": "CLI Dump",
+        "cliDumpOptional": "(Optional)",
+        "cliDumpHint": "Current configuration from Betaflight CLI",
+        "tip": "Tip:",
+        "tipContent": "Record a 30+ second flight with blackbox logging enabled. Include hover, forward flight, and some maneuvers for best results."
+      },
+      "problems": {
+        "title": "What issues are you experiencing?",
+        "description": "Select all problems you want to fix (select at least one)",
+        "additionalDetails": "Additional details",
+        "additionalDetailsOptional": "(optional)",
+        "additionalDetailsPlaceholder": "Describe any specific issues or conditions when problems occur...",
+        "items": {
+          "propwash": {
+            "name": "Prop Wash",
+            "description": "Oscillation during descents or quick direction changes"
+          },
+          "hotmotors": {
+            "name": "Hot Motors",
+            "description": "Motors getting too warm after flights"
+          },
+          "sluggish": {
+            "name": "Sluggish Response",
+            "description": "Slow or mushy stick feel"
+          },
+          "oscillation": {
+            "name": "Mid-Throttle Oscillation",
+            "description": "Vibrations at certain throttle positions"
+          },
+          "bouncy": {
+            "name": "Bouncy / Overshoot",
+            "description": "Quad bounces back after maneuvers"
+          },
+          "noise": {
+            "name": "Noisy Motors",
+            "description": "Excessive motor noise or grinding sound"
+          }
+        }
+      },
+      "goals": {
+        "title": "What do you want to achieve?",
+        "description": "Select your tuning goals (select at least one)",
+        "otherGoals": "Other goals",
+        "otherGoalsOptional": "(optional)",
+        "otherGoalsPlaceholder": "Describe any specific tuning goals not listed above...",
+        "items": {
+          "locked": {
+            "name": "Locked-in Feel",
+            "description": "Precise, connected flight response"
+          },
+          "smooth": {
+            "name": "Smooth & Cinematic",
+            "description": "Buttery smooth for video"
+          },
+          "snappy": {
+            "name": "Snappy Response",
+            "description": "Quick, aggressive stick feel"
+          },
+          "efficient": {
+            "name": "Efficient Cruising",
+            "description": "Longer flight time, less heat"
+          },
+          "balanced": {
+            "name": "Balanced All-Round",
+            "description": "Good for everything"
+          }
+        }
+      },
+      "styles": {
+        "title": "Select Your Flying Style",
+        "description": "This helps optimize PID settings for your preferred flight characteristics",
+        "items": {
+          "freestyle": {
+            "name": "Freestyle",
+            "description": "Tricks, flips, fast maneuvers"
+          },
+          "racing": {
+            "name": "Racing",
+            "description": "Low latency, competitive"
+          },
+          "cinematic": {
+            "name": "Cinematic",
+            "description": "Smooth video, stable"
+          },
+          "longrange": {
+            "name": "Long Range",
+            "description": "Efficient cruising"
+          }
+        }
+      },
+      "frames": {
+        "title": "Select Your Frame Size",
+        "description": "Different frame sizes require different PID tuning approaches",
+        "items": {
+          "2-3": {
+            "name": "2-3\"",
+            "description": "Tiny Whoop / Toothpick"
+          },
+          "5": {
+            "name": "5\"",
+            "description": "Freestyle / Racing"
+          },
+          "7": {
+            "name": "7\"",
+            "description": "Long Range / Cinematic"
+          },
+          "10+": {
+            "name": "10\"+",
+            "description": "Cinelifter / X-Class"
+          }
+        }
+      },
+      "payment": {
+        "title": "Complete Your Order",
+        "description": "Review and pay to get your personalized PID tune",
+        "orderSummary": "Order Summary",
+        "blackboxLog": "Blackbox Log",
+        "problemsToFix": "Problems to Fix",
+        "tuningGoals": "Tuning Goals",
+        "flyingStyle": "Flying Style",
+        "frameSize": "Frame Size",
+        "additionalNotes": "Additional Notes",
+        "oneTimePayment": "One-time payment",
+        "launchDiscount": "50% Launch Discount",
+        "limitedOffer": "Limited Offer",
+        "features": {
+          "pid": "AI-optimized PID values for Roll, Pitch, Yaw",
+          "filter": "Filter settings (Gyro, D-term, Dynamic Notch)",
+          "feedforward": "Feedforward configuration",
+          "cli": "Ready-to-paste CLI commands",
+          "report": "Detailed analysis report"
+        },
+        "emailAddress": "Email Address",
+        "emailPlaceholder": "your@email.com",
+        "emailHint": "Results will be sent to this email",
+        "payButton": "Pay $9.99 - Get Your Tune",
+        "analyzing": "Analyzing your flight data...",
+        "securePayment": "Secure Payment",
+        "instantDelivery": "Instant Delivery"
+      },
+      "results": {
+        "title": "Your Tune is Ready",
+        "description": "AI-optimized settings based on your blackbox analysis",
+        "analysisSummary": "Analysis Summary",
+        "issuesIdentified": "Issues Identified",
+        "recommendations": "Recommendations",
+        "optimizedPID": "Optimized PID Values",
+        "axis": "Axis",
+        "roll": "Roll",
+        "pitch": "Pitch",
+        "yaw": "Yaw",
+        "filterSettings": "Filter Settings",
+        "gyroLPF": "Gyro LPF",
+        "dtermLPF": "D-term LPF",
+        "dynNotchCount": "Dyn Notch Count",
+        "dynNotchQ": "Dyn Notch Q",
+        "dynNotchMin": "Dyn Notch Min",
+        "dynNotchMax": "Dyn Notch Max",
+        "cliCommands": "CLI Commands",
+        "copy": "Copy",
+        "copied": "Copied!",
+        "download": "Download",
+        "howToApply": "How to Apply",
+        "applySteps": {
+          "step1": "Connect your quad to Betaflight Configurator",
+          "step2": "Go to the CLI tab",
+          "step3": "Paste the commands above and press Enter",
+          "step4": "Type \"save\" and press Enter to save settings",
+          "step5": "Test fly and enjoy your optimized tune!"
+        },
+        "backToHome": "Back to Home"
+      },
+      "navigation": {
+        "back": "Back",
+        "continue": "Continue"
+      }
+    },
+    "form": {
+      "hero": {
+        "badge": "AI-Powered Smart Tuning",
+        "titleLine1": "Customize Your",
+        "titleLine2": "Perfect PID",
+        "description": "Upload Blackbox logs and flight controller config, AI analyzes your flight data and generates a custom tuning solution for your specific setup"
+      },
+      "header": {
+        "pricing": "Pricing",
+        "docs": "Docs"
+      },
+      "upload": {
+        "stepTitle": "Upload Flight Data",
+        "blackboxLog": "Blackbox Log",
+        "blackboxHint": ".bbl, .bfl or .txt file",
+        "cliDump": "CLI Dump",
+        "cliDumpHint": "Betaflight CLI export config"
+      },
+      "hardware": {
+        "stepTitle": "Hardware Info",
+        "frameSize": "Frame Size",
+        "frameName": "Frame Model",
+        "frameNamePlaceholder": "e.g. iFlight Nazgul5 V2",
+        "motorName": "Motor Model",
+        "motorNamePlaceholder": "e.g. XING2 2207",
+        "motorKv": "Motor KV",
+        "motorKvPlaceholder": "e.g. 1855"
+      },
+      "submitButton": "Start AI Analysis",
+      "features": {
+        "blackbox": {
+          "title": "Blackbox Deep Analysis",
+          "description": "AI analyzes your flight logs, identifies vibration, overshoot, latency issues, and pinpoints tuning direction."
+        },
+        "hardware": {
+          "title": "Hardware-Adaptive Optimization",
+          "description": "Generates optimal PID and filter parameters based on your motor, frame, and propeller combination."
+        },
+        "import": {
+          "title": "One-Click Config Import",
+          "description": "Generated tuning can be copied directly to Betaflight CLI, or downloaded as a config file for one-click import."
+        }
+      },
+      "faq": {
+        "title": "FAQ",
+        "description": "Common questions about AI tuning",
+        "items": {
+          "q1": {
+            "question": "What files do I need to upload?",
+            "answer": "Blackbox log files (.bbl/.bfl) for flight data analysis, CLI dump for current config. Recommend recording 30+ seconds of normal flight."
+          },
+          "q2": {
+            "question": "How long does AI analysis take?",
+            "answer": "Usually completes within 1-2 minutes. Complex log files may take longer, you'll be notified by email when done."
+          },
+          "q3": {
+            "question": "Which flight controller firmware is supported?",
+            "answer": "Currently supports Betaflight 4.3+, INAV 6.0+ and EmuFlight. KISS and other firmware support is in development."
+          },
+          "q4": {
+            "question": "Can I use the generated parameters directly?",
+            "answer": "AI-generated parameters are an optimized starting point based on your data. Recommend test flying in a safe environment and fine-tuning based on feel."
+          },
+          "q5": {
+            "question": "Is my data secure?",
+            "answer": "Your flight data is only used for analysis and won't be stored or shared. Data is automatically deleted after analysis."
+          }
+        }
+      },
+      "footer": {
+        "madeBy": "Built by FPV enthusiasts, for the FPV community",
+        "viewDocs": "View Documentation",
+        "joinCommunity": "Join Community",
+        "discordGroup": "Discord Group"
+      }
+    },
+    "adoption": {
+      "title": "Compatible with Major Hardware",
+      "description": "Pre-configured support for mainstream flight controller firmware and hardware brands"
+    }
+  },
+  "SkillsPage": {
+    "title": "FPVTune - AI Smart Tuning Tool",
+    "description": "Upload Blackbox logs and flight controller config, AI analyzes your flight data and generates a custom PID tuning solution for your specific setup."
+  }
+}

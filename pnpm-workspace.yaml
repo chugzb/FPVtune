@@ -1,0 +1,7 @@
+onlyBuiltDependencies:
+  - '@biomejs/biome'
+  - '@parcel/watcher'
+  - '@vercel/speed-insights'
+  - esbuild
+  - libpq
+  - sharp

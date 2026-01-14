@@ -1,0 +1,32 @@
+# Cloudflare Workers development environment variables
+# Copy this file to .dev.vars and fill in your values
+
+# Database (use Neon, Supabase, or other edge-compatible PostgreSQL)
+DATABASE_URL=postgresql://user:password@host:5432/database
+
+# Better Auth
+BETTER_AUTH_SECRET=your-secret-key
+BETTER_AUTH_URL=http://localhost:3000
+
+# Google OAuth
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+# Stripe
+STRIPE_SECRET_KEY=sk_test_xxx
+STRIPE_WEBHOOK_SECRET=whsec_xxx
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_xxx
+NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY=price_xxx
+NEXT_PUBLIC_STRIPE_PRICE_PRO_YEARLY=price_xxx
+NEXT_PUBLIC_STRIPE_PRICE_LIFETIME=price_xxx
+
+# Resend (Email)
+RESEND_API_KEY=re_xxx
+RESEND_AUDIENCE_ID=xxx
+
+# Cloudflare R2 Storage
+R2_ACCOUNT_ID=xxx
+R2_ACCESS_KEY_ID=xxx
+R2_SECRET_ACCESS_KEY=xxx
+R2_BUCKET_NAME=fpvtune
+R2_PUBLIC_URL=https://your-r2-public-url

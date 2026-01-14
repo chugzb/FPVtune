@@ -1,0 +1,120 @@
+import { PaymentTypes, PlanIntervals } from '@/payment/types';
+import type { WebsiteConfig } from '@/types';
+
+/**
+ * website config, without translations
+ *
+ * docs:
+ * https://fpvtune.com/docs/config/website
+ */
+export const websiteConfig: WebsiteConfig = {
+  metadata: {
+    theme: {
+      defaultTheme: 'default',
+      enableSwitch: true,
+    },
+    mode: {
+      defaultMode: 'system',
+      enableSwitch: true,
+    },
+    images: {
+      ogImage: '/og.png',
+      logoLight: '/logo.png',
+      logoDark: '/logo-dark.png',
+    },
+    social: {
+      github: 'https://github.com/fpvtune',
+      twitter: 'https://x.com/fpvtune',
+      discord: 'https://discord.gg/fpvtune',
+      youtube: 'https://www.youtube.com/@fpvtune',
+    },
+  },
+  routes: {
+    defaultLoginRedirect: '/dashboard',
+  },
+  analytics: {
+    enableVercelAnalytics: false,
+    enableSpeedInsights: false,
+  },
+  auth: {
+    enableGoogleLogin: true,
+    enableGithubLogin: false,
+  },
+  i18n: {
+    defaultLocale: 'en',
+    locales: {
+      en: {
+        flag: '🇺🇸',
+        name: 'English',
+      },
+      zh: {
+        flag: '🇨🇳',
+        name: '中文',
+      },
+    },
+  },
+  blog: {
+    paginationSize: 6,
+    relatedPostsSize: 3,
+  },
+  mail: {
+    provider: 'resend',
+    fromEmail: 'FPVTune <support@fpvtune.com>',
+    supportEmail: 'FPVTune <support@fpvtune.com>',
+  },
+  newsletter: {
+    provider: 'resend',
+    autoSubscribeAfterSignUp: true,
+  },
+  storage: {
+    provider: 's3',
+  },
+  payment: {
+    provider: 'stripe',
+  },
+  price: {
+    plans: {
+      free: {
+        id: 'free',
+        prices: [],
+        isFree: true,
+        isLifetime: false,
+      },
+      pro: {
+        id: 'pro',
+        prices: [
+          {
+            type: PaymentTypes.SUBSCRIPTION,
+            priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY!,
+            amount: 990,
+            currency: 'USD',
+            interval: PlanIntervals.MONTH,
+          },
+          {
+            type: PaymentTypes.SUBSCRIPTION,
+            priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_YEARLY!,
+            amount: 9900,
+            currency: 'USD',
+            interval: PlanIntervals.YEAR,
+          },
+        ],
+        isFree: false,
+        isLifetime: false,
+        recommended: true,
+      },
+      lifetime: {
+        id: 'lifetime',
+        prices: [
+          {
+            type: PaymentTypes.ONE_TIME,
+            priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_LIFETIME!,
+            amount: 19900,
+            currency: 'USD',
+          },
+        ],
+        isFree: false,
+        isLifetime: true,
+      },
+    },
+  },
+};
