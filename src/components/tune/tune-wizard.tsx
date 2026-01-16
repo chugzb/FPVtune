@@ -65,6 +65,7 @@ interface AnalysisResult {
 }
 
 const TOTAL_STEPS = 6;
+const VALID_TEST_CODES = ['JB_VIP_TEST'];
 const problemIds = [
   'propwash',
   'hotmotors',
@@ -97,6 +98,7 @@ export function TuneWizard() {
     null
   );
   const [error, setError] = useState<string | null>(null);
+  const [testCode, setTestCode] = useState('');
 
   const stepLabels = [
     t('steps.upload'),
@@ -187,6 +189,54 @@ export function TuneWizard() {
       apiFormData.append('additionalNotes', formData.additionalNotes);
       apiFormData.append('email', formData.email);
       apiFormData.append('locale', locale);
+
+      const response = await fetch('/api/tune/analyze', {
+        method: 'POST',
+        body: apiFormData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Analysis failed');
+      }
+
+      const result = await response.json();
+      setAnalysisResult(result.analysis);
+      setCurrentStep(7);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleTestCodeSubmit = async () => {
+    // 验证测试码
+    if (!VALID_TEST_CODES.includes(testCode.toUpperCase())) {
+      setError('Invalid test code');
+      return;
+    }
+
+    setIsProcessing(true);
+    setError(null);
+
+    try {
+      const apiFormData = new FormData();
+      if (formData.blackboxFile) {
+        apiFormData.append('blackbox', formData.blackboxFile);
+      }
+      if (formData.cliDumpFile) {
+        apiFormData.append('cliDump', formData.cliDumpFile);
+      }
+      apiFormData.append('problems', formData.problems.join(', '));
+      apiFormData.append('goals', formData.goals.join(', '));
+      apiFormData.append('customGoal', formData.customGoal);
+      apiFormData.append('flyingStyle', formData.flyingStyle);
+      apiFormData.append('frameSize', formData.frameSize);
+      apiFormData.append('additionalNotes', formData.additionalNotes);
+      apiFormData.append('email', formData.email);
+      apiFormData.append('locale', locale);
+      apiFormData.append('testCode', testCode.toUpperCase());
 
       const response = await fetch('/api/tune/analyze', {
         method: 'POST',
@@ -318,6 +368,9 @@ export function TuneWizard() {
               onPayment={handlePayment}
               isProcessing={isProcessing}
               error={error}
+              testCode={testCode}
+              onTestCodeChange={setTestCode}
+              onTestCodeSubmit={handleTestCodeSubmit}
             />
           )}
           {currentStep === 7 && analysisResult && (
@@ -741,6 +794,9 @@ function StepPayment({
   onPayment,
   isProcessing,
   error,
+  testCode,
+  onTestCodeChange,
+  onTestCodeSubmit,
 }: {
   formData: FormData;
   email: string;
@@ -748,12 +804,16 @@ function StepPayment({
   onPayment: () => void;
   isProcessing: boolean;
   error: string | null;
+  testCode: string;
+  onTestCodeChange: (code: string) => void;
+  onTestCodeSubmit: () => void;
 }) {
   const t = useTranslations('TunePage.wizard.payment');
   const tStyles = useTranslations('TunePage.wizard.styles.items');
   const tFrames = useTranslations('TunePage.wizard.frames.items');
   const tProblems = useTranslations('TunePage.wizard.problems.items');
   const tGoals = useTranslations('TunePage.wizard.goals.items');
+  const [showTestCode, setShowTestCode] = useState(false);
 
   const styleName = tStyles(`${formData.flyingStyle}.name` as any);
   const sizeName = tFrames(`${formData.frameSize}.name` as any);
@@ -897,6 +957,49 @@ function StepPayment({
           </>
         )}
       </button>
+
+      {/* Test Code Section */}
+      <div className="border-t border-white/10 pt-4">
+        <button
+          type="button"
+          onClick={() => setShowTestCode(!showTestCode)}
+          className="text-xs text-gray-500 hover:text-gray-400 transition-colors"
+        >
+          {showTestCode ? t('hideTestCode') : t('haveTestCode')}
+        </button>
+
+        {showTestCode && (
+          <div className="mt-3 space-y-3">
+            <input
+              type="text"
+              value={testCode}
+              onChange={(e) => onTestCodeChange(e.target.value)}
+              placeholder={t('testCodePlaceholder')}
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white text-sm placeholder:text-gray-500 focus:outline-none focus:border-green-500"
+            />
+            <button
+              type="button"
+              onClick={onTestCodeSubmit}
+              disabled={!testCode || !email || isProcessing}
+              className={cn(
+                'w-full flex items-center justify-center gap-2 py-3 rounded-lg font-medium text-sm transition-all',
+                testCode && email && !isProcessing
+                  ? 'bg-green-600 text-white hover:bg-green-700'
+                  : 'bg-white/10 text-gray-500 cursor-not-allowed'
+              )}
+            >
+              {isProcessing ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  {t('analyzing')}
+                </>
+              ) : (
+                t('useTestCode')
+              )}
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* Error Message */}
       {error && (

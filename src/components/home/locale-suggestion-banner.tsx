@@ -8,7 +8,7 @@ import { type Locale, useLocale } from 'next-intl';
 import { useParams } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
 
-const LOCALE_SUGGESTION_DISMISSED_KEY = 'fpvtune_locale_suggestion_dismissed';
+const LOCALE_PREFERENCE_KEY = 'fpvtune_locale_preference';
 
 export function LocaleSuggestionBanner() {
   const [suggestedLocale, setSuggestedLocale] = useState<Locale | null>(null);
@@ -21,9 +21,10 @@ export function LocaleSuggestionBanner() {
   const [, startTransition] = useTransition();
 
   useEffect(() => {
-    // Check if user has dismissed the banner before
-    const dismissed = localStorage.getItem(LOCALE_SUGGESTION_DISMISSED_KEY);
-    if (dismissed === currentLocale) {
+    // Check if user has already made a language preference
+    const savedPreference = localStorage.getItem(LOCALE_PREFERENCE_KEY);
+    if (savedPreference) {
+      // User has already chosen, don't show banner
       setIsDismissed(true);
       return;
     }
@@ -53,6 +54,8 @@ export function LocaleSuggestionBanner() {
   const handleSwitch = () => {
     if (!suggestedLocale) return;
 
+    // Save user's language preference
+    localStorage.setItem(LOCALE_PREFERENCE_KEY, suggestedLocale);
     setCurrentLocale(suggestedLocale);
     startTransition(() => {
       router.replace(
@@ -65,7 +68,8 @@ export function LocaleSuggestionBanner() {
   };
 
   const handleDismiss = () => {
-    localStorage.setItem(LOCALE_SUGGESTION_DISMISSED_KEY, currentLocale);
+    // Save current locale as user's preference (they chose to keep it)
+    localStorage.setItem(LOCALE_PREFERENCE_KEY, currentLocale);
     setIsDismissed(true);
   };
 
@@ -97,26 +101,41 @@ export function LocaleSuggestionBanner() {
   const msg = messages[suggestedLocale] || messages.en;
 
   return (
-    <div className="fixed top-16 left-0 right-0 z-40 bg-blue-600/95 backdrop-blur-sm border-b border-blue-500/50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3 text-sm text-white">
-          <span>{suggestedLocaleData?.flag}</span>
-          <span>{msg.prompt}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleSwitch}
-            className="px-3 py-1 text-xs font-medium bg-white text-blue-600 rounded hover:bg-blue-50 transition-colors"
-          >
-            {msg.switchBtn}
-          </button>
-          <button
-            onClick={handleDismiss}
-            className="p-1 text-white/70 hover:text-white transition-colors"
-            aria-label="Dismiss"
-          >
-            <X className="w-4 h-4" />
-          </button>
+    <div className="fixed bottom-6 right-6 z-50 max-w-xs animate-in slide-in-from-bottom-4 fade-in duration-300">
+      <div className="bg-[#0a0a0b] border border-white/10 rounded-xl shadow-2xl overflow-hidden">
+        <div className="p-4">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">{suggestedLocaleData?.flag}</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-white/90 leading-relaxed">
+                {msg.prompt}
+              </p>
+              <div className="flex items-center gap-2 mt-3">
+                <button
+                  type="button"
+                  onClick={handleSwitch}
+                  className="px-4 py-1.5 text-xs font-medium bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  {msg.switchBtn}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDismiss}
+                  className="px-3 py-1.5 text-xs font-medium text-white/60 hover:text-white transition-colors"
+                >
+                  {suggestedLocale === 'zh' ? '保持当前' : 'Keep current'}
+                </button>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={handleDismiss}
+              className="p-1 text-white/40 hover:text-white transition-colors flex-shrink-0"
+              aria-label="Dismiss"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

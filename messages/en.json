@@ -1200,7 +1200,11 @@
         "payButton": "Pay $9.99 - Get Your Tune",
         "analyzing": "Analyzing your flight data...",
         "securePayment": "Secure Payment",
-        "instantDelivery": "Instant Delivery"
+        "instantDelivery": "Instant Delivery",
+        "haveTestCode": "Have a test code?",
+        "hideTestCode": "Hide test code",
+        "testCodePlaceholder": "Enter test code",
+        "useTestCode": "Use Test Code"
       },
       "results": {
         "title": "Your Tune is Ready",
