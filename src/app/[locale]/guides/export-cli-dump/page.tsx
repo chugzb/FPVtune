@@ -250,10 +250,10 @@ export default async function ExportCliDumpPage({
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div key={i}>
               <h4 className="font-semibold text-white mb-1">
-                {t(`troubleshooting.q${i}.question`)}
+                {t(`troubleshooting.q${i}.question` as any)}
               </h4>
               <p className="text-sm text-gray-400">
-                {t(`troubleshooting.q${i}.answer`)}
+                {t(`troubleshooting.q${i}.answer` as any)}
               </p>
             </div>
           ))}

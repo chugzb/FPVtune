@@ -48,8 +48,9 @@ export async function generateMetadata({ params }: DocPageProps) {
 
   return constructMetadata({
     title: `${page.data.title} | ${t('title')}`,
-    description: page.data.description,
+    description: page.data.description ?? t('description'),
     canonicalUrl: getUrlWithLocale(`/docs/${page.slugs.join('/')}`, locale),
+    locale,
   });
 }
 

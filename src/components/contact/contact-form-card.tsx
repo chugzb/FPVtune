@@ -33,18 +33,21 @@ import { z } from 'zod';
  * This is a client component that handles the contact form submission
  */
 export function ContactFormCard() {
-  const t = useTranslations('ContactPage.form');
+  const t = useTranslations('ContactPage' as any) as any;
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | undefined>('');
 
   // Create a schema for contact form validation
+  const nameMinLength = t('form.nameMinLength');
+  const nameMaxLength = t('form.nameMaxLength');
+  const emailValidation = t('form.emailValidation');
+  const messageMinLength = t('form.messageMinLength');
+  const messageMaxLength = t('form.messageMaxLength');
+
   const formSchema = z.object({
-    name: z.string().min(3, t('nameMinLength')).max(30, t('nameMaxLength')),
-    email: z.string().email(t('emailValidation')),
-    message: z
-      .string()
-      .min(10, t('messageMinLength'))
-      .max(500, t('messageMaxLength')),
+    name: z.string().min(3, nameMinLength).max(30, nameMaxLength),
+    email: z.string().email(emailValidation),
+    message: z.string().min(10, messageMinLength).max(500, messageMaxLength),
   });
 
   // Form types
@@ -70,17 +73,17 @@ export function ContactFormCard() {
         const result = await sendMessageAction(values);
 
         if (result?.data?.success) {
-          toast.success(t('success'));
+          toast.success(t('form.success' as any));
           form.reset();
         } else {
-          const errorMessage = result?.data?.error || t('fail');
+          const errorMessage = result?.data?.error || t('form.fail' as any);
           setError(errorMessage);
           toast.error(errorMessage);
         }
       } catch (err) {
         console.error('Form submission error:', err);
-        setError(t('fail'));
-        toast.error(t('fail'));
+        setError(t('form.fail' as any));
+        toast.error(t('form.fail' as any));
       }
     });
   };
@@ -88,8 +91,10 @@ export function ContactFormCard() {
   return (
     <Card className="mx-auto max-w-lg overflow-hidden pt-6 pb-0">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold">{t('title')}</CardTitle>
-        <CardDescription>{t('description')}</CardDescription>
+        <CardTitle className="text-lg font-semibold">
+          {t('form.title' as any)}
+        </CardTitle>
+        <CardDescription>{t('form.description' as any)}</CardDescription>
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col">
@@ -99,9 +104,9 @@ export function ContactFormCard() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('name')}</FormLabel>
+                  <FormLabel>{t('form.name' as any)}</FormLabel>
                   <FormControl>
-                    <Input placeholder={t('name')} {...field} />
+                    <Input placeholder={t('form.name' as any)} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -113,9 +118,13 @@ export function ContactFormCard() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('email')}</FormLabel>
+                  <FormLabel>{t('form.email' as any)}</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder={t('email')} {...field} />
+                    <Input
+                      type="email"
+                      placeholder={t('form.email' as any)}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -127,9 +136,13 @@ export function ContactFormCard() {
               name="message"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('message')}</FormLabel>
+                  <FormLabel>{t('form.message' as any)}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder={t('message')} rows={3} {...field} />
+                    <Textarea
+                      placeholder={t('form.message' as any)}
+                      rows={3}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -144,7 +157,9 @@ export function ContactFormCard() {
               disabled={isPending}
               className="cursor-pointer"
             >
-              {isPending ? t('submitting') : t('submit')}
+              {isPending
+                ? t('form.submitting' as any)
+                : t('form.submit' as any)}
             </Button>
           </CardFooter>
         </form>

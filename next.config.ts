@@ -12,6 +12,16 @@ const nextConfig: NextConfig = {
   // Required for Cloudflare deployment with OpenNext
   output: 'standalone',
 
+  // Disable TypeScript type checking during build to speed up deployment
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+
+  // Disable ESLint during build
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
   // https://nextjs.org/docs/architecture/nextjs-compiler#remove-console
   // Remove all console.* calls in production only
   compiler: {

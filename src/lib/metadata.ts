@@ -5,7 +5,8 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://fpvtune.com';
 interface GenerateMetadataParams {
   title: string;
   description: string;
-  path: string;
+  path?: string;
+  canonicalUrl?: string; // 支持直接传入 canonical URL
   locale: string;
   type?: 'website' | 'article';
   images?: string[];
@@ -18,13 +19,27 @@ export function generatePageMetadata({
   title,
   description,
   path,
+  canonicalUrl: providedCanonicalUrl,
   locale,
   type = 'website',
   images,
 }: GenerateMetadataParams): Metadata {
-  // 移除路径中的语言前缀,获取规范路径
-  const canonicalPath = path.replace(/^\/(zh|en)/, '');
-  const canonicalUrl = `${SITE_URL}${canonicalPath}`;
+  // 如果提供了 canonicalUrl 则使用它，否则从 path 生成
+  let canonicalUrl: string;
+  let canonicalPath: string;
+
+  if (providedCanonicalUrl) {
+    canonicalUrl = providedCanonicalUrl;
+    canonicalPath = providedCanonicalUrl.replace(SITE_URL, '');
+  } else if (path) {
+    // 移除路径中的语言前缀,获取规范路径
+    canonicalPath = path.replace(/^\/(zh|en)/, '');
+    canonicalUrl = `${SITE_URL}${canonicalPath}`;
+  } else {
+    // 如果都没提供，使用默认值
+    canonicalPath = '/';
+    canonicalUrl = SITE_URL;
+  }
 
   return {
     title,
@@ -53,3 +68,6 @@ export function generatePageMetadata({
     },
   };
 }
+
+// 别名导出以保持向后兼容
+export const constructMetadata = generatePageMetadata;

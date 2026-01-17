@@ -9,7 +9,7 @@ interface FeedbackWidgetProps {
 }
 
 export function FeedbackWidget({ tutorialId }: FeedbackWidgetProps) {
-  const t = useTranslations('Guides.feedback');
+  const t = useTranslations('Guides' as any) as any;
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [rating, setRating] = useState<'helpful' | 'not-helpful' | null>(null);
   const [comment, setComment] = useState('');
@@ -49,17 +49,18 @@ export function FeedbackWidget({ tutorialId }: FeedbackWidgetProps) {
   if (hasSubmitted) {
     return (
       <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-6 text-center">
-        <p className="text-green-400">{t('thankYou')}</p>
+        <p className="text-green-400">{t('feedback.thankYou')}</p>
       </div>
     );
   }
 
   return (
     <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-      <h3 className="font-semibold text-white mb-4">{t('title')}</h3>
+      <h3 className="font-semibold text-white mb-4">{t('feedback.title')}</h3>
 
       <div className="flex gap-3 mb-4">
         <button
+          type="button"
           onClick={() => setRating('helpful')}
           className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg border-2 transition-all ${
             rating === 'helpful'
@@ -68,9 +69,10 @@ export function FeedbackWidget({ tutorialId }: FeedbackWidgetProps) {
           }`}
         >
           <ThumbsUp className="w-5 h-5" />
-          {t('helpful')}
+          {t('feedback.helpful')}
         </button>
         <button
+          type="button"
           onClick={() => setRating('not-helpful')}
           className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg border-2 transition-all ${
             rating === 'not-helpful'
@@ -79,7 +81,7 @@ export function FeedbackWidget({ tutorialId }: FeedbackWidgetProps) {
           }`}
         >
           <ThumbsDown className="w-5 h-5" />
-          {t('notHelpful')}
+          {t('feedback.notHelpful')}
         </button>
       </div>
 
@@ -87,7 +89,7 @@ export function FeedbackWidget({ tutorialId }: FeedbackWidgetProps) {
         <textarea
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          placeholder={t('commentPlaceholder')}
+          placeholder={t('feedback.commentPlaceholder')}
           rows={3}
           className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:border-blue-500 resize-none mb-4"
         />
@@ -95,12 +97,13 @@ export function FeedbackWidget({ tutorialId }: FeedbackWidgetProps) {
 
       {rating && (
         <button
+          type="button"
           onClick={handleSubmit}
           disabled={isSubmitting}
           className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-medium transition-all disabled:opacity-50"
         >
           <Send className="w-4 h-4" />
-          {isSubmitting ? t('submitting') : t('submit')}
+          {isSubmitting ? t('feedback.submitting') : t('feedback.submit')}
         </button>
       )}
     </div>

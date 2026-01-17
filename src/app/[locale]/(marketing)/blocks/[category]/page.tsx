@@ -27,6 +27,7 @@ export async function generateMetadata({
     title: category + ' | ' + t('title'),
     description: t('description'),
     canonicalUrl: getUrlWithLocale('/blocks/${category}', locale),
+    locale,
   });
 }
 

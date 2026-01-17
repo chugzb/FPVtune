@@ -35,6 +35,7 @@ export async function generateMetadata({
     title: `${category.name} | ${t('title')}`,
     description: category.description,
     canonicalUrl: getUrlWithLocale('/blog/category/${slug}', locale),
+    locale,
   });
 }
 

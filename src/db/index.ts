@@ -45,3 +45,4 @@ if (connectionString) {
  */
 
 export default db as ReturnType<typeof drizzle>;
+export { db };
