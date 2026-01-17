@@ -7,7 +7,7 @@ export enum Routes {
   Root = '/',
 
   // marketing pages
-  FAQ = '/#faq',
+  FAQ = '/faq',
   Features = '/#features',
   Pricing = '/pricing', // change to /#pricing if you want to use the pricing section in homepage
   Blog = '/blog',
@@ -20,6 +20,7 @@ export enum Routes {
   CookiePolicy = '/cookie',
   PrivacyPolicy = '/privacy',
   TermsOfService = '/terms',
+  RefundPolicy = '/refund',
 
   // auth routes
   Login = '/auth/login',

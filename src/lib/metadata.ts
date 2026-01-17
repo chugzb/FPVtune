@@ -1,64 +1,55 @@
-import { websiteConfig } from '@/config/website';
-import { defaultMessages } from '@/i18n/messages';
 import type { Metadata } from 'next';
-import { getBaseUrl } from './urls/urls';
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://fpvtune.com';
+
+interface GenerateMetadataParams {
+  title: string;
+  description: string;
+  path: string;
+  locale: string;
+  type?: 'website' | 'article';
+  images?: string[];
+}
 
 /**
- * Construct the metadata object for the current page (in docs/guides)
+ * 生成标准化的页面元数据,包含 canonical URL 和多语言支持
  */
-export function constructMetadata({
+export function generatePageMetadata({
   title,
   description,
-  canonicalUrl,
-  image,
-  noIndex = false,
-}: {
-  title?: string;
-  description?: string;
-  canonicalUrl?: string;
-  image?: string;
-  noIndex?: boolean;
-} = {}): Metadata {
-  title = title || defaultMessages.Metadata.title;
-  description = description || defaultMessages.Metadata.description;
-  image = image || websiteConfig.metadata.images?.ogImage;
-  const ogImageUrl = new URL(`${getBaseUrl()}${image}`);
+  path,
+  locale,
+  type = 'website',
+  images,
+}: GenerateMetadataParams): Metadata {
+  // 移除路径中的语言前缀,获取规范路径
+  const canonicalPath = path.replace(/^\/(zh|en)/, '');
+  const canonicalUrl = `${SITE_URL}${canonicalPath}`;
+
   return {
     title,
     description,
-    alternates: canonicalUrl
-      ? {
-          canonical: canonicalUrl,
-        }
-      : undefined,
+    alternates: {
+      canonical: canonicalUrl,
+      languages: {
+        en: canonicalPath,
+        zh: `/zh${canonicalPath}`,
+      },
+    },
     openGraph: {
-      type: 'website',
-      locale: 'en_US',
-      url: canonicalUrl,
       title,
       description,
-      siteName: title,
-      images: [ogImageUrl.toString()],
+      url: canonicalUrl,
+      siteName: 'FPVTune',
+      locale: locale === 'zh' ? 'zh_CN' : 'en_US',
+      type,
+      images: images || [`${SITE_URL}/og.png`],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: [ogImageUrl.toString()],
-      site: getBaseUrl(),
+      images: images || [`${SITE_URL}/og.png`],
     },
-    icons: {
-      icon: '/favicon.ico',
-      shortcut: '/favicon-32x32.png',
-      apple: '/apple-touch-icon.png',
-    },
-    metadataBase: new URL(getBaseUrl()),
-    manifest: `${getBaseUrl()}/manifest.webmanifest`,
-    ...(noIndex && {
-      robots: {
-        index: false,
-        follow: false,
-      },
-    }),
   };
 }

@@ -124,25 +124,28 @@
     "subtitle": "Stay up to date with the latest changes in our product"
   },
   "ContactPage": {
-    "title": "Contact",
-    "description": "We'll help you find the right plan for your business",
-    "subtitle": "We'll help you find the right plan for your business",
-    "form": {
-      "title": "Contact Us",
-      "description": "If you have any questions or feedback, please reach out to our team",
-      "name": "Name",
-      "email": "Email",
-      "message": "Message",
-      "submit": "Submit",
-      "submitting": "Submitting...",
-      "success": "Message sent successfully",
-      "fail": "Failed to send message",
-      "nameMinLength": "Name must be at least 3 characters",
-      "nameMaxLength": "Name must not exceed 30 characters",
-      "emailValidation": "Please enter a valid email address",
-      "messageMinLength": "Message must be at least 10 characters",
-      "messageMaxLength": "Message must not exceed 500 characters"
-    }
+    "title": "Contact Us",
+    "description": "Get in touch with our team"
+  },
+  "FAQPage": {
+    "title": "Frequently Asked Questions",
+    "description": "Find answers to common questions"
+  },
+  "RefundPolicyPage": {
+    "title": "Refund Policy",
+    "description": "Our refund and dispute resolution policy"
+  },
+  "CookiePolicyPage": {
+    "title": "Cookie Policy",
+    "description": "How we use cookies on our website"
+  },
+  "PrivacyPolicyPage": {
+    "title": "Privacy Policy",
+    "description": "How we protect your privacy and data"
+  },
+  "TermsOfServicePage": {
+    "title": "Terms of Service",
+    "description": "Terms and conditions for using our services"
   },
   "WaitlistPage": {
     "title": "Waitlist",
@@ -423,7 +426,8 @@
         "items": {
           "cookiePolicy": "Cookie Policy",
           "privacyPolicy": "Privacy Policy",
-          "termsOfService": "Terms of Service"
+          "termsOfService": "Terms of Service",
+          "refundPolicy": "Refund Policy"
         }
       }
     },
@@ -599,6 +603,7 @@
     "nav": {
       "features": "Features",
       "howItWorks": "How It Works",
+      "tutorials": "Tutorials",
       "startTuning": "Start Tuning"
     },
     "landing": {
@@ -1065,6 +1070,7 @@
         "cliDump": "CLI Dump",
         "cliDumpOptional": "(Optional)",
         "cliDumpHint": "Current configuration from Betaflight CLI",
+        "howToExport": "How to export?",
         "tip": "Tip:",
         "tipContent": "Record a 30+ second flight with blackbox logging enabled. Include hover, forward flight, and some maneuvers for best results."
       },
@@ -1156,10 +1162,6 @@
         "title": "Select Your Frame Size",
         "description": "Different frame sizes require different PID tuning approaches",
         "items": {
-          "2-3": {
-            "name": "2-3\"",
-            "description": "Tiny Whoop / Toothpick"
-          },
           "5": {
             "name": "5\"",
             "description": "Freestyle / Racing"
@@ -1167,6 +1169,10 @@
           "7": {
             "name": "7\"",
             "description": "Long Range / Cinematic"
+          },
+          "2-3": {
+            "name": "2-3\"",
+            "description": "Tiny Whoop / Toothpick"
           },
           "10+": {
             "name": "10\"+",
@@ -1327,5 +1333,308 @@
   "SkillsPage": {
     "title": "FPVTune - AI Smart Tuning Tool",
     "description": "Upload Blackbox logs and flight controller config, AI analyzes your flight data and generates a custom PID tuning solution for your specific setup."
+  },
+  "Guides": {
+    "index": {
+      "meta": {
+        "title": "Tutorial Center - FPVTune",
+        "description": "Learn how to export and use FPV drone configuration files"
+      },
+      "title": "Tutorial Center",
+      "description": "Learn how to export and use FPV drone configuration files",
+      "breadcrumbs": {
+        "home": "Home",
+        "current": "Tutorials"
+      },
+      "categories": {
+        "gettingStarted": "Getting Started"
+      },
+      "guides": {
+        "exportBlackbox": {
+          "title": "How to Export Blackbox Logs",
+          "description": "Learn how to export Blackbox flight log files from your flight controller"
+        },
+        "exportCliDump": {
+          "title": "How to Export CLI Dump",
+          "description": "Learn how to export CLI configuration files from your flight controller"
+        }
+      }
+    },
+    "exportBlackbox": {
+      "meta": {
+        "title": "How to Export Blackbox Logs - FPVTune",
+        "description": "Detailed tutorial: How to export Blackbox flight log files from Betaflight flight controller"
+      },
+      "title": "How to Export Blackbox Logs",
+      "description": "Learn how to export Blackbox flight log files from your flight controller for analysis",
+      "intro": {
+        "title": "Why Export Blackbox Logs?",
+        "p1": "Blackbox logs record all critical data from your drone during flight, including gyro readings, PID control outputs, motor speeds, and more. By analyzing this data, you can:",
+        "benefits": {
+          "tune": "Optimize PID parameters to improve flight performance",
+          "diagnose": "Diagnose flight issues like oscillations and propwash",
+          "improve": "Understand flight characteristics and improve piloting skills"
+        },
+        "p2": "This tutorial will teach you how to quickly export Blackbox log files. The entire process takes only 5 minutes."
+      },
+      "preparation": {
+        "title": "Preparation",
+        "software": {
+          "title": "Required Software",
+          "description": "Download and install Betaflight Configurator (official configuration tool)",
+          "link": "Visit betaflight.com to download the latest version"
+        },
+        "hardware": {
+          "title": "Check Flight Controller Configuration",
+          "storage": "Confirm your flight controller has an SD card slot or onboard flash",
+          "enabled": "Enable Blackbox recording in Betaflight configuration",
+          "space": "Ensure sufficient storage space (recommend at least 100MB)"
+        },
+        "cable": {
+          "title": "Prepare Connection Cable",
+          "description": "Prepare a USB data cable (Micro-USB or USB-C, depending on your flight controller)"
+        }
+      },
+      "breadcrumbs": {
+        "home": "Home",
+        "guides": "Tutorials",
+        "current": "Export Blackbox Logs"
+      },
+      "what": {
+        "title": "What is a Blackbox Log?",
+        "description": "Blackbox logs are detailed flight data recorded by the flight controller, including gyro, accelerometer, motor outputs, and more. This data is crucial for analyzing flight performance and tuning PID parameters."
+      },
+      "steps": {
+        "1": {
+          "title": "Connect Flight Controller to Betaflight Configurator",
+          "description": "Connect your flight controller to your computer using a USB cable, open Betaflight Configurator and click the Connect button.",
+          "imageAlt": "Connect flight controller to Betaflight Configurator"
+        },
+        "2": {
+          "title": "Export Log Files",
+          "description": "Choose the export method based on your storage type:",
+          "sdCard": {
+            "title": "SD Card Storage",
+            "description": "If using SD card, directly copy .bbl or .bfl files from the card"
+          },
+          "onboard": {
+            "title": "Onboard Flash",
+            "description": "If using onboard flash, click Save Flash to File button to export"
+          },
+          "imageAlt": "Export Blackbox log files"
+        }
+      },
+      "formats": {
+        "title": "Supported File Formats",
+        "bbl": "Blackbox binary log file",
+        "bfl": "Blackbox flash log file",
+        "txt": "Converted text format log"
+      },
+      "bestPractices": {
+        "title": "Best Practices",
+        "recording": {
+          "title": "Record High-Quality Logs",
+          "duration": "Recording duration: Recommend 30-60 seconds of flight data including hover, forward flight, and basic maneuvers",
+          "conditions": "Flight conditions: Choose calm or light wind weather to avoid extreme conditions affecting data quality",
+          "maneuvers": "Flight maneuvers: Include different throttle positions, turns, and pitch movements for comprehensive flight characteristics"
+        },
+        "storage": {
+          "title": "Storage Management",
+          "sdCard": "SD card: Recommend high-speed SD cards (Class 10 or UHS-I) to avoid write delays",
+          "space": "Space management: Regularly clean old logs, maintain at least 200MB free space",
+          "backup": "Data backup: Back up important flight logs to computer to avoid accidental loss"
+        },
+        "analysis": {
+          "title": "Analysis Preparation",
+          "naming": "File naming: Use meaningful filenames like \"5inch_freestyle_20260113.bbl\"",
+          "notes": "Flight notes: Record issues and feelings during flight to help AI analyze more accurately",
+          "multiple": "Multiple flights: If issues are inconsistent, upload multiple logs for comparison"
+        }
+      },
+      "nextSteps": {
+        "title": "Next Steps",
+        "description": "After successfully exporting Blackbox logs, you can:",
+        "upload": {
+          "title": "Upload to FPVTune for AI Analysis",
+          "description": "Let AI analyze your flight data, identify issues, and generate optimized PID settings",
+          "link": "Start Analysis"
+        },
+        "viewer": {
+          "title": "View with Blackbox Explorer",
+          "description": "Official Betaflight tool to visualize flight data and waveforms",
+          "link": "Download Blackbox Explorer"
+        },
+        "learn": {
+          "title": "Learn PID Tuning Basics",
+          "description": "Understand PID parameter meanings and tuning principles to improve flying skills",
+          "link": "View Tuning Documentation"
+        }
+      },
+      "troubleshooting": {
+        "title": "FAQ",
+        "q1": {
+          "question": "Why is there no Blackbox data?",
+          "answer": "First check if Blackbox recording is enabled in flight controller configuration. Go to Blackbox tab in Betaflight Configurator and ensure recording is enabled. Second, check if storage media (SD card or onboard flash) has sufficient space. If using SD card, ensure it's properly inserted and formatted as FAT32."
+        },
+        "q2": {
+          "question": "File too large to upload?",
+          "answer": "FPVTune supports log files up to 50MB. If file is too large, use Blackbox Explorer to open the log and export only the time segment you need to analyze. Or record shorter flights (30-60 seconds is sufficient) to avoid large files from long recordings."
+        },
+        "q3": {
+          "question": "Which flight controller firmware is supported?",
+          "answer": "FPVTune supports Blackbox logs from Betaflight 4.0+, INAV 2.0+, EmuFlight, and other mainstream firmware. Different firmware have slightly different log formats, but all can be correctly recognized and analyzed."
+        },
+        "q4": {
+          "question": "SD card read failure?",
+          "answer": "If SD card cannot be read, try: 1) Re-insert SD card; 2) Format as FAT32 on computer; 3) Replace with high-quality SD card (recommend SanDisk or Samsung); 4) Check if flight controller SD card slot has dust or damage."
+        },
+        "q5": {
+          "question": "Onboard flash export is slow?",
+          "answer": "Onboard flash read speed is usually slower than SD card, this is normal. Export may take several minutes, please be patient. If you frequently need to export logs, recommend using SD card storage for faster read speeds and larger capacity."
+        },
+        "q6": {
+          "question": "Log file corrupted and won't open?",
+          "answer": "Log corruption usually occurs due to power loss during flight or storage media failure. Try using Blackbox Explorer's repair function, or re-record a complete flight. To avoid corruption, wait a few seconds after flight ends before powering off to let data fully write."
+        }
+      }
+    },
+    "exportCliDump": {
+      "meta": {
+        "title": "How to Export CLI Dump - FPVTune",
+        "description": "Detailed tutorial: How to export CLI configuration files from Betaflight flight controller"
+      },
+      "title": "How to Export CLI Dump",
+      "description": "Learn how to export CLI configuration files from your flight controller for analysis",
+      "intro": {
+        "title": "Why Export CLI Dump?",
+        "p1": "CLI Dump is a complete snapshot of your flight controller configuration. It contains all settings including PID values, filter configurations, rates, motor mapping, and more. Having a CLI dump allows you to:",
+        "benefits": {
+          "backup": "Backup your configuration before making changes",
+          "restore": "Quickly restore settings if something goes wrong",
+          "share": "Share your configuration with others or get help from the community",
+          "analyze": "Let AI analyze your settings and suggest improvements"
+        },
+        "p2": "This tutorial will show you how to export a CLI dump in just a few minutes."
+      },
+      "preparation": {
+        "title": "Preparation",
+        "software": {
+          "title": "Required Software",
+          "description": "Download and install Betaflight Configurator (official configuration tool)",
+          "link": "Visit betaflight.com to download the latest version"
+        },
+        "connection": {
+          "title": "Connection Requirements",
+          "cable": "Prepare a USB data cable (Micro-USB or USB-C)",
+          "driver": "Ensure proper USB drivers are installed",
+          "battery": "Flight controller can be powered via USB or battery"
+        }
+      },
+      "breadcrumbs": {
+        "home": "Home",
+        "guides": "Tutorials",
+        "current": "Export CLI Dump"
+      },
+      "what": {
+        "title": "What is a CLI Dump?",
+        "description": "CLI Dump is a complete configuration export from your flight controller, including all settings, PID values, filter configurations, and more. This file can be used for backing up your configuration or having AI analyze your settings."
+      },
+      "steps": {
+        "1": {
+          "title": "Connect Flight Controller to Betaflight Configurator",
+          "description": "Connect your flight controller to your computer using a USB cable, open Betaflight Configurator and click the Connect button.",
+          "imageAlt": "Connect flight controller to Betaflight Configurator"
+        },
+        "2": {
+          "title": "Navigate to CLI Tab",
+          "description": "In Betaflight Configurator, click on the CLI tab in the left menu.",
+          "imageAlt": "Navigate to CLI tab"
+        },
+        "3": {
+          "title": "Execute dump Command",
+          "description": "Type the following command in the CLI command line and press Enter:",
+          "command": "Command",
+          "note": "Wait for the command to complete, which usually takes a few seconds."
+        },
+        "4": {
+          "title": "Save Output to File",
+          "description": "Save the CLI output to a text file:",
+          "step1": "Select all CLI output (Ctrl+A or Cmd+A)",
+          "step2": "Copy the content (Ctrl+C or Cmd+C)",
+          "step3": "Paste into a text editor and save as .txt file",
+          "tip": {
+            "title": "Tip:",
+            "description": "Use a meaningful filename like JHEF745V2_20260113.txt including the flight controller model and date."
+          }
+        }
+      },
+      "bestPractices": {
+        "title": "Best Practices",
+        "backup": {
+          "title": "Regular Configuration Backups",
+          "frequency": "Backup frequency: Export CLI dump after every important settings change",
+          "naming": "Naming convention: Use date and version numbers like \"config_v2.3_20260113.txt\"",
+          "storage": "Storage location: Save to cloud storage or multiple locations to avoid data loss"
+        },
+        "documentation": {
+          "title": "Document Configuration Changes",
+          "notes": "Change notes: Add comments at the beginning of file explaining what was changed and why",
+          "comparison": "Version comparison: Keep multiple configuration versions for easy comparison and rollback",
+          "testing": "Test records: Record flight performance for each configuration version for optimization"
+        },
+        "sharing": {
+          "title": "Sharing Configurations",
+          "community": "Community exchange: Share configurations with FPV community to get advice from other pilots",
+          "privacy": "Privacy protection: Check for sensitive information (like GPS coordinates) before sharing",
+          "format": "Format cleanup: Use text editor to organize format for better readability"
+        }
+      },
+      "nextSteps": {
+        "title": "Next Steps",
+        "description": "After successfully exporting CLI dump, you can:",
+        "upload": {
+          "title": "Use with Blackbox Logs",
+          "description": "Upload CLI dump together with Blackbox logs to FPVTune for more accurate analysis",
+          "link": "Start Analysis"
+        },
+        "compare": {
+          "title": "Compare Different Configurations",
+          "description": "Use text comparison tools (like WinMerge) to compare differences between configuration versions",
+          "link": "Recommended Tools"
+        },
+        "restore": {
+          "title": "Restore Configuration",
+          "description": "If tuning goes wrong, use backed up CLI dump to quickly restore to previous state",
+          "link": "View Restore Tutorial"
+        }
+      },
+      "troubleshooting": {
+        "title": "FAQ",
+        "q1": {
+          "question": "CLI command not responding?",
+          "answer": "First ensure flight controller is properly connected to computer with good USB cable contact. If still not responding, try: 1) Disconnect and reconnect flight controller; 2) Restart Betaflight Configurator; 3) Change USB port or cable; 4) Check if drivers are correctly installed."
+        },
+        "q2": {
+          "question": "Incomplete dump output?",
+          "answer": "The dump command takes a few seconds to fully execute, please wait patiently until command prompt appears again. If output is interrupted, it may be unstable USB connection, try using better quality cable. Ensure not to operate flight controller or move USB cable during command execution."
+        },
+        "q3": {
+          "question": "Can I save directly in CLI?",
+          "answer": "Betaflight Configurator 10.8.0 and above supports \"Save to File\" button that can directly save CLI output as text file without manual copy-paste. If your version is older, recommend upgrading to latest version for better experience."
+        },
+        "q4": {
+          "question": "How to restore CLI dump configuration?",
+          "answer": "Restoring configuration is simple: 1) Connect flight controller and go to CLI tab; 2) Open saved CLI dump file; 3) Copy all content (skip comment lines); 4) Paste into CLI command line; 5) Type \"save\" to save settings. Note: Recommend backing up current configuration before restoring."
+        },
+        "q5": {
+          "question": "What information does CLI dump contain?",
+          "answer": "CLI dump contains complete flight controller configuration including: PID parameters, filter settings, rate curves, motor mapping, receiver configuration, OSD settings, mode switches, etc. Basically all parameters that can be set in Betaflight Configurator are exported."
+        },
+        "q6": {
+          "question": "Are dumps from different firmware versions compatible?",
+          "answer": "Different Betaflight versions may have parameter changes, directly restoring old version dumps may cause some settings to be invalid or incorrect. Recommend reconfiguring after firmware upgrade, or use diff command to export only settings different from defaults for better compatibility."
+        }
+      }
+    }
   }
 }

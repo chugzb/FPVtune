@@ -69,3 +69,12 @@ export const payment = pgTable("payment", {
 	createdAt: timestamp('created_at').notNull().defaultNow(),
 	updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
+
+export const tutorialFeedback = pgTable("tutorial_feedback", {
+	id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+	tutorialId: text('tutorial_id').notNull(),
+	rating: text('rating').notNull(), // 'helpful' or 'not-helpful'
+	comment: text('comment'),
+	userAgent: text('user_agent'),
+	createdAt: timestamp('created_at').notNull().defaultNow(),
+});

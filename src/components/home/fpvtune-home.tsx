@@ -96,6 +96,7 @@ function HomeLocaleSwitcher() {
 
 export function FPVtuneHome() {
   const t = useTranslations('HomePage');
+  const tMarketing = useTranslations('Marketing');
 
   return (
     <div className="min-h-screen bg-[#030304] text-white selection:bg-white selection:text-black">
@@ -118,6 +119,12 @@ export function FPVtuneHome() {
             >
               {t('nav.howItWorks')}
             </a>
+            <LocaleLink
+              href="/guides"
+              className="hover:text-white transition-colors"
+            >
+              {t('nav.tutorials')}
+            </LocaleLink>
           </div>
           <HomeLocaleSwitcher />
         </div>
@@ -799,12 +806,46 @@ export function FPVtuneHome() {
               >
                 {t('nav.howItWorks')}
               </a>
+              <LocaleLink
+                href="/guides"
+                className="text-sm text-gray-400 hover:text-white transition-colors"
+              >
+                {t('nav.tutorials')}
+              </LocaleLink>
             </div>
           </div>
           <div className="border-t border-white/5 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-xs text-gray-500">
-              2025 {t('landing.footer.copyright')}
-            </p>
+            <div className="flex flex-col md:flex-row items-center gap-4">
+              <p className="text-xs text-gray-500">
+                2025 {t('landing.footer.copyright')}
+              </p>
+              <div className="flex items-center gap-4 text-xs">
+                <LocaleLink
+                  href="/privacy"
+                  className="text-gray-500 hover:text-white transition-colors"
+                >
+                  {tMarketing('footer.legal.items.privacyPolicy')}
+                </LocaleLink>
+                <LocaleLink
+                  href="/terms"
+                  className="text-gray-500 hover:text-white transition-colors"
+                >
+                  {tMarketing('footer.legal.items.termsOfService')}
+                </LocaleLink>
+                <LocaleLink
+                  href="/refund"
+                  className="text-gray-500 hover:text-white transition-colors"
+                >
+                  {tMarketing('footer.legal.items.refundPolicy')}
+                </LocaleLink>
+                <LocaleLink
+                  href="/contact"
+                  className="text-gray-500 hover:text-white transition-colors"
+                >
+                  {tMarketing('navbar.pages.items.contact.title')}
+                </LocaleLink>
+              </div>
+            </div>
             <div className="flex gap-4">
               <a
                 href="https://github.com/fpvtune"

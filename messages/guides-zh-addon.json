@@ -1,0 +1,153 @@
+{
+  "Guides": {
+    "index": {
+      "meta": {
+        "title": "教程中心 - FPVTune",
+        "description": "学习如何导出和使用 FPV 无人机的配置文件"
+      },
+      "title": "教程中心",
+      "description": "学习如何导出和使用 FPV 无人机的配置文件",
+      "breadcrumbs": {
+        "home": "首页",
+        "current": "教程"
+      },
+      "categories": {
+        "gettingStarted": "入门指南"
+      },
+      "guides": {
+        "exportBlackbox": {
+          "title": "如何导出 Blackbox 日志",
+          "description": "学习如何从飞控导出 Blackbox 飞行日志文件"
+        },
+        "exportCliDump": {
+          "title": "如何导出 CLI Dump",
+          "description": "学习如何导出飞控的 CLI 配置文件"
+        }
+      }
+    },
+    "exportBlackbox": {
+      "meta": {
+        "title": "如何导出 Blackbox 日志 - FPVTune",
+        "description": "详细教程：如何从 Betaflight 飞控导出 Blackbox 飞行日志文件"
+      },
+      "title": "如何导出 Blackbox 日志",
+      "description": "学习如何从飞控导出 Blackbox 飞行日志文件用于分析",
+      "breadcrumbs": {
+        "home": "首页",
+        "guides": "教程",
+        "current": "导出 Blackbox 日志"
+      },
+      "what": {
+        "title": "什么是 Blackbox 日志？",
+        "description": "Blackbox 日志是飞控记录的详细飞行数据，包含陀螺仪、加速度计、电机输出等信息。这些数据对于分析飞行性能和调试 PID 参数至关重要。"
+      },
+      "steps": {
+        "1": {
+          "title": "连接飞控到 Betaflight Configurator",
+          "description": "使用 USB 线将飞控连接到电脑，打开 Betaflight Configurator 并点击连接按钮。",
+          "imageAlt": "连接飞控到 Betaflight Configurator"
+        },
+        "2": {
+          "title": "进入 Blackbox 标签",
+          "description": "在 Betaflight Configurator 中，点击左侧菜单的 Blackbox 标签。",
+          "imageAlt": "进入 Blackbox 标签"
+        },
+        "3": {
+          "title": "导出日志文件",
+          "description": "根据你的存储方式选择导出方法：",
+          "sdCard": {
+            "title": "SD 卡存储",
+            "description": "如果使用 SD 卡，直接从卡中复制 .bbl 或 .bfl 文件"
+          },
+          "onboard": {
+            "title": "板载闪存",
+            "description": "如果使用板载闪存，点击保存闪存到文件按钮导出"
+          },
+          "imageAlt": "导出 Blackbox 日志文件"
+        }
+      },
+      "formats": {
+        "title": "支持的文件格式",
+        "bbl": "Blackbox 二进制日志文件",
+        "bfl": "Blackbox 闪存日志文件",
+        "txt": "转换后的文本格式日志"
+      },
+      "troubleshooting": {
+        "title": "常见问题",
+        "q1": {
+          "question": "为什么没有 Blackbox 数据？",
+          "answer": "确保在飞控配置中启用了 Blackbox 记录功能，并且有足够的存储空间。"
+        },
+        "q2": {
+          "question": "文件太大无法上传怎么办？",
+          "answer": "FPVTune 支持最大 50MB 的日志文件。如果文件过大，可以只上传最近的飞行记录。"
+        },
+        "q3": {
+          "question": "支持哪些飞控固件？",
+          "answer": "支持 Betaflight、INAV、EmuFlight 等主流固件的 Blackbox 日志。"
+        }
+      }
+    },
+    "exportCliDump": {
+      "meta": {
+        "title": "如何导出 CLI Dump - FPVTune",
+        "description": "详细教程：如何从 Betaflight 飞控导出 CLI 配置文件"
+      },
+      "title": "如何导出 CLI Dump",
+      "description": "学习如何导出飞控的 CLI 配置文件用于分析",
+      "breadcrumbs": {
+        "home": "首页",
+        "guides": "教程",
+        "current": "导出 CLI Dump"
+      },
+      "what": {
+        "title": "什么是 CLI Dump？",
+        "description": "CLI Dump 是飞控的完整配置导出，包含所有设置参数、PID 值、滤波器配置等。这个文件可以用于备份配置或让 AI 分析你的设置。"
+      },
+      "steps": {
+        "1": {
+          "title": "连接飞控到 Betaflight Configurator",
+          "description": "使用 USB 线将飞控连接到电脑，打开 Betaflight Configurator 并点击连接按钮。",
+          "imageAlt": "连接飞控到 Betaflight Configurator"
+        },
+        "2": {
+          "title": "进入 CLI 标签",
+          "description": "在 Betaflight Configurator 中，点击左侧菜单的 CLI 标签。",
+          "imageAlt": "进入 CLI 标签"
+        },
+        "3": {
+          "title": "执行 dump 命令",
+          "description": "在 CLI 命令行中输入以下命令并按回车：",
+          "command": "命令",
+          "note": "等待命令执行完成，通常需要几秒钟。"
+        },
+        "4": {
+          "title": "保存输出到文件",
+          "description": "将 CLI 输出保存为文本文件：",
+          "step1": "全选 CLI 输出内容（Ctrl+A 或 Cmd+A）",
+          "step2": "复制内容（Ctrl+C 或 Cmd+C）",
+          "step3": "粘贴到文本编辑器并保存为 .txt 文件",
+          "tip": {
+            "title": "提示：",
+            "description": "建议使用有意义的文件名，如 JHEF745V2_20260113.txt，包含飞控型号和日期。"
+          }
+        }
+      },
+      "troubleshooting": {
+        "title": "常见问题",
+        "q1": {
+          "question": "CLI 命令无响应怎么办？",
+          "answer": "确保飞控已正确连接，尝试断开重连或重启 Betaflight Configurator。"
+        },
+        "q2": {
+          "question": "dump 输出不完整？",
+          "answer": "等待命令完全执行完毕再复制，通常需要几秒钟。确保没有在命令执行过程中操作。"
+        },
+        "q3": {
+          "question": "可以直接在 CLI 中保存吗？",
+          "answer": "某些版本的 Betaflight Configurator 支持保存到文件按钮，可以直接导出 CLI dump。"
+        }
+      }
+    }
+  }
+}

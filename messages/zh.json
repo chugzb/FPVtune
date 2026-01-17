@@ -126,24 +126,27 @@
   },
   "ContactPage": {
     "title": "联系我们",
-    "description": "我们帮助您找到合适的计划",
-    "subtitle": "我们帮助您找到合适的计划",
-    "form": {
-      "title": "联系我们",
-      "description": "如果您有任何问题或反馈，请随时联系我们的团队",
-      "name": "姓名",
-      "email": "邮箱",
-      "message": "消息",
-      "submit": "提交",
-      "submitting": "提交中...",
-      "success": "消息发送成功",
-      "fail": "消息发送失败",
-      "nameMinLength": "姓名必须至少包含 3 个字符",
-      "nameMaxLength": "姓名必须不超过 30 个字符",
-      "emailValidation": "请输入有效的邮箱地址",
-      "messageMinLength": "消息必须至少包含 10 个字符",
-      "messageMaxLength": "消息必须不超过 500 个字符"
-    }
+    "description": "与我们的团队取得联系"
+  },
+  "FAQPage": {
+    "title": "常见问题",
+    "description": "查找常见问题的答案"
+  },
+  "RefundPolicyPage": {
+    "title": "退款政策",
+    "description": "我们的退款和争议解决政策"
+  },
+  "CookiePolicyPage": {
+    "title": "Cookie 政策",
+    "description": "我们如何在网站上使用 Cookie"
+  },
+  "PrivacyPolicyPage": {
+    "title": "隐私政策",
+    "description": "我们如何保护您的隐私和数据"
+  },
+  "TermsOfServicePage": {
+    "title": "服务条款",
+    "description": "使用我们服务的条款和条件"
   },
   "WaitlistPage": {
     "title": "等待队列",
@@ -424,7 +427,8 @@
         "items": {
           "cookiePolicy": "Cookie政策",
           "privacyPolicy": "隐私政策",
-          "termsOfService": "服务条款"
+          "termsOfService": "服务条款",
+          "refundPolicy": "退款政策"
         }
       }
     },
@@ -600,6 +604,7 @@
     "nav": {
       "features": "功能特性",
       "howItWorks": "工作原理",
+      "tutorials": "教程",
       "startTuning": "开始调参"
     },
     "landing": {
@@ -1066,6 +1071,7 @@
         "cliDump": "CLI Dump",
         "cliDumpOptional": "(可选)",
         "cliDumpHint": "来自 Betaflight CLI 的当前配置",
+        "howToExport": "如何导出？",
         "tip": "提示：",
         "tipContent": "录制 30 秒以上的飞行，启用黑盒记录。包含悬停、前飞和一些机动动作以获得最佳效果。"
       },
@@ -1157,10 +1163,6 @@
         "title": "选择你的机架尺寸",
         "description": "不同尺寸的机架需要不同的 PID 调参方法",
         "items": {
-          "2-3": {
-            "name": "2-3\"",
-            "description": "穿越机 / 牙签机"
-          },
           "5": {
             "name": "5\"",
             "description": "花飞 / 竞速"
@@ -1168,6 +1170,10 @@
           "7": {
             "name": "7\"",
             "description": "远航 / 航拍"
+          },
+          "2-3": {
+            "name": "2-3\"",
+            "description": "穿越机 / 牙签机"
           },
           "10+": {
             "name": "10\"+",
@@ -1328,5 +1334,308 @@
   "SkillsPage": {
     "title": "FPVTune - AI 智能调参工具",
     "description": "上传 Blackbox 日志和飞控配置，AI 分析你的飞行数据，生成针对你机型的专属 PID 调参方案。"
+  },
+  "Guides": {
+    "index": {
+      "meta": {
+        "title": "教程中心 - FPVTune",
+        "description": "学习如何导出和使用 FPV 无人机的配置文件"
+      },
+      "title": "教程中心",
+      "description": "学习如何导出和使用 FPV 无人机的配置文件",
+      "breadcrumbs": {
+        "home": "首页",
+        "current": "教程"
+      },
+      "categories": {
+        "gettingStarted": "入门指南"
+      },
+      "guides": {
+        "exportBlackbox": {
+          "title": "如何导出 Blackbox 日志",
+          "description": "学习如何从飞控导出 Blackbox 飞行日志文件"
+        },
+        "exportCliDump": {
+          "title": "如何导出 CLI Dump",
+          "description": "学习如何导出飞控的 CLI 配置文件"
+        }
+      }
+    },
+    "exportBlackbox": {
+      "meta": {
+        "title": "如何导出 Blackbox 日志 - Betaflight 飞控教程 | FPVTune",
+        "description": "详细图文教程：学习如何从 Betaflight 飞控导出 Blackbox 日志文件（.bbl/.bfl），支持 SD 卡和板载闪存两种方式。适合 FPV 无人机新手，5 分钟快速上手。"
+      },
+      "title": "如何导出 Blackbox 日志",
+      "description": "学习如何从飞控导出 Blackbox 飞行日志文件用于分析",
+      "intro": {
+        "title": "为什么需要导出 Blackbox 日志？",
+        "p1": "Blackbox 日志记录了你的无人机在飞行过程中的所有关键数据，包括陀螺仪读数、PID 控制输出、电机转速等。通过分析这些数据，你可以：",
+        "benefits": {
+          "tune": "优化 PID 参数，提升飞行性能",
+          "diagnose": "诊断飞行问题，如震荡、propwash 等",
+          "improve": "了解飞行特性，改进操控技巧"
+        },
+        "p2": "本教程将教你如何快速导出 Blackbox 日志文件，整个过程只需 5 分钟。"
+      },
+      "preparation": {
+        "title": "准备工作",
+        "software": {
+          "title": "所需软件",
+          "description": "下载并安装 Betaflight Configurator（官方配置工具）",
+          "link": "访问 betaflight.com 下载最新版本"
+        },
+        "hardware": {
+          "title": "检查飞控配置",
+          "storage": "确认你的飞控有 SD 卡插槽或板载闪存",
+          "enabled": "在 Betaflight 配置中启用 Blackbox 记录功能",
+          "space": "确保有足够的存储空间（建议至少 100MB）"
+        },
+        "cable": {
+          "title": "准备连接线",
+          "description": "准备一根 USB 数据线（Micro-USB 或 USB-C，取决于你的飞控）"
+        }
+      },
+      "breadcrumbs": {
+        "home": "首页",
+        "guides": "教程",
+        "current": "导出 Blackbox 日志"
+      },
+      "what": {
+        "title": "什么是 Blackbox 日志？",
+        "description": "Blackbox 日志是飞控记录的详细飞行数据，包含陀螺仪、加速度计、电机输出等信息。这些数据对于分析飞行性能和调试 PID 参数至关重要。"
+      },
+      "steps": {
+        "1": {
+          "title": "连接飞控到 Betaflight Configurator",
+          "description": "使用 USB 线将飞控连接到电脑，打开 Betaflight Configurator 并点击连接按钮。",
+          "imageAlt": "连接飞控到 Betaflight Configurator"
+        },
+        "2": {
+          "title": "导出日志文件",
+          "description": "根据你的存储方式选择导出方法：",
+          "sdCard": {
+            "title": "SD 卡存储",
+            "description": "如果使用 SD 卡，直接从卡中复制 .bbl 或 .bfl 文件"
+          },
+          "onboard": {
+            "title": "板载闪存",
+            "description": "如果使用板载闪存，点击保存闪存到文件按钮导出"
+          },
+          "imageAlt": "导出 Blackbox 日志文件"
+        }
+      },
+      "formats": {
+        "title": "支持的文件格式",
+        "bbl": "Blackbox 二进制日志文件",
+        "bfl": "Blackbox 闪存日志文件",
+        "txt": "转换后的文本格式日志"
+      },
+      "bestPractices": {
+        "title": "最佳实践建议",
+        "recording": {
+          "title": "录制高质量日志",
+          "duration": "录制时长：建议录制 30-60 秒的飞行数据，包含悬停、前飞和一些基本机动",
+          "conditions": "飞行条件：选择无风或微风天气，避免极端环境影响数据质量",
+          "maneuvers": "飞行动作：包含不同油门位置、转向和俯仰动作，让 AI 全面了解飞行特性"
+        },
+        "storage": {
+          "title": "存储管理",
+          "sdCard": "SD 卡：推荐使用高速 SD 卡（Class 10 或 UHS-I），避免写入延迟",
+          "space": "空间管理：定期清理旧日志，保持至少 200MB 可用空间",
+          "backup": "数据备份：重要的飞行日志建议备份到电脑，避免意外丢失"
+        },
+        "analysis": {
+          "title": "分析准备",
+          "naming": "文件命名：使用有意义的文件名，如 \"5inch_freestyle_20260113.bbl\"",
+          "notes": "飞行笔记：记录飞行时的问题和感受，帮助 AI 更准确地分析",
+          "multiple": "多次飞行：如果问题不稳定，可以上传多个日志进行对比分析"
+        }
+      },
+      "nextSteps": {
+        "title": "下一步",
+        "description": "成功导出 Blackbox 日志后，你可以：",
+        "upload": {
+          "title": "上传到 FPVTune 进行 AI 分析",
+          "description": "让 AI 分析你的飞行数据，识别问题并生成优化的 PID 设置",
+          "link": "开始分析"
+        },
+        "viewer": {
+          "title": "使用 Blackbox Explorer 查看",
+          "description": "Betaflight 官方工具，可视化查看飞行数据和波形图",
+          "link": "下载 Blackbox Explorer"
+        },
+        "learn": {
+          "title": "学习 PID 调参基础",
+          "description": "了解 PID 参数的含义和调参原理，提升飞行技能",
+          "link": "查看调参文档"
+        }
+      },
+      "troubleshooting": {
+        "title": "常见问题解答",
+        "q1": {
+          "question": "为什么没有 Blackbox 数据？",
+          "answer": "首先检查飞控配置中是否启用了 Blackbox 记录功能。进入 Betaflight Configurator 的 Blackbox 标签，确保记录功能已开启。其次，检查存储介质（SD 卡或板载闪存）是否有足够空间。如果使用 SD 卡，确保卡已正确插入且格式化为 FAT32。"
+        },
+        "q2": {
+          "question": "文件太大无法上传怎么办？",
+          "answer": "FPVTune 支持最大 50MB 的日志文件。如果文件过大，可以使用 Blackbox Explorer 打开日志，只导出需要分析的时间段。或者录制较短的飞行（30-60 秒即可），避免长时间录制产生过大文件。"
+        },
+        "q3": {
+          "question": "支持哪些飞控固件？",
+          "answer": "FPVTune 支持 Betaflight 4.0 及以上版本、INAV 2.0+、EmuFlight 等主流固件的 Blackbox 日志。不同固件的日志格式略有差异，但都能被正确识别和分析。"
+        },
+        "q4": {
+          "question": "SD 卡读取失败怎么办？",
+          "answer": "如果 SD 卡无法读取，尝试以下方法：1) 重新插拔 SD 卡；2) 在电脑上格式化为 FAT32 格式；3) 更换高质量的 SD 卡（推荐 SanDisk 或 Samsung）；4) 检查飞控的 SD 卡插槽是否有灰尘或损坏。"
+        },
+        "q5": {
+          "question": "板载闪存导出很慢？",
+          "answer": "板载闪存的读取速度通常比 SD 卡慢，这是正常现象。导出过程可能需要几分钟，请耐心等待。如果经常需要导出日志，建议使用 SD 卡存储，读取速度更快且容量更大。"
+        },
+        "q6": {
+          "question": "日志文件损坏无法打开？",
+          "answer": "日志损坏通常是因为飞行中断电或存储介质故障。尝试使用 Blackbox Explorer 的修复功能，或重新录制一段完整的飞行。为避免损坏，建议在飞行结束后等待几秒再断电，让数据完全写入。"
+        }
+      }
+    },
+    "exportCliDump": {
+      "meta": {
+        "title": "如何导出 CLI Dump - FPVTune",
+        "description": "详细教程：如何从 Betaflight 飞控导出 CLI 配置文件"
+      },
+      "title": "如何导出 CLI Dump",
+      "description": "学习如何导出飞控的 CLI 配置文件用于分析",
+      "intro": {
+        "title": "为什么需要导出 CLI Dump？",
+        "p1": "CLI Dump 是飞控配置的完整快照。它包含所有设置,包括 PID 值、滤波器配置、Rate 曲线、电机映射等。拥有 CLI dump 可以让你:",
+        "benefits": {
+          "backup": "在修改前备份配置",
+          "restore": "出问题时快速恢复设置",
+          "share": "与他人分享配置或从社区获取帮助",
+          "analyze": "让 AI 分析你的设置并提供改进建议"
+        },
+        "p2": "本教程将教你如何在几分钟内导出 CLI dump。"
+      },
+      "preparation": {
+        "title": "准备工作",
+        "software": {
+          "title": "所需软件",
+          "description": "下载并安装 Betaflight Configurator（官方配置工具）",
+          "link": "访问 betaflight.com 下载最新版本"
+        },
+        "connection": {
+          "title": "连接要求",
+          "cable": "准备一根 USB 数据线（Micro-USB 或 USB-C）",
+          "driver": "确保已安装正确的 USB 驱动程序",
+          "battery": "飞控可以通过 USB 或电池供电"
+        }
+      },
+      "breadcrumbs": {
+        "home": "首页",
+        "guides": "教程",
+        "current": "导出 CLI Dump"
+      },
+      "what": {
+        "title": "什么是 CLI Dump？",
+        "description": "CLI Dump 是飞控的完整配置导出，包含所有设置参数、PID 值、滤波器配置等。这个文件可以用于备份配置或让 AI 分析你的设置。"
+      },
+      "steps": {
+        "1": {
+          "title": "连接飞控到 Betaflight Configurator",
+          "description": "使用 USB 线将飞控连接到电脑，打开 Betaflight Configurator 并点击连接按钮。",
+          "imageAlt": "连接飞控到 Betaflight Configurator"
+        },
+        "2": {
+          "title": "进入 CLI 标签",
+          "description": "在 Betaflight Configurator 中，点击左侧菜单的 CLI 标签。",
+          "imageAlt": "进入 CLI 标签"
+        },
+        "3": {
+          "title": "执行 dump 命令",
+          "description": "在 CLI 命令行中输入以下命令并按回车：",
+          "command": "命令",
+          "note": "等待命令执行完成，通常需要几秒钟。"
+        },
+        "4": {
+          "title": "保存输出到文件",
+          "description": "将 CLI 输出保存为文本文件：",
+          "step1": "全选 CLI 输出内容（Ctrl+A 或 Cmd+A）",
+          "step2": "复制内容（Ctrl+C 或 Cmd+C）",
+          "step3": "粘贴到文本编辑器并保存为 .txt 文件",
+          "tip": {
+            "title": "提示：",
+            "description": "建议使用有意义的文件名，如 JHEF745V2_20260113.txt，包含飞控型号和日期。"
+          }
+        }
+      },
+      "bestPractices": {
+        "title": "最佳实践建议",
+        "backup": {
+          "title": "定期备份配置",
+          "frequency": "备份频率：每次修改重要设置后都应导出 CLI dump 作为备份",
+          "naming": "命名规范：使用日期和版本号命名，如 \"config_v2.3_20260113.txt\"",
+          "storage": "存储位置：建议保存在云盘或多个位置，避免数据丢失"
+        },
+        "documentation": {
+          "title": "记录配置变更",
+          "notes": "变更说明：在文件开头添加注释，说明本次修改的内容和原因",
+          "comparison": "版本对比：保留多个版本的配置，方便对比和回滚",
+          "testing": "测试记录：记录每个配置版本的飞行表现，便于优化"
+        },
+        "sharing": {
+          "title": "分享配置",
+          "community": "社区交流：可以将配置分享到 FPV 社区，获取其他飞手的建议",
+          "privacy": "隐私保护：分享前检查是否包含敏感信息（如 GPS 坐标）",
+          "format": "格式整理：使用文本编辑器整理格式，提高可读性"
+        }
+      },
+      "nextSteps": {
+        "title": "下一步",
+        "description": "成功导出 CLI dump 后，你可以：",
+        "upload": {
+          "title": "配合 Blackbox 日志使用",
+          "description": "将 CLI dump 和 Blackbox 日志一起上传到 FPVTune，获得更精准的分析结果",
+          "link": "开始分析"
+        },
+        "compare": {
+          "title": "对比不同配置",
+          "description": "使用文本对比工具（如 WinMerge）对比不同版本的配置差异",
+          "link": "推荐工具"
+        },
+        "restore": {
+          "title": "恢复配置",
+          "description": "如果调参出现问题，可以使用备份的 CLI dump 快速恢复到之前的状态",
+          "link": "查看恢复教程"
+        }
+      },
+      "troubleshooting": {
+        "title": "常见问题解答",
+        "q1": {
+          "question": "CLI 命令无响应怎么办？",
+          "answer": "首先确保飞控已正确连接到电脑，USB 线接触良好。如果仍无响应，尝试以下步骤：1) 断开并重新连接飞控；2) 重启 Betaflight Configurator；3) 更换 USB 端口或数据线；4) 检查驱动程序是否正确安装。"
+        },
+        "q2": {
+          "question": "dump 输出不完整？",
+          "answer": "dump 命令需要几秒钟才能完全执行完毕，请耐心等待直到看到命令提示符再次出现。如果输出中断，可能是 USB 连接不稳定，尝试使用质量更好的数据线。确保在命令执行过程中不要操作飞控或移动 USB 线。"
+        },
+        "q3": {
+          "question": "可以直接在 CLI 中保存吗？",
+          "answer": "Betaflight Configurator 10.8.0 及以上版本支持 \"保存到文件\" 按钮，可以直接将 CLI 输出保存为文本文件，无需手动复制粘贴。如果你的版本较旧，建议升级到最新版本以获得更好的体验。"
+        },
+        "q4": {
+          "question": "如何恢复 CLI dump 配置？",
+          "answer": "恢复配置很简单：1) 连接飞控并进入 CLI 标签；2) 打开保存的 CLI dump 文件；3) 复制所有内容（跳过注释行）；4) 粘贴到 CLI 命令行；5) 输入 \"save\" 保存设置。注意：恢复前建议先备份当前配置。"
+        },
+        "q5": {
+          "question": "CLI dump 包含哪些信息？",
+          "answer": "CLI dump 包含飞控的完整配置，包括：PID 参数、滤波器设置、Rate 曲线、电机映射、接收机配置、OSD 设置、模式开关等。基本上所有在 Betaflight Configurator 中可以设置的参数都会被导出。"
+        },
+        "q6": {
+          "question": "不同固件版本的 dump 兼容吗？",
+          "answer": "不同版本的 Betaflight 可能有参数变化，直接恢复旧版本的 dump 可能导致部分设置无效或错误。建议在升级固件后重新配置，或使用 diff 命令只导出与默认值不同的设置，这样兼容性更好。"
+        }
+      }
+    }
   }
 }

@@ -1,0 +1,39 @@
+{
+  "files": [
+    {
+      "localPath": "/Users/a1/Desktop/黑盒子下载方式/bf 链接方式第一步.png",
+      "r2Key": "fpvtune/guides/blackbox/step1-connect.png",
+      "description": "Blackbox 教程 - 步骤1：连接飞控"
+    },
+    {
+      "localPath": "/Users/a1/Desktop/黑盒子下载方式/bf 链接方式第二步.png",
+      "r2Key": "fpvtune/guides/blackbox/step2-blackbox-tab.png",
+      "description": "Blackbox 教程 - 步骤2：进入 Blackbox 标签"
+    },
+    {
+      "localPath": "/Users/a1/Desktop/黑盒子下载方式/黑瞎子保存方式.png",
+      "r2Key": "fpvtune/guides/blackbox/step3-save.png",
+      "description": "Blackbox 教程 - 步骤3：保存日志"
+    },
+    {
+      "localPath": "/Users/a1/Desktop/黑盒子下载方式/BTFL_BLACKBOX_LOG_20260113_154353_JHEF745V2五寸竞速胶带.BBL",
+      "r2Key": "fpvtune/guides/blackbox/example-file.bbl",
+      "description": "Blackbox 示例文件"
+    },
+    {
+      "localPath": "/Users/a1/Desktop/黑盒子下载方式/cli 保存方式第一步.png",
+      "r2Key": "fpvtune/guides/cli-dump/step1-cli-tab.png",
+      "description": "CLI Dump 教程 - 步骤1：进入 CLI 标签"
+    },
+    {
+      "localPath": "/Users/a1/Desktop/黑盒子下载方式/cli 保存方式第二步.png",
+      "r2Key": "fpvtune/guides/cli-dump/step2-save.png",
+      "description": "CLI Dump 教程 - 步骤2：保存输出"
+    },
+    {
+      "localPath": "/Users/a1/Desktop/黑盒子下载方式/BTFL_cli_20260113_154510_JHEF745V2五寸竞速胶带.txt",
+      "r2Key": "fpvtune/guides/cli-dump/example-file.txt",
+      "description": "CLI Dump 示例文件"
+    }
+  ]
+}

@@ -415,3 +415,19 @@ body {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+/* Tutorial Quick Reference Mode Styles */
+/* 在快速参考模式下，隐藏详细内容，只显示关键步骤 */
+[data-quick-mode="true"] [data-quick-only="false"] .prose {
+  display: none;
+}
+
+[data-quick-mode="true"] [data-quick-only="false"] {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+}
+
+/* 在快速参考模式下，保持 isQuickOnly 步骤的完整显示 */
+[data-quick-mode="true"] [data-quick-only="true"] {
+  display: block;
+}

@@ -101,6 +101,11 @@ export function getFooterLinks(): NestedMenuItem[] {
           href: Routes.TermsOfService,
           external: false,
         },
+        {
+          title: t('legal.items.refundPolicy'),
+          href: Routes.RefundPolicy,
+          external: false,
+        },
       ],
     },
   ];

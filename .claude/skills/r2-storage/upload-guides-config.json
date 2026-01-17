@@ -1,0 +1,32 @@
+{
+  "files": [
+    {
+      "localPath": "/Users/a1/Desktop/黑盒子下载方式/bf 链接方式第一步.png",
+      "r2Key": "fpvtune/guides/blackbox/step1-connect.png"
+    },
+    {
+      "localPath": "/Users/a1/Desktop/黑盒子下载方式/bf 链接方式第二步.png",
+      "r2Key": "fpvtune/guides/blackbox/step2-connect.png"
+    },
+    {
+      "localPath": "/Users/a1/Desktop/黑盒子下载方式/黑瞎子保存方式.png",
+      "r2Key": "fpvtune/guides/blackbox/step3-save.png"
+    },
+    {
+      "localPath": "/Users/a1/Desktop/黑盒子下载方式/BTFL_BLACKBOX_LOG_20260113_154353_JHEF745V2五寸竞速胶带.BBL",
+      "r2Key": "fpvtune/guides/blackbox/example-file.bbl"
+    },
+    {
+      "localPath": "/Users/a1/Desktop/黑盒子下载方式/cli 保存方式第一步.png",
+      "r2Key": "fpvtune/guides/cli-dump/step1-save.png"
+    },
+    {
+      "localPath": "/Users/a1/Desktop/黑盒子下载方式/cli 保存方式第二步.png",
+      "r2Key": "fpvtune/guides/cli-dump/step2-save.png"
+    },
+    {
+      "localPath": "/Users/a1/Desktop/黑盒子下载方式/BTFL_cli_20260113_154510_JHEF745V2五寸竞速胶带.txt",
+      "r2Key": "fpvtune/guides/cli-dump/example-file.txt"
+    }
+  ]
+}

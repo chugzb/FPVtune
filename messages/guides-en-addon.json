@@ -1,0 +1,153 @@
+{
+  "Guides": {
+    "index": {
+      "meta": {
+        "title": "Tutorial Center - FPVTune",
+        "description": "Learn how to export and use FPV drone configuration files"
+      },
+      "title": "Tutorial Center",
+      "description": "Learn how to export and use FPV drone configuration files",
+      "breadcrumbs": {
+        "home": "Home",
+        "current": "Tutorials"
+      },
+      "categories": {
+        "gettingStarted": "Getting Started"
+      },
+      "guides": {
+        "exportBlackbox": {
+          "title": "How to Export Blackbox Logs",
+          "description": "Learn how to export Blackbox flight log files from your flight controller"
+        },
+        "exportCliDump": {
+          "title": "How to Export CLI Dump",
+          "description": "Learn how to export CLI configuration files from your flight controller"
+        }
+      }
+    },
+    "exportBlackbox": {
+      "meta": {
+        "title": "How to Export Blackbox Logs - FPVTune",
+        "description": "Detailed tutorial: How to export Blackbox flight log files from Betaflight flight controller"
+      },
+      "title": "How to Export Blackbox Logs",
+      "description": "Learn how to export Blackbox flight log files from your flight controller for analysis",
+      "breadcrumbs": {
+        "home": "Home",
+        "guides": "Tutorials",
+        "current": "Export Blackbox Logs"
+      },
+      "what": {
+        "title": "What is a Blackbox Log?",
+        "description": "Blackbox logs are detailed flight data recorded by the flight controller, including gyro, accelerometer, motor outputs, and more. This data is crucial for analyzing flight performance and tuning PID parameters."
+      },
+      "steps": {
+        "1": {
+          "title": "Connect Flight Controller to Betaflight Configurator",
+          "description": "Connect your flight controller to your computer using a USB cable, open Betaflight Configurator and click the Connect button.",
+          "imageAlt": "Connect flight controller to Betaflight Configurator"
+        },
+        "2": {
+          "title": "Navigate to Blackbox Tab",
+          "description": "In Betaflight Configurator, click on the Blackbox tab in the left menu.",
+          "imageAlt": "Navigate to Blackbox tab"
+        },
+        "3": {
+          "title": "Export Log Files",
+          "description": "Choose the export method based on your storage type:",
+          "sdCard": {
+            "title": "SD Card Storage",
+            "description": "If using SD card, directly copy .bbl or .bfl files from the card"
+          },
+          "onboard": {
+            "title": "Onboard Flash",
+            "description": "If using onboard flash, click Save Flash to File button to export"
+          },
+          "imageAlt": "Export Blackbox log files"
+        }
+      },
+      "formats": {
+        "title": "Supported File Formats",
+        "bbl": "Blackbox binary log file",
+        "bfl": "Blackbox flash log file",
+        "txt": "Converted text format log"
+      },
+      "troubleshooting": {
+        "title": "Common Issues",
+        "q1": {
+          "question": "Why is there no Blackbox data?",
+          "answer": "Make sure Blackbox recording is enabled in your flight controller configuration and you have sufficient storage space."
+        },
+        "q2": {
+          "question": "File too large to upload?",
+          "answer": "FPVTune supports log files up to 50MB. If your file is too large, you can upload only the most recent flight records."
+        },
+        "q3": {
+          "question": "Which flight controller firmware is supported?",
+          "answer": "Supports Blackbox logs from mainstream firmware including Betaflight, INAV, EmuFlight, and more."
+        }
+      }
+    },
+    "exportCliDump": {
+      "meta": {
+        "title": "How to Export CLI Dump - FPVTune",
+        "description": "Detailed tutorial: How to export CLI configuration files from Betaflight flight controller"
+      },
+      "title": "How to Export CLI Dump",
+      "description": "Learn how to export CLI configuration files from your flight controller for analysis",
+      "breadcrumbs": {
+        "home": "Home",
+        "guides": "Tutorials",
+        "current": "Export CLI Dump"
+      },
+      "what": {
+        "title": "What is a CLI Dump?",
+        "description": "CLI Dump is a complete configuration export from your flight controller, including all settings, PID values, filter configurations, and more. This file can be used for backing up your configuration or having AI analyze your settings."
+      },
+      "steps": {
+        "1": {
+          "title": "Connect Flight Controller to Betaflight Configurator",
+          "description": "Connect your flight controller to your computer using a USB cable, open Betaflight Configurator and click the Connect button.",
+          "imageAlt": "Connect flight controller to Betaflight Configurator"
+        },
+        "2": {
+          "title": "Navigate to CLI Tab",
+          "description": "In Betaflight Configurator, click on the CLI tab in the left menu.",
+          "imageAlt": "Navigate to CLI tab"
+        },
+        "3": {
+          "title": "Execute dump Command",
+          "description": "Type the following command in the CLI command line and press Enter:",
+          "command": "Command",
+          "note": "Wait for the command to complete, which usually takes a few seconds."
+        },
+        "4": {
+          "title": "Save Output to File",
+          "description": "Save the CLI output to a text file:",
+          "step1": "Select all CLI output (Ctrl+A or Cmd+A)",
+          "step2": "Copy the content (Ctrl+C or Cmd+C)",
+          "step3": "Paste into a text editor and save as .txt file",
+          "tip": {
+            "title": "Tip:",
+            "description": "Use a meaningful filename like JHEF745V2_20260113.txt including the flight controller model and date."
+          }
+        }
+      },
+      "troubleshooting": {
+        "title": "Common Issues",
+        "q1": {
+          "question": "CLI command not responding?",
+          "answer": "Make sure the flight controller is properly connected, try disconnecting and reconnecting or restarting Betaflight Configurator."
+        },
+        "q2": {
+          "question": "Incomplete dump output?",
+          "answer": "Wait for the command to fully execute before copying, which usually takes a few seconds. Make sure not to interact during command execution."
+        },
+        "q3": {
+          "question": "Can I save directly in CLI?",
+          "answer": "Some versions of Betaflight Configurator support a Save to File button that can directly export the CLI dump."
+        }
+      }
+    }
+  }
+}

@@ -18,6 +18,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
+import Link from 'next/link';
 import { useCallback, useState } from 'react';
 
 type WizardStep = 1 | 2 | 3 | 4 | 5 | 6 | 7;
@@ -475,7 +476,16 @@ function StepUpload({
               {blackboxFile ? (
                 <p className="text-sm text-green-400">{blackboxFile.name}</p>
               ) : (
-                <p className="text-sm text-gray-500">{t('blackboxHint')}</p>
+                <>
+                  <p className="text-sm text-gray-500">{t('blackboxHint')}</p>
+                  <Link
+                    href="/guides/export-blackbox"
+                    target="_blank"
+                    className="relative z-20 text-sm text-blue-400 hover:text-blue-300 underline mt-1 inline-block pointer-events-auto"
+                  >
+                    {t('howToExport')}
+                  </Link>
+                </>
               )}
             </div>
             <Upload className="w-5 h-5 text-gray-500" />
@@ -519,7 +529,16 @@ function StepUpload({
               {cliDumpFile ? (
                 <p className="text-sm text-green-400">{cliDumpFile.name}</p>
               ) : (
-                <p className="text-sm text-gray-500">{t('cliDumpHint')}</p>
+                <>
+                  <p className="text-sm text-gray-500">{t('cliDumpHint')}</p>
+                  <Link
+                    href="/guides/export-cli-dump"
+                    target="_blank"
+                    className="relative z-20 text-sm text-blue-400 hover:text-blue-300 underline mt-1 inline-block pointer-events-auto"
+                  >
+                    {t('howToExport')}
+                  </Link>
+                </>
               )}
             </div>
             <Upload className="w-5 h-5 text-gray-500" />
