@@ -1,0 +1,44 @@
+H Product:Blackbox flight data recorder by Nicholas Sherlock
+H Data version:2
+H I interval:1
+H P interval:1
+H P ratio:32
+H minthrottle:1070
+H maxthrottle:2000
+H gyro.scale:0x3f800000
+H acc_1G:2048
+H vbatscale:110
+H vbatref:4095
+H vbatmincellvoltage:330
+H vbatmaxcellvoltage:430
+H vbatwarningcellvoltage:350
+H currentMeter:0,400
+H looptime:125
+H gyroSync:1
+H pidController:2
+H rcRate:100
+H rcExpo:0
+H rcYawRate:100
+H rcYawExpo:0
+H thrMid:50
+H thrExpo:0
+H dynThrPID:0
+H tpa_breakpoint:1500
+H rates:70,70,70
+H rollPID:40,40,23
+H pitchPID:58,50,35
+H yawPID:70,45,20
+H dtermSetpointWeight:60
+H yaw_lpf_hz:0
+H dterm_average_count:12
+H vbat_pid_compensation:0
+H pidAtMinThrottle:1
+H features:0
+H debug_mode:0
+H Field I name:loopIteration,time,axisP[0],axisP[1],axisP[2],axisI[0],axisI[1],axisI[2],axisD[0],axisD[1],rcCommand[0],rcCommand[1],rcCommand[2],rcCommand[3],vbatLatest,amperageLatest,rssi,gyroADC[0],gyroADC[1],gyroADC[2],accSmooth[0],accSmooth[1],accSmooth[2],motor[0],motor[1],motor[2],motor[3]
+H Field I signed:0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,1,0,0,0,0
+H Field I predictor:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+H Field I encoding:1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,1500,1500,1000,1000,165,0,1023,0,0,0,0,0,2048,1000,1000,1000,1000
+1,125,0,0,0,0,0,0,0,0,1500,1500,1000,1000,165,0,1023,0,0,0,0,0,2048,1000,1000,1000,1000
+2,250,0,0,0,0,0,0,0,0,1500,1500,1000,1000,165,0,1023,0,0,0,0,0,2048,1000,1000,1000,1000

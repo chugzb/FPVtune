@@ -1,0 +1,79 @@
+# FPVtune Generated Settings
+# NOTE: These settings assume Betaflight 4.x with the modern PID controller.
+# Make a diff backup before applying.
+
+# --- PID CONTROLLER & FEEDFORWARD ---
+set pid_controller = 3
+
+# Roll
+set p_roll = 48
+set i_roll = 60
+set d_roll = 32
+set f_roll = 90
+
+# Pitch
+set p_pitch = 52
+set i_pitch = 65
+set d_pitch = 36
+set f_pitch = 95
+
+# Yaw
+set p_yaw = 50
+set i_yaw = 60
+set d_yaw = 0
+set f_yaw = 60
+
+# General PID behaviour
+set iterm_relax = RP
+set iterm_relax_cutoff = 15
+set iterm_rotation = ON
+set smart_feedforward = ON
+set feedforward_transition = 0
+set feedforward_boost = 15
+set feedforward_smooth_factor = 35
+set feedforward_jitter = 7
+set feedforward_max_rate_limit = 90
+set feedforward_boost_limit = 90
+
+# --- FILTERS ---
+# Gyro
+set gyro_lpf1_dyn_min_hz = 0
+set gyro_lpf1_dyn_max_hz = 0
+set gyro_lpf1_static_hz = 120
+set gyro_lpf2_static_hz = 250
+
+# D-term
+set dterm_lpf1_dyn_min_hz = 0
+set dterm_lpf1_dyn_max_hz = 0
+set dterm_lpf1_static_hz = 80
+set dterm_lpf2_static_hz = 160
+
+# Dynamic Notch (for typical 5" resonance)
+set dyn_notch_count = 2
+set dyn_notch_q = 250
+set dyn_notch_min_hz = 90
+set dyn_notch_max_hz = 350
+set dyn_notch_width_percent = 0
+
+# Enable RPM filtering if your ESCs support it
+set dshot_bidir = ON
+set rpm_filter = ON
+
+# --- OTHER PERFORMANCE / SMOOTHNESS OPTIONS ---
+# Motor output limit to keep temps safe while testing
+set motor_output_limit = 95
+
+# Anti-gravity for propwash during throttle changes
+set anti_gravity_gain = 5
+set anti_gravity_mode = SMOOTH
+
+# Throttle boost – small for smooth freestyle
+set throttle_boost = 5
+set throttle_boost_cutoff = 15
+
+# Ensure TPA is mild, since this is a relatively low D tune
+set tpa_rate = 0
+set tpa_breakpoint = 1500
+
+# Save
+save

@@ -1250,6 +1250,18 @@
         "continue": "Continue"
       }
     },
+    "success": {
+      "title": "Payment Successful!",
+      "description": "Thank you for your purchase. Your PID tuning report is being generated.",
+      "orderNumber": "Order Number",
+      "processing": "Generating Your Report",
+      "processingHint": "Our AI is analyzing your blackbox data...",
+      "emailSoon": "Check Your Email",
+      "emailHint": "Your report will be sent within a few minutes",
+      "pdfReport": "PDF Report Included",
+      "pdfHint": "Complete analysis with CLI commands attached",
+      "backToHome": "Back to Home"
+    },
     "form": {
       "hero": {
         "badge": "AI-Powered Smart Tuning",

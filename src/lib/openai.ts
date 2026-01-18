@@ -1,9 +1,23 @@
 import OpenAI from 'openai';
 
 // Future API 配置 (https://future-api.doc.vodeshop.com)
-export const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-  baseURL: process.env.OPENAI_BASE_URL || 'https://future-api.vodeshop.com/v1',
+let _openai: OpenAI | null = null;
+
+export const getOpenAI = () => {
+  if (!_openai) {
+    _openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+      baseURL: process.env.OPENAI_BASE_URL || 'https://future-api.vodeshop.com/v1',
+    });
+  }
+  return _openai;
+};
+
+// For backward compatibility
+export const openai = new Proxy({} as OpenAI, {
+  get(_, prop) {
+    return (getOpenAI() as unknown as Record<string, unknown>)[prop as string];
+  },
 });
 
 // 默认模型

@@ -191,22 +191,25 @@ export function TuneWizard() {
       apiFormData.append('email', formData.email);
       apiFormData.append('locale', locale);
 
-      const response = await fetch('/api/tune/analyze', {
+      const response = await fetch('/api/tune/checkout', {
         method: 'POST',
         body: apiFormData,
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Analysis failed');
+        throw new Error(errorData.error || 'Checkout failed');
       }
 
       const result = await response.json();
-      setAnalysisResult(result.analysis);
-      setCurrentStep(7);
+      
+      if (result.checkoutUrl) {
+        window.location.href = result.checkoutUrl;
+      } else {
+        throw new Error('No checkout URL returned');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
       setIsProcessing(false);
     }
   };

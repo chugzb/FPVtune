@@ -1251,6 +1251,18 @@
         "continue": "继续"
       }
     },
+    "success": {
+      "title": "支付成功!",
+      "description": "感谢您的购买。您的 PID 调参报告正在生成中。",
+      "orderNumber": "订单号",
+      "processing": "正在生成报告",
+      "processingHint": "AI 正在分析您的黑盒数据...",
+      "emailSoon": "查收邮件",
+      "emailHint": "报告将在几分钟内发送到您的邮箱",
+      "pdfReport": "包含 PDF 报告",
+      "pdfHint": "完整分析报告及 CLI 命令附件",
+      "backToHome": "返回首页"
+    },
     "form": {
       "hero": {
         "badge": "AI 驱动的智能调参",
