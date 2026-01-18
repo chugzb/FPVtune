@@ -24,6 +24,7 @@
   // Environment variables - set in Cloudflare dashboard or .dev.vars
   "vars": {
     "NEXTJS_ENV": "production",
+    "NEXT_PUBLIC_BASE_URL": "https://fpvtune.com",
     "NEXT_PUBLIC_GOOGLE_ANALYTICS_ID": "G-R1FDJM2H4C"
   }
 }
