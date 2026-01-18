@@ -1,0 +1,81 @@
+---
+title: Betaflight Filter Settings Explained
+description: A deep dive into gyro filters, D-term filters, and dynamic notch filters for optimal noise reduction.
+image: https://pub-a43dfa5ee4c84353a038f71491cecbd9.r2.dev/fpvtune/blog/72639793-d20d-476b-bada-2466828be7f9.png
+date: 2026-01-10T12:00:00.000Z
+published: true
+categories: [tuning, product]
+author: fpvtune
+---
+
+Filters are the unsung heroes of a good tune. They remove unwanted noise from your gyro signal while preserving the responsiveness you need for precise flight. Understanding how they work is key to getting the most out of your quad.
+
+## Why Filters Matter
+
+Your flight controller's gyroscope picks up more than just your drone's movement. It also captures:
+
+- Motor vibrations
+- Propeller resonance
+- Frame flex
+- Electronic noise
+
+Without proper filtering, this noise gets amplified by the PID controller, causing motor heat, reduced performance, and that dreaded "hot motor syndrome."
+
+## Types of Filters in Betaflight
+
+### Gyro Lowpass Filters
+
+These are your first line of defense against high-frequency noise. Betaflight offers:
+
+- **PT1**: Simple first-order filter, minimal delay
+- **Biquad**: Second-order filter, steeper cutoff
+- **PT2/PT3**: Multi-stage filters for aggressive noise reduction
+
+Lower cutoff frequencies = more filtering but more delay.
+
+### D-Term Lowpass Filters
+
+The derivative term is particularly sensitive to noise. D-term filters are typically set lower than gyro filters to prevent motor heating.
+
+### Dynamic Notch Filters
+
+These intelligent filters automatically track and eliminate motor noise at specific frequencies. They're essential for clean flight on most builds.
+
+Key settings:
+- **Count**: Number of notch filters (1-5)
+- **Q Factor**: Width of the notch (higher = narrower)
+- **Min/Max Hz**: Frequency range to scan
+
+### RPM Filtering
+
+If your ESCs support bidirectional DShot, RPM filtering is a game-changer. It uses actual motor RPM data to precisely target motor harmonics, allowing you to run less aggressive lowpass filtering for improved response.
+
+## Finding the Right Balance
+
+The goal is to filter enough noise to protect your motors while maintaining responsiveness. Too much filtering adds latency; too little causes heating and oscillations.
+
+| Flying Style | Filter Approach |
+|--------------|-----------------|
+| Freestyle | Moderate filtering, prioritize prop wash handling |
+| Racing | Minimal filtering for lowest latency |
+| Cinematic | Heavier filtering for smooth footage |
+| Long Range | Conservative filtering for reliability |
+
+## How FPVtune Optimizes Filters
+
+Our AI analyzes your blackbox data to:
+
+1. Identify the exact frequencies where noise occurs
+2. Calculate optimal lowpass cutoff frequencies
+3. Configure dynamic notch placement
+4. Balance filtering delay vs noise reduction
+
+Instead of guessing filter values, let data drive your decisions. [Upload your blackbox log](/tune) and get filter settings tailored to your specific build.
+
+## Pro Tips
+
+- Always check motor temps after tuning
+- Start with default filters and adjust based on data
+- RPM filtering allows for less aggressive lowpass settings
+- Soft-mounted flight controllers may need different filter settings
+- Props and motors significantly affect noise profile

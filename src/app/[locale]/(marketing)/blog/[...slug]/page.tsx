@@ -21,6 +21,17 @@ import { notFound } from 'next/navigation';
 import '@/styles/mdx.css';
 
 /**
+ * Generate static params for all blog posts
+ */
+export async function generateStaticParams() {
+  const params = allPosts.map((post) => ({
+    locale: post.locale,
+    slug: post.slugAsParams.split('/'),
+  }));
+  return params;
+}
+
+/**
  * Gets the blog post from the params
  * @param props - The props of the page
  * @returns The blog post
@@ -166,10 +177,10 @@ export default async function BlogPostPage(props: NextPageProps) {
           {/* blog post content */}
           {/* in order to make the mdx.css work, we need to add the className prose to the div */}
           {/* https://github.com/tailwindlabs/tailwindcss-typography */}
-          <div className="mt-8 max-w-none prose prose-neutral dark:prose-invert prose-img:rounded-lg">
+          <div className="mt-8 max-w-none prose dark:text-gray-200 prose-headings:dark:text-white prose-strong:dark:text-white prose-a:dark:text-primary prose-img:rounded-lg">
             <CustomMDXContent
               code={post.body}
-              includeFumadocsComponents={true}
+              includeFumadocsComponents={false}
             />
           </div>
 
@@ -209,7 +220,7 @@ export default async function BlogPostPage(props: NextPageProps) {
                       <li key={category.slug}>
                         <LocaleLink
                           href={`/blog/category/${category.slug}`}
-                          className="text-sm font-medium text-muted-foreground hover:text-primary"
+                          className="text-sm font-medium text-foreground/70 hover:text-primary"
                         >
                           {category.name}
                         </LocaleLink>

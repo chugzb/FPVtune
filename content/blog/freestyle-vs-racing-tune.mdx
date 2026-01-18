@@ -1,0 +1,82 @@
+---
+title: Freestyle vs Racing - Tuning for Your Flying Style
+description: How to optimize your PID settings for freestyle tricks or competitive racing performance.
+image: https://pub-a43dfa5ee4c84353a038f71491cecbd9.r2.dev/fpvtune/blog/8563c411-c7b9-47b3-bbbe-dc6529e74f7a.png
+date: 2026-01-05T12:00:00.000Z
+published: true
+categories: [tuning, product]
+author: fpvtune
+---
+
+Not all tunes are created equal. A quad optimized for freestyle will feel very different from one tuned for racing. Understanding these differences helps you dial in the perfect settings for how you actually fly.
+
+## Freestyle Tuning Philosophy
+
+Freestyle flying demands:
+
+- **Prop wash handling**: Quick recovery during power loops and dives
+- **Smooth stick feel**: Predictable response for tricks
+- **Forgiveness**: The quad should help, not fight you
+
+### Key Settings for Freestyle
+
+**Higher D-term**: Freestyle pilots typically run higher D values to combat prop wash. The trade-off is slightly more motor heat, but the improved handling during aggressive maneuvers is worth it.
+
+**D-min/D-max**: Use D-min for smooth cruising and let D-max kick in during quick moves. This gives you the best of both worlds.
+
+**Feedforward**: Moderate feedforward provides instant response without feeling twitchy. Too much makes the quad feel nervous.
+
+## Racing Tuning Philosophy
+
+Racing is all about:
+
+- **Minimal latency**: Every millisecond counts
+- **Predictable response**: Consistent behavior lap after lap
+- **Efficiency**: Clean power delivery for maximum speed
+
+### Key Settings for Racing
+
+**Lower filtering**: Racers often run more aggressive (less) filtering to minimize delay. This requires well-balanced props and motors.
+
+**Crisp P-term**: Higher P for immediate response to stick inputs. The quad should go exactly where you point it, instantly.
+
+**Lower D-term**: Less D means less delay, but you sacrifice some prop wash handling. On a smooth race track, this trade-off makes sense.
+
+## Comparison Table
+
+| Aspect | Freestyle | Racing |
+|--------|-----------|--------|
+| P Gain | Moderate-High | High |
+| I Gain | Moderate | Moderate-Low |
+| D Gain | High | Moderate |
+| Filtering | Moderate | Minimal |
+| Feedforward | Moderate | High |
+| Priority | Feel & Recovery | Speed & Precision |
+
+## Cinematic Flying
+
+For smooth footage, you'll want:
+
+- Lower rates for gentle movements
+- Higher filtering for buttery smooth video
+- Moderate PID values across the board
+- Expo on your rates for fine control
+
+## How FPVtune Adapts
+
+When you use FPVtune, we ask about your flying style for a reason. Our AI adjusts recommendations based on whether you're:
+
+- Sending it through gaps at 150km/h
+- Throwing tricks in a bando
+- Capturing cinematic mountain shots
+- Cruising long range
+
+Each style has different priorities, and your tune should reflect that.
+
+## Finding Your Style
+
+Most pilots don't fit neatly into one category. You might freestyle on weekdays and race on weekends. The good news is that a well-tuned quad can handle multiple styles reasonably well.
+
+Start with a balanced tune from FPVtune, then make small adjustments based on what feels off. Keep notes on what you change and how it affects the feel.
+
+Ready to optimize for your flying style? [Start your tune](/tune) and tell us how you fly!

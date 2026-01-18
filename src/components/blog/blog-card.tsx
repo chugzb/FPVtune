@@ -32,6 +32,7 @@ export default function BlogCard({ post }: BlogCardProps) {
                 placeholder="blur"
                 blurDataURL={PLACEHOLDER_IMAGE}
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
 
               {post.categories && post.categories.length > 0 && (
@@ -90,6 +91,7 @@ export default function BlogCard({ post }: BlogCardProps) {
                     alt={`avatar for ${post?.author?.name}`}
                     className="rounded-full object-cover border"
                     fill
+                    sizes="32px"
                   />
                 )}
               </div>
@@ -115,6 +117,7 @@ export function BlogCardSkeleton() {
           alt="Loading placeholder"
           className="object-cover"
           fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
       </div>
       <div className="p-4 flex flex-col justify-between flex-1">

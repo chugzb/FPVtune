@@ -96,7 +96,7 @@ function Tree({ tree, level = 1, activeItem }: TreeProps) {
                 'inline-block text-sm no-underline hover:text-primary line-clamp-1',
                 item.url === `#${activeItem}`
                   ? 'font-medium text-primary'
-                  : 'text-muted-foreground'
+                  : 'text-foreground/70'
               )}
             >
               {item.title}

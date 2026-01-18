@@ -1,0 +1,79 @@
+---
+title: Understanding Blackbox Logs for Better Tuning
+description: Learn how to interpret blackbox data and use it to diagnose flight issues and optimize your PID settings.
+image: https://pub-a43dfa5ee4c84353a038f71491cecbd9.r2.dev/fpvtune/blog/0c9278b0-7d5e-4956-82de-a3428d43227a.png
+date: 2026-01-12T12:00:00.000Z
+published: true
+categories: [tuning, news]
+author: fpvtune
+---
+
+Blackbox logs are the key to understanding what's really happening with your drone during flight. This data-rich recording captures everything from gyro readings to motor outputs, giving you unprecedented insight into your quad's behavior.
+
+## What Does Blackbox Record?
+
+Every blackbox log contains:
+
+- **Gyro data**: Raw angular velocity readings from your gyroscope
+- **Accelerometer data**: Linear acceleration measurements
+- **PID outputs**: The calculated corrections for each axis
+- **Motor outputs**: Actual throttle values sent to each motor
+- **RC inputs**: Your stick positions and switch states
+- **Setpoint**: The target attitude based on your inputs
+
+## Key Metrics to Analyze
+
+### Gyro Noise
+
+High-frequency noise in your gyro data indicates vibrations that can cause:
+- Motor heating
+- Reduced flight performance
+- Prop wash oscillations
+
+Look for noise spikes at specific frequencies - these often correspond to motor RPM harmonics.
+
+### Step Response
+
+When you make a quick stick input, how does your quad respond? A good tune shows:
+- Fast initial response (high P)
+- Minimal overshoot (proper D)
+- Quick settling (balanced I)
+
+### D-Term Noise
+
+The derivative term amplifies high-frequency noise. If your D-term trace looks noisy, you may need:
+- Better filtering
+- Lower D gains
+- Motor/prop balancing
+
+## Common Issues and Solutions
+
+| Symptom | Likely Cause | Solution |
+|---------|--------------|----------|
+| Oscillations at hover | P too high | Reduce P gain |
+| Slow response | P too low | Increase P gain |
+| Bounce-back after flips | D too low | Increase D gain |
+| Hot motors | D too high or poor filtering | Reduce D or adjust filters |
+| Drift in wind | I too low | Increase I gain |
+
+## How FPVtune Analyzes Your Logs
+
+Our AI performs comprehensive analysis including:
+
+1. **Spectral Analysis**: Identifies noise frequencies and optimal filter placement
+2. **Step Response Evaluation**: Measures your current tune quality
+3. **Thermal Prediction**: Estimates motor temperature based on noise profile
+4. **Comparative Analysis**: Benchmarks against thousands of reference tunes
+
+Instead of spending hours learning to read these graphs yourself, let our neural network do the heavy lifting. Upload your blackbox log and get actionable recommendations in seconds.
+
+## Best Practices for Recording
+
+For the best analysis results:
+
+- Record 30-60 seconds of varied flight
+- Include hover, forward flight, and some maneuvers
+- Fly in calm conditions for baseline tuning
+- Use high logging rate (2kHz recommended)
+
+Ready to analyze your flight data? [Start tuning now](/tune) and see what insights AI can uncover from your blackbox logs!

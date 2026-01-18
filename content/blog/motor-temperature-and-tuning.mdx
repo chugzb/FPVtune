@@ -1,0 +1,72 @@
+---
+title: Motor Temperature and PID Tuning
+description: How to prevent motor overheating through proper PID and filter configuration.
+image: https://pub-a43dfa5ee4c84353a038f71491cecbd9.r2.dev/fpvtune/blog/898929c8-9644-4b60-b273-b106f0198692.png
+date: 2026-01-08T12:00:00.000Z
+published: true
+categories: [tuning, news]
+author: fpvtune
+---
+
+Hot motors are one of the most common issues FPV pilots face. While some warmth is normal, excessively hot motors can lead to reduced performance, shortened lifespan, and even mid-flight failures. Understanding the relationship between your tune and motor temperature is crucial.
+
+## Why Do Motors Get Hot?
+
+Motors heat up when they work harder than necessary. In the context of PID tuning, this usually means:
+
+1. **Excessive D-term**: The derivative gain amplifies high-frequency noise, causing rapid motor corrections
+2. **Poor filtering**: Unfiltered noise passes through to motor outputs
+3. **Oscillations**: The flight controller constantly fighting itself
+4. **Prop wash corrections**: Aggressive attempts to stabilize during turbulent air
+
+## The D-Term Dilemma
+
+D-term is essential for smooth flight - it dampens oscillations and reduces prop wash. But it's also the primary cause of motor heating because it responds to the rate of change in error, which includes noise.
+
+The solution isn't simply to lower D-term (which would hurt flight performance), but to:
+
+- Filter noise before it reaches the D-term calculation
+- Use appropriate D-term lowpass settings
+- Balance D-min and D-max values
+
+## Safe Temperature Ranges
+
+| Temperature | Status |
+|-------------|--------|
+| Room temp - 50°C | Normal |
+| 50°C - 60°C | Warm but acceptable |
+| 60°C - 70°C | Hot - investigate cause |
+| 70°C+ | Too hot - reduce D or improve filtering |
+
+*Check motors immediately after landing for accurate readings.*
+
+## FPVtune's Thermal Prediction
+
+Our AI doesn't just optimize for flight feel - it also considers motor health. By analyzing your blackbox data, we can:
+
+- Estimate motor temperature based on noise profile
+- Recommend safe D-gain limits for your specific setup
+- Suggest filter settings that balance performance and thermal safety
+
+This predictive approach helps you avoid the trial-and-error of finding out your motors are too hot after a flight.
+
+## Tips for Cooler Motors
+
+1. **Balance your props**: Unbalanced props create vibrations that heat motors
+2. **Check motor screws**: Loose screws cause frame resonance
+3. **Soft-mount your FC**: Reduces vibration transmission to the gyro
+4. **Use quality components**: Cheap motors and ESCs often run hotter
+5. **Enable RPM filtering**: Allows less aggressive lowpass filtering
+
+## When to Worry
+
+If your motors are consistently hot despite proper tuning:
+
+- Check for damaged bearings
+- Inspect props for damage
+- Verify ESC timing settings
+- Consider motor/prop matching
+
+Remember, a well-tuned quad should have motors you can comfortably touch after a normal flight. If you're burning your fingers, it's time to revisit your tune.
+
+[Upload your blackbox log](/tune) and let our AI help you find the sweet spot between performance and motor longevity.

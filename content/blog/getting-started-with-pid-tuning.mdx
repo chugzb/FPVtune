@@ -1,0 +1,60 @@
+---
+title: Getting Started with Betaflight PID Tuning
+description: A comprehensive beginner's guide to understanding and tuning PID parameters for your FPV drone.
+image: https://pub-a43dfa5ee4c84353a038f71491cecbd9.r2.dev/fpvtune/blog/69282e5d-edcd-4a15-9f93-1b24baabdcf0.png
+date: 2026-01-15T12:00:00.000Z
+published: true
+categories: [tuning, product]
+author: fpvtune
+---
+
+If you're new to FPV drones, PID tuning might seem like a daunting task. But don't worry - with the right approach and tools, you can achieve a perfectly tuned quad that feels locked-in and responsive.
+
+## What is PID Tuning?
+
+PID stands for **Proportional**, **Integral**, and **Derivative** - three mathematical terms that describe how your flight controller responds to errors in flight. When your drone drifts from its intended position or angle, the PID controller calculates corrections to bring it back.
+
+- **P (Proportional)**: Determines how aggressively the quad corrects errors. Higher P = faster response, but too high causes oscillations.
+- **I (Integral)**: Helps maintain attitude against constant forces like wind. Accumulates error over time.
+- **D (Derivative)**: Dampens oscillations and reduces overshoot. Essential for smooth flight.
+
+## Why Does PID Tuning Matter?
+
+A well-tuned drone will:
+
+1. **Feel locked-in**: Stick inputs translate directly to movement
+2. **Eliminate prop wash**: No wobbles during quick descents
+3. **Reduce motor heat**: Proper filtering and D-term settings protect your motors
+4. **Improve battery life**: Efficient corrections mean less wasted energy
+
+## The Traditional Approach vs AI-Powered Tuning
+
+Traditionally, pilots would spend hours doing test flights, analyzing blackbox logs manually, and making incremental adjustments. This process requires deep technical knowledge and lots of patience.
+
+With **FPVtune**, you can skip the guesswork. Our AI analyzes your blackbox data and generates optimized settings in seconds. Simply:
+
+1. Record a short flight with blackbox logging enabled
+2. Upload your .BBL or .BFL file
+3. Get AI-optimized PID values and filter settings
+4. Copy the CLI commands to your flight controller
+
+## Getting Your First Tune
+
+Ready to get started? Here's what you need:
+
+- A drone with Betaflight 4.3 or newer
+- Blackbox logging enabled (SD card or onboard flash)
+- A 30-60 second flight recording
+- Access to Betaflight Configurator
+
+Head over to our [tuning page](/tune) to upload your first blackbox log and experience the difference AI-powered tuning can make!
+
+## Next Steps
+
+Once you have your base tune, you can fine-tune for your specific flying style:
+
+- **Freestyle**: Higher D-term for prop wash handling
+- **Racing**: Lower filtering for minimal latency
+- **Cinematic**: Smoother response curves for buttery footage
+
+Stay tuned for more in-depth guides on advanced tuning techniques!

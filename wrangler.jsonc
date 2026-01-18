@@ -2,13 +2,18 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "fpvtune",
   "main": ".open-next/worker.js",
-  "compatibility_date": "2024-12-01",
+  "compatibility_date": "2024-09-23",
   "compatibility_flags": ["nodejs_compat"],
 
   // Static assets binding (required)
   "assets": {
     "binding": "ASSETS",
     "directory": ".open-next/assets"
+  },
+
+  // Image optimization binding (enables next/image optimization on Cloudflare)
+  "images": {
+    "binding": "IMAGES"
   },
 
   // Observability for monitoring and logs

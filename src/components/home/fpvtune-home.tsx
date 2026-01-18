@@ -125,6 +125,12 @@ export function FPVtuneHome() {
             >
               {t('nav.tutorials')}
             </LocaleLink>
+            <LocaleLink
+              href="/blog"
+              className="hover:text-white transition-colors"
+            >
+              {t('nav.blog')}
+            </LocaleLink>
           </div>
           <HomeLocaleSwitcher />
         </div>
@@ -811,6 +817,12 @@ export function FPVtuneHome() {
                 className="text-sm text-gray-400 hover:text-white transition-colors"
               >
                 {t('nav.tutorials')}
+              </LocaleLink>
+              <LocaleLink
+                href="/blog"
+                className="text-sm text-gray-400 hover:text-white transition-colors"
+              >
+                {t('nav.blog')}
               </LocaleLink>
             </div>
           </div>
