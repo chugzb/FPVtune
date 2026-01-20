@@ -31,9 +31,88 @@
     "logoutFailed": "Failed to log out"
   },
   "PricingPage": {
-    "title": "Pricing",
-    "description": "Choose the plan that works best for you",
-    "subtitle": "Choose the plan that works best for you",
+    "meta": {
+      "title": "Pricing - FPVtune AI PID Tuning",
+      "description": "Get AI-optimized Betaflight PID settings for your FPV drone. One-time payment, instant results."
+    },
+    "title": "Simple, Transparent Pricing",
+    "subtitle": "Pay only when you're satisfied with the analysis results. No subscription, no hidden fees.",
+    "badge": "Launch Special",
+    "productName": "AI PID Analysis",
+    "productDesc": "Complete Betaflight PID tuning analysis for your FPV drone",
+    "discount": "50% off launch discount",
+    "perAnalysis": "One-time payment per analysis",
+    "cta": "Start Tuning Now",
+    "features": {
+      "pid": {
+        "title": "Optimized PID Values",
+        "desc": "AI-calculated P, I, D gains for all axes"
+      },
+      "filter": {
+        "title": "Filter Settings",
+        "desc": "Gyro and D-term lowpass filter optimization"
+      },
+      "feedforward": {
+        "title": "Feedforward Tuning",
+        "desc": "Optimized feedforward for responsive stick feel"
+      },
+      "cli": {
+        "title": "Ready-to-Use CLI Commands",
+        "desc": "Copy-paste directly into Betaflight Configurator"
+      },
+      "report": {
+        "title": "Detailed Analysis Report",
+        "desc": "PDF report with noise analysis and recommendations"
+      },
+      "email": {
+        "title": "Email Delivery",
+        "desc": "Results sent to your email for future reference"
+      }
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "step1": {
+        "title": "Upload Blackbox Log",
+        "desc": "Upload your .BBL or .BFL file from Betaflight"
+      },
+      "step2": {
+        "title": "AI Analysis",
+        "desc": "Our AI analyzes gyro noise and flight characteristics"
+      },
+      "step3": {
+        "title": "Get Results",
+        "desc": "Receive optimized settings and CLI commands"
+      }
+    },
+    "guarantees": {
+      "refund": {
+        "title": "Satisfaction Guarantee",
+        "desc": "Full refund if not satisfied with results"
+      },
+      "support": {
+        "title": "Email Support",
+        "desc": "Get help with applying your tune"
+      },
+      "compatible": {
+        "title": "Betaflight 4.5+",
+        "desc": "Compatible with latest Betaflight versions"
+      }
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "q1": {
+        "question": "What do I get for $9.99?",
+        "answer": "You receive a complete PID tuning analysis including optimized PID values, filter settings, feedforward configuration, and ready-to-use CLI commands. Results are delivered instantly and also sent to your email."
+      },
+      "q2": {
+        "question": "Do I need to pay before seeing results?",
+        "answer": "You can upload your blackbox log and go through the analysis setup for free. Payment is only required to view the final optimized settings."
+      },
+      "q3": {
+        "question": "What if I'm not satisfied?",
+        "answer": "We offer a satisfaction guarantee. If the tune doesn't work for your setup, contact us for a full refund."
+      }
+    },
     "monthly": "Monthly",
     "yearly": "Yearly",
     "PricingCard": {
@@ -603,6 +682,7 @@
     "nav": {
       "features": "Features",
       "howItWorks": "How It Works",
+      "pricing": "Pricing",
       "tutorials": "Tutorials",
       "blog": "Blog",
       "startTuning": "Start Tuning"
@@ -642,7 +722,7 @@
         "title": "How AI-Powered Analysis Works",
         "desc": "FPVtune analyzes your blackbox data using advanced machine learning to generate optimized settings tailored to your specific drone configuration.",
         "step1Title": "1. Upload Blackbox Log",
-        "step1Desc": "Record a short flight with blackbox logging enabled in Betaflight Configurator. Upload the .BBL or .BFL file to FPVtune. We support Betaflight 4.3, 4.4, and 4.5 log formats.",
+        "step1Desc": "Record a short flight with blackbox logging enabled in Betaflight Configurator. Upload the .BBL or .BFL file to FPVtune. We support Betaflight 4.5 and newer log formats.",
         "step2Title": "2. AI Analysis",
         "step2Desc": "Our neural network performs spectral analysis on your gyro data, identifies noise frequencies, measures step response, and evaluates your current PID performance against thousands of reference tunes.",
         "step3Title": "3. Get Optimized Settings",
@@ -730,7 +810,7 @@
       "cta": {
         "title": "Ready to Optimize Your Drone?",
         "desc": "Get AI-optimized Betaflight PID settings in seconds. Pay only when you are satisfied with the analysis results.",
-        "supportedFiles": "Supports .BBL and .BFL files from Betaflight 4.3, 4.4, and 4.5"
+        "supportedFiles": "Supports .BBL and .BFL files from Betaflight 4.5+"
       },
       "footer": {
         "tagline": "AI-powered Betaflight PID tuning for FPV pilots worldwide.",
@@ -1163,19 +1243,19 @@
         "title": "Select Your Frame Size",
         "description": "Different frame sizes require different PID tuning approaches",
         "items": {
-          "5": {
+          "inch5": {
             "name": "5\"",
             "description": "Freestyle / Racing"
           },
-          "7": {
+          "inch7": {
             "name": "7\"",
             "description": "Long Range / Cinematic"
           },
-          "2-3": {
+          "inch2_3": {
             "name": "2-3\"",
             "description": "Tiny Whoop / Toothpick"
           },
-          "10+": {
+          "inch10plus": {
             "name": "10\"+",
             "description": "Cinelifter / X-Class"
           }
@@ -1254,13 +1334,32 @@
       "title": "Payment Successful!",
       "description": "Thank you for your purchase. Your PID tuning report is being generated.",
       "orderNumber": "Order Number",
-      "processing": "Generating Your Report",
-      "processingHint": "Our AI is analyzing your blackbox data...",
-      "emailSoon": "Check Your Email",
-      "emailHint": "Your report will be sent within a few minutes",
-      "pdfReport": "PDF Report Included",
-      "pdfHint": "Complete analysis with CLI commands attached",
-      "backToHome": "Back to Home"
+      "status": {
+        "paid": "Payment Received",
+        "paidHint": "Your payment has been confirmed",
+        "processing": "Analyzing Flight Data",
+        "processingHint": "AI is analyzing your blackbox data and generating optimized settings...",
+        "completed": "Analysis Complete",
+        "completedHint": "Your tuning report is ready",
+        "failed": "Processing Failed",
+        "failedHint": "Please contact support for assistance",
+        "sendingEmail": "Sending Report",
+        "sendingEmailHint": "Delivering your report to your inbox..."
+      },
+      "yourConfig": "Your Configuration",
+      "problems": "Problems to Fix",
+      "goals": "Tuning Goals",
+      "flyingStyle": "Flying Style",
+      "frameSize": "Frame Size",
+      "emailSent": "Report Sent to Email",
+      "emailSentHint": "Check your inbox for the complete PDF report",
+      "viewResults": "View Results",
+      "backToHome": "Back to Home",
+      "newAnalysis": "New Analysis",
+      "error": {
+        "notFound": "Order not found",
+        "loadFailed": "Failed to load order status"
+      }
     },
     "form": {
       "hero": {
@@ -1319,7 +1418,7 @@
           },
           "q3": {
             "question": "Which flight controller firmware is supported?",
-            "answer": "Currently supports Betaflight 4.3+, INAV 6.0+ and EmuFlight. KISS and other firmware support is in development."
+            "answer": "Currently supports Betaflight 4.5+, INAV 6.0+ and EmuFlight. KISS and other firmware support is in development."
           },
           "q4": {
             "question": "Can I use the generated parameters directly?",

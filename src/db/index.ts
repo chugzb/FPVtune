@@ -1,9 +1,9 @@
 /**
- * Connect to PostgreSQL Database (Supabase/Neon/Local PostgreSQL)
- * https://orm.drizzle.team/docs/tutorials/drizzle-with-supabase
+ * Connect to Neon Database with HTTP driver for Cloudflare Workers
+ * https://orm.drizzle.team/docs/connect-neon
  */
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
+import { neon } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -12,9 +12,8 @@ const connectionString = process.env.DATABASE_URL;
 let db: ReturnType<typeof drizzle> | null = null;
 
 if (connectionString) {
-  // Disable prefetch as it is not supported for "Transaction" pool mode
-  const client = postgres(connectionString, { prepare: false });
-  db = drizzle(client);
+  const sql = neon(connectionString);
+  db = drizzle(sql);
 }
 
 /**

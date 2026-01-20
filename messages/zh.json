@@ -31,9 +31,88 @@
     "logoutFailed": "退出失败"
   },
   "PricingPage": {
-    "title": "价格",
-    "description": "选择最适合您的付费计划",
-    "subtitle": "选择最适合您的付费计划",
+    "meta": {
+      "title": "价格 - FPVtune AI PID调参",
+      "description": "获取AI优化的Betaflight PID设置。一次性付费，即时获取结果。"
+    },
+    "title": "简单透明的定价",
+    "subtitle": "只有在您满意分析结果后才需付费。无订阅，无隐藏费用。",
+    "badge": "上线特惠",
+    "productName": "AI PID分析",
+    "productDesc": "为您的FPV无人机提供完整的Betaflight PID调参分析",
+    "discount": "上线特惠5折",
+    "perAnalysis": "每次分析一次性付费",
+    "cta": "立即开始调参",
+    "features": {
+      "pid": {
+        "title": "优化的PID值",
+        "desc": "AI计算的所有轴向P、I、D增益"
+      },
+      "filter": {
+        "title": "滤波器设置",
+        "desc": "陀螺仪和D项低通滤波器优化"
+      },
+      "feedforward": {
+        "title": "前馈调参",
+        "desc": "优化的前馈设置，提供灵敏的摇杆手感"
+      },
+      "cli": {
+        "title": "即用CLI命令",
+        "desc": "直接复制粘贴到Betaflight配置器"
+      },
+      "report": {
+        "title": "详细分析报告",
+        "desc": "包含噪声分析和建议的PDF报告"
+      },
+      "email": {
+        "title": "邮件发送",
+        "desc": "结果发送到您的邮箱以便日后查阅"
+      }
+    },
+    "howItWorks": {
+      "title": "使用流程",
+      "step1": {
+        "title": "上传黑盒日志",
+        "desc": "上传Betaflight的.BBL或.BFL文件"
+      },
+      "step2": {
+        "title": "AI分析",
+        "desc": "我们的AI分析陀螺仪噪声和飞行特性"
+      },
+      "step3": {
+        "title": "获取结果",
+        "desc": "获得优化的设置和CLI命令"
+      }
+    },
+    "guarantees": {
+      "refund": {
+        "title": "满意保证",
+        "desc": "对结果不满意可全额退款"
+      },
+      "support": {
+        "title": "邮件支持",
+        "desc": "获取应用调参的帮助"
+      },
+      "compatible": {
+        "title": "Betaflight 4.5+",
+        "desc": "兼容最新Betaflight版本"
+      }
+    },
+    "faq": {
+      "title": "常见问题",
+      "q1": {
+        "question": "9.99美元能获得什么？",
+        "answer": "您将获得完整的PID调参分析，包括优化的PID值、滤波器设置、前馈配置和即用的CLI命令。结果即时交付，同时发送到您的邮箱。"
+      },
+      "q2": {
+        "question": "需要先付费才能看到结果吗？",
+        "answer": "您可以免费上传黑盒日志并完成分析设置。只有在查看最终优化设置时才需要付费。"
+      },
+      "q3": {
+        "question": "如果不满意怎么办？",
+        "answer": "我们提供满意保证。如果调参不适合您的设置，请联系我们获得全额退款。"
+      }
+    },
     "monthly": "月付",
     "yearly": "年付",
     "PricingCard": {
@@ -604,6 +683,7 @@
     "nav": {
       "features": "功能特性",
       "howItWorks": "工作原理",
+      "pricing": "价格",
       "tutorials": "教程",
       "blog": "博客",
       "startTuning": "开始调参"
@@ -643,7 +723,7 @@
         "title": "AI分析工作原理",
         "desc": "FPVtune使用先进的机器学习分析您的黑盒数据，生成针对您特定无人机配置的优化设置。",
         "step1Title": "1. 上传黑盒日志",
-        "step1Desc": "在Betaflight配置器中启用黑盒记录并录制一段短飞行。将.BBL或.BFL文件上传到FPVtune。我们支持Betaflight 4.3、4.4和4.5日志格式。",
+        "step1Desc": "在Betaflight配置器中启用黑盒记录并录制一段短飞行。将.BBL或.BFL文件上传到FPVtune。我们支持Betaflight 4.5及更新版本的日志格式。",
         "step2Title": "2. AI分析",
         "step2Desc": "我们的神经网络对您的陀螺仪数据进行频谱分析，识别噪声频率，测量阶跃响应，并将您当前的PID性能与数千个参考调参进行评估。",
         "step3Title": "3. 获取优化设置",
@@ -726,12 +806,12 @@
         "q4": "使用FPVtune需要Betaflight PID调参经验吗？",
         "a4": "不需要任何Betaflight PID调参经验。FPVtune专为各种技能水平的飞手设计。我们的AI处理复杂的分析并提供即用的CLI命令。只需复制粘贴到Betaflight配置器中即可应用您的优化调参。",
         "q5": "支持哪些Betaflight版本的PID调参？",
-        "a5": "FPVtune支持Betaflight 4.3、4.4和4.5版本的PID调参。我们的AI了解固件版本之间的差异，并为您特定的Betaflight安装生成适当的设置。我们定期更新模型以支持最新的Betaflight版本。"
+        "a5": "FPVtune支持Betaflight 4.5及更新版本的PID调参。我们的AI了解固件版本之间的差异，并为您特定的Betaflight安装生成适当的设置。我们定期更新模型以支持最新的Betaflight版本。"
       },
       "cta": {
         "title": "准备好优化您的无人机了吗？",
         "desc": "几秒内获取AI优化的Betaflight PID设置。只有在您对分析结果满意时才需付费。",
-        "supportedFiles": "支持Betaflight 4.3、4.4和4.5的.BBL和.BFL文件"
+        "supportedFiles": "支持Betaflight 4.5+的.BBL和.BFL文件"
       },
       "footer": {
         "tagline": "为全球FPV飞手提供AI驱动的Betaflight PID调参。",
@@ -1164,19 +1244,19 @@
         "title": "选择你的机架尺寸",
         "description": "不同尺寸的机架需要不同的 PID 调参方法",
         "items": {
-          "5": {
+          "inch5": {
             "name": "5\"",
             "description": "花飞 / 竞速"
           },
-          "7": {
+          "inch7": {
             "name": "7\"",
             "description": "远航 / 航拍"
           },
-          "2-3": {
+          "inch2_3": {
             "name": "2-3\"",
             "description": "穿越机 / 牙签机"
           },
-          "10+": {
+          "inch10plus": {
             "name": "10\"+",
             "description": "载机 / X-Class"
           }
@@ -1255,13 +1335,32 @@
       "title": "支付成功!",
       "description": "感谢您的购买。您的 PID 调参报告正在生成中。",
       "orderNumber": "订单号",
-      "processing": "正在生成报告",
-      "processingHint": "AI 正在分析您的黑盒数据...",
-      "emailSoon": "查收邮件",
-      "emailHint": "报告将在几分钟内发送到您的邮箱",
-      "pdfReport": "包含 PDF 报告",
-      "pdfHint": "完整分析报告及 CLI 命令附件",
-      "backToHome": "返回首页"
+      "status": {
+        "paid": "支付已确认",
+        "paidHint": "您的支付已成功处理",
+        "processing": "正在分析飞行数据",
+        "processingHint": "AI 正在分析您的黑盒数据并生成优化设置...",
+        "completed": "分析完成",
+        "completedHint": "您的调参报告已准备好",
+        "failed": "处理失败",
+        "failedHint": "请联系客服获取帮助",
+        "sendingEmail": "正在发送报告",
+        "sendingEmailHint": "正在将报告发送到您的邮箱..."
+      },
+      "yourConfig": "您的配置",
+      "problems": "需要解决的问题",
+      "goals": "调参目标",
+      "flyingStyle": "飞行风格",
+      "frameSize": "机架尺寸",
+      "emailSent": "报告已发送至邮箱",
+      "emailSentHint": "请查收邮箱中的完整 PDF 报告",
+      "viewResults": "查看结果",
+      "backToHome": "返回首页",
+      "newAnalysis": "新建分析",
+      "error": {
+        "notFound": "订单未找到",
+        "loadFailed": "加载订单状态失败"
+      }
     },
     "form": {
       "hero": {
@@ -1320,7 +1419,7 @@
           },
           "q3": {
             "question": "支持哪些飞控固件？",
-            "answer": "目前支持 Betaflight 4.3+、INAV 6.0+ 和 EmuFlight。KISS 和其他固件支持正在开发中。"
+            "answer": "目前支持 Betaflight 4.5+、INAV 6.0+ 和 EmuFlight。KISS 和其他固件支持正在开发中。"
           },
           "q4": {
             "question": "生成的参数可以直接使用吗？",

@@ -77,7 +77,7 @@ const problemIds = [
 ];
 const goalIds = ['locked', 'smooth', 'snappy', 'efficient', 'balanced'];
 const styleIds = ['freestyle', 'racing', 'cinematic', 'longrange'];
-const frameIds = ['2-3', '5', '7', '10+'];
+const frameIds = ['inch2_3', 'inch5', 'inch7', 'inch10plus'];
 
 export function TuneWizard() {
   const t = useTranslations('TunePage.wizard');
@@ -202,7 +202,7 @@ export function TuneWizard() {
       }
 
       const result = await response.json();
-      
+
       if (result.checkoutUrl) {
         window.location.href = result.checkoutUrl;
       } else {
@@ -242,22 +242,27 @@ export function TuneWizard() {
       apiFormData.append('locale', locale);
       apiFormData.append('testCode', testCode.toUpperCase());
 
-      const response = await fetch('/api/tune/analyze', {
+      // 调用测试订单 API（创建订单 + 处理 + 发邮件）
+      const response = await fetch('/api/tune/test-checkout', {
         method: 'POST',
         body: apiFormData,
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Analysis failed');
+        throw new Error(errorData.error || 'Test checkout failed');
       }
 
       const result = await response.json();
-      setAnalysisResult(result.analysis);
-      setCurrentStep(7);
+
+      // 跳转到成功页面（和真实支付流程一致）
+      if (result.orderNumber) {
+        window.location.href = `/${locale}/tune/success?order=${result.orderNumber}`;
+      } else {
+        throw new Error('No order number returned');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
       setIsProcessing(false);
     }
   };
@@ -1073,36 +1078,36 @@ function StepResults({ result }: { result: AnalysisResult }) {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Success Header */}
       <div className="text-center">
-        <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-          <CheckCircle className="w-8 h-8 text-green-400" />
+        <div className="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+          <CheckCircle className="w-7 h-7 text-white" />
         </div>
-        <h1 className="text-3xl font-bold mb-3">{t('title')}</h1>
-        <p className="text-gray-400">{t('description')}</p>
+        <h1 className="text-2xl font-bold mb-2">{t('title')}</h1>
+        <p className="text-gray-500 text-sm">{t('description')}</p>
       </div>
 
       {/* Analysis Summary */}
-      <div className="bg-white/5 rounded-xl border border-white/10 p-6">
-        <h3 className="font-semibold text-white mb-3">
+      <div className="bg-white/5 rounded-xl border border-white/10 p-5">
+        <h3 className="font-medium text-white mb-3 text-sm">
           {t('analysisSummary')}
         </h3>
-        <p className="text-gray-300 text-sm leading-relaxed">
+        <p className="text-gray-400 text-sm leading-relaxed">
           {result.analysis.summary}
         </p>
       </div>
 
       {/* Issues Found */}
       {result.analysis.issues.length > 0 && (
-        <div className="bg-orange-500/10 rounded-xl border border-orange-500/20 p-6">
-          <h3 className="font-semibold text-orange-400 mb-3">
+        <div className="bg-white/5 rounded-xl border border-white/10 p-5">
+          <h3 className="font-medium text-white mb-3 text-sm">
             {t('issuesIdentified')}
           </h3>
           <ul className="space-y-2">
             {result.analysis.issues.map((issue, i) => (
-              <li key={i} className="text-gray-300 text-sm flex gap-2">
-                <span className="text-orange-400 flex-shrink-0">-</span>
+              <li key={i} className="text-gray-400 text-sm flex gap-2">
+                <span className="text-gray-500 flex-shrink-0">-</span>
                 <span>{issue}</span>
               </li>
             ))}
@@ -1112,14 +1117,14 @@ function StepResults({ result }: { result: AnalysisResult }) {
 
       {/* Recommendations */}
       {result.analysis.recommendations.length > 0 && (
-        <div className="bg-blue-500/10 rounded-xl border border-blue-500/20 p-6">
-          <h3 className="font-semibold text-blue-400 mb-3">
+        <div className="bg-white/5 rounded-xl border border-white/10 p-5">
+          <h3 className="font-medium text-white mb-3 text-sm">
             {t('recommendations')}
           </h3>
           <ul className="space-y-2">
             {result.analysis.recommendations.map((rec, i) => (
-              <li key={i} className="text-gray-300 text-sm flex gap-2">
-                <span className="text-blue-400 flex-shrink-0">-</span>
+              <li key={i} className="text-gray-400 text-sm flex gap-2">
+                <span className="text-gray-500 flex-shrink-0">-</span>
                 <span>{rec}</span>
               </li>
             ))}
@@ -1129,34 +1134,54 @@ function StepResults({ result }: { result: AnalysisResult }) {
 
       {/* PID Values */}
       <div className="bg-white/5 rounded-xl border border-white/10 overflow-hidden">
-        <div className="p-4 border-b border-white/10 bg-white/5">
-          <h3 className="font-semibold text-white">{t('optimizedPID')}</h3>
+        <div className="px-5 py-3 border-b border-white/10">
+          <h3 className="font-medium text-white text-sm">
+            {t('optimizedPID')}
+          </h3>
         </div>
-        <div className="p-4">
-          <div className="grid grid-cols-4 gap-2 text-center text-sm mb-2">
+        <div className="p-5">
+          <div className="grid grid-cols-4 gap-2 text-center text-xs mb-3">
             <div className="text-gray-500">{t('axis')}</div>
             <div className="text-gray-500">P</div>
             <div className="text-gray-500">I</div>
             <div className="text-gray-500">D</div>
           </div>
           <div className="space-y-2">
-            <div className="grid grid-cols-4 gap-2 text-center bg-white/5 rounded-lg py-2">
-              <div className="text-white font-medium">{t('roll')}</div>
-              <div className="text-blue-400">{result.pid.roll.p}</div>
-              <div className="text-green-400">{result.pid.roll.i}</div>
-              <div className="text-orange-400">{result.pid.roll.d}</div>
+            <div className="grid grid-cols-4 gap-2 text-center bg-white/5 rounded-lg py-2.5">
+              <div className="text-white text-sm">{t('roll')}</div>
+              <div className="text-white text-sm font-mono">
+                {result.pid.roll.p}
+              </div>
+              <div className="text-white text-sm font-mono">
+                {result.pid.roll.i}
+              </div>
+              <div className="text-white text-sm font-mono">
+                {result.pid.roll.d}
+              </div>
             </div>
-            <div className="grid grid-cols-4 gap-2 text-center bg-white/5 rounded-lg py-2">
-              <div className="text-white font-medium">{t('pitch')}</div>
-              <div className="text-blue-400">{result.pid.pitch.p}</div>
-              <div className="text-green-400">{result.pid.pitch.i}</div>
-              <div className="text-orange-400">{result.pid.pitch.d}</div>
+            <div className="grid grid-cols-4 gap-2 text-center bg-white/5 rounded-lg py-2.5">
+              <div className="text-white text-sm">{t('pitch')}</div>
+              <div className="text-white text-sm font-mono">
+                {result.pid.pitch.p}
+              </div>
+              <div className="text-white text-sm font-mono">
+                {result.pid.pitch.i}
+              </div>
+              <div className="text-white text-sm font-mono">
+                {result.pid.pitch.d}
+              </div>
             </div>
-            <div className="grid grid-cols-4 gap-2 text-center bg-white/5 rounded-lg py-2">
-              <div className="text-white font-medium">{t('yaw')}</div>
-              <div className="text-blue-400">{result.pid.yaw.p}</div>
-              <div className="text-green-400">{result.pid.yaw.i}</div>
-              <div className="text-orange-400">{result.pid.yaw.d}</div>
+            <div className="grid grid-cols-4 gap-2 text-center bg-white/5 rounded-lg py-2.5">
+              <div className="text-white text-sm">{t('yaw')}</div>
+              <div className="text-white text-sm font-mono">
+                {result.pid.yaw.p}
+              </div>
+              <div className="text-white text-sm font-mono">
+                {result.pid.yaw.i}
+              </div>
+              <div className="text-white text-sm font-mono">
+                {result.pid.yaw.d}
+              </div>
             </div>
           </div>
         </div>
@@ -1164,39 +1189,45 @@ function StepResults({ result }: { result: AnalysisResult }) {
 
       {/* Filter Settings */}
       <div className="bg-white/5 rounded-xl border border-white/10 overflow-hidden">
-        <div className="p-4 border-b border-white/10 bg-white/5">
-          <h3 className="font-semibold text-white">{t('filterSettings')}</h3>
+        <div className="px-5 py-3 border-b border-white/10">
+          <h3 className="font-medium text-white text-sm">
+            {t('filterSettings')}
+          </h3>
         </div>
-        <div className="p-4 grid grid-cols-2 gap-4 text-sm">
+        <div className="p-5 grid grid-cols-2 gap-3 text-sm">
           <div className="flex justify-between">
-            <span className="text-gray-400">{t('gyroLPF')}</span>
-            <span className="text-white">
+            <span className="text-gray-500">{t('gyroLPF')}</span>
+            <span className="text-white font-mono">
               {result.filters.gyro_lowpass_hz} Hz
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">{t('dtermLPF')}</span>
-            <span className="text-white">
+            <span className="text-gray-500">{t('dtermLPF')}</span>
+            <span className="text-white font-mono">
               {result.filters.dterm_lowpass_hz} Hz
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">{t('dynNotchCount')}</span>
-            <span className="text-white">{result.filters.dyn_notch_count}</span>
+            <span className="text-gray-500">{t('dynNotchCount')}</span>
+            <span className="text-white font-mono">
+              {result.filters.dyn_notch_count}
+            </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">{t('dynNotchQ')}</span>
-            <span className="text-white">{result.filters.dyn_notch_q}</span>
+            <span className="text-gray-500">{t('dynNotchQ')}</span>
+            <span className="text-white font-mono">
+              {result.filters.dyn_notch_q}
+            </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">{t('dynNotchMin')}</span>
-            <span className="text-white">
+            <span className="text-gray-500">{t('dynNotchMin')}</span>
+            <span className="text-white font-mono">
               {result.filters.dyn_notch_min_hz} Hz
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">{t('dynNotchMax')}</span>
-            <span className="text-white">
+            <span className="text-gray-500">{t('dynNotchMax')}</span>
+            <span className="text-white font-mono">
               {result.filters.dyn_notch_max_hz} Hz
             </span>
           </div>
@@ -1205,56 +1236,58 @@ function StepResults({ result }: { result: AnalysisResult }) {
 
       {/* CLI Commands */}
       <div className="bg-white/5 rounded-xl border border-white/10 overflow-hidden">
-        <div className="p-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
-          <h3 className="font-semibold text-white">{t('cliCommands')}</h3>
+        <div className="px-5 py-3 border-b border-white/10 flex justify-between items-center">
+          <h3 className="font-medium text-white text-sm">{t('cliCommands')}</h3>
           <div className="flex gap-2">
             <button
               type="button"
               onClick={handleCopy}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/15 rounded-lg text-xs transition-colors"
             >
-              <Copy className="w-4 h-4" />
+              <Copy className="w-3.5 h-3.5" />
               {copied ? t('copied') : t('copy')}
             </button>
             <button
               type="button"
               onClick={handleDownload}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 hover:bg-blue-600 rounded-lg text-sm transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-black hover:bg-gray-200 rounded-lg text-xs font-medium transition-colors"
             >
-              <Download className="w-4 h-4" />
+              <Download className="w-3.5 h-3.5" />
               {t('download')}
             </button>
           </div>
         </div>
-        <div className="p-4 max-h-64 overflow-y-auto">
-          <pre className="text-xs text-gray-300 font-mono whitespace-pre-wrap">
+        <div className="p-4 max-h-60 overflow-y-auto bg-black/20">
+          <pre className="text-xs text-gray-400 font-mono whitespace-pre-wrap">
             {result.cli_commands}
           </pre>
         </div>
       </div>
 
       {/* Instructions */}
-      <div className="bg-green-500/10 rounded-xl border border-green-500/20 p-6">
-        <h3 className="font-semibold text-green-400 mb-3">{t('howToApply')}</h3>
-        <ol className="space-y-2 text-gray-300 text-sm">
-          <li className="flex gap-2">
-            <span className="text-green-400 font-medium">1.</span>
+      <div className="bg-white/5 rounded-xl border border-white/10 p-5">
+        <h3 className="font-medium text-white mb-3 text-sm">
+          {t('howToApply')}
+        </h3>
+        <ol className="space-y-2 text-gray-400 text-sm">
+          <li className="flex gap-3">
+            <span className="text-gray-500 font-mono text-xs w-4">1.</span>
             <span>{t('applySteps.step1')}</span>
           </li>
-          <li className="flex gap-2">
-            <span className="text-green-400 font-medium">2.</span>
+          <li className="flex gap-3">
+            <span className="text-gray-500 font-mono text-xs w-4">2.</span>
             <span>{t('applySteps.step2')}</span>
           </li>
-          <li className="flex gap-2">
-            <span className="text-green-400 font-medium">3.</span>
+          <li className="flex gap-3">
+            <span className="text-gray-500 font-mono text-xs w-4">3.</span>
             <span>{t('applySteps.step3')}</span>
           </li>
-          <li className="flex gap-2">
-            <span className="text-green-400 font-medium">4.</span>
+          <li className="flex gap-3">
+            <span className="text-gray-500 font-mono text-xs w-4">4.</span>
             <span>{t('applySteps.step4')}</span>
           </li>
-          <li className="flex gap-2">
-            <span className="text-green-400 font-medium">5.</span>
+          <li className="flex gap-3">
+            <span className="text-gray-500 font-mono text-xs w-4">5.</span>
             <span>{t('applySteps.step5')}</span>
           </li>
         </ol>
@@ -1263,7 +1296,7 @@ function StepResults({ result }: { result: AnalysisResult }) {
       {/* Back to Home */}
       <a
         href="/"
-        className="block w-full text-center py-4 rounded-xl bg-white/10 hover:bg-white/20 font-semibold transition-colors"
+        className="block w-full text-center py-3.5 rounded-xl bg-white/10 hover:bg-white/15 text-sm font-medium transition-colors"
       >
         {t('backToHome')}
       </a>

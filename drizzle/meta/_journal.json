@@ -22,6 +22,20 @@
       "when": 1768723784747,
       "tag": "0002_broad_nuke",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1768756521803,
+      "tag": "0003_shocking_lyja",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1768793153629,
+      "tag": "0004_curved_flatman",
+      "breakpoints": true
     }
   ]
 }

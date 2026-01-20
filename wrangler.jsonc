@@ -24,7 +24,34 @@
   // Environment variables - set in Cloudflare dashboard or .dev.vars
   "vars": {
     "NEXTJS_ENV": "production",
+    "APP_URL": "https://fpvtune.com",
     "NEXT_PUBLIC_BASE_URL": "https://fpvtune.com",
-    "NEXT_PUBLIC_GOOGLE_ANALYTICS_ID": "G-R1FDJM2H4C"
+    "NEXT_PUBLIC_APP_URL": "https://fpvtune.com",
+    "NEXT_PUBLIC_GOOGLE_ANALYTICS_ID": "G-R1FDJM2H4C",
+    "NEXT_PUBLIC_R2_PUBLIC_URL": "https://pub-a43dfa5ee4c84353a038f71491cecbd9.r2.dev",
+
+    // OpenAI / Future API
+    "OPENAI_API_KEY": "sk-fJfxnb96RtsJLJO7oNAW5VQ5rUijYl1byPxQwVkM56Mu1mzz",
+    "OPENAI_BASE_URL": "https://future-api.vodeshop.com/v1",
+    "OPENAI_MODEL": "gpt-5.1-2025-11-13",
+
+    // Cloudflare R2 Storage
+    "STORAGE_REGION": "auto",
+    "STORAGE_BUCKET_NAME": "promptimage",
+    "STORAGE_ACCESS_KEY_ID": "82e098cb869d132a841a9fbc3ef491b9",
+    "STORAGE_SECRET_ACCESS_KEY": "5cff805e0ae02af489a054a1e179df478e30689023e7ceb344a19c5c211563a4",
+    "STORAGE_ENDPOINT": "https://3dd3c1beb6f00ab66adfa6990affd459.r2.cloudflarestorage.com",
+    "STORAGE_PUBLIC_URL": "https://pub-a43dfa5ee4c84353a038f71491cecbd9.r2.dev",
+
+    // Creem (Tune Payment)
+    "CREEM_API_KEY": "creem_test_2Y7IFtLzabnvVckcFUswOr",
+    "CREEM_WEBHOOK_SECRET": "whsec_4tJRvil55Rs8pVgLbmUtc5",
+    "CREEM_PRODUCT_ID": "prod_IipfdsDGNCrMrLL0tq04v",
+
+    // Resend (Email)
+    "RESEND_API_KEY": "re_XBUBzXpa_B8XSacJ4dYvv4mzRvaqdgA7k",
+
+    // Database
+    "DATABASE_URL": "postgresql://neondb_owner:npg_peUWi1b8YFDx@ep-lucky-shape-ae14enhf-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require"
   }
 }

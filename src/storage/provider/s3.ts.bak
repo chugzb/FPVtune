@@ -8,6 +8,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { storageConfig } from '../config/storage-config';
 import {
   ConfigurationError,
+  type DownloadFileResult,
   type PresignedUploadUrlParams,
   type StorageConfig,
   StorageError,
@@ -45,17 +46,33 @@ export class S3Provider implements StorageProvider {
 
   /**
    * Get the S3 client instance
+   * 直接从 process.env 读取配置，确保在 Cloudflare Workers 中正确获取环境变量
    */
   private getS3Client(): S3Client {
-    if (this.s3Client) {
-      return this.s3Client;
-    }
+    // 每次都从 process.env 读取，确保在 Cloudflare Workers 运行时正确获取
+    const region = process.env.STORAGE_REGION || this.config.region;
+    const endpoint = process.env.STORAGE_ENDPOINT || this.config.endpoint;
+    const accessKeyId =
+      process.env.STORAGE_ACCESS_KEY_ID || this.config.accessKeyId;
+    const secretAccessKey =
+      process.env.STORAGE_SECRET_ACCESS_KEY || this.config.secretAccessKey;
+    const forcePathStyle = process.env.STORAGE_FORCE_PATH_STYLE !== 'false';
 
-    const { region, endpoint, accessKeyId, secretAccessKey, forcePathStyle } =
-      this.config;
+    console.log('[S3Provider] getS3Client config:', {
+      region,
+      endpoint,
+      hasAccessKeyId: !!accessKeyId,
+      accessKeyIdLength: accessKeyId?.length || 0,
+      hasSecretAccessKey: !!secretAccessKey,
+      secretAccessKeyLength: secretAccessKey?.length || 0,
+    });
 
     if (!region) {
       throw new ConfigurationError('Storage region is not configured');
+    }
+
+    if (!accessKeyId || !secretAccessKey) {
+      throw new ConfigurationError('Storage credentials are not configured');
     }
 
     const clientOptions: any = {
@@ -72,8 +89,8 @@ export class S3Provider implements StorageProvider {
       clientOptions.forcePathStyle = forcePathStyle !== false;
     }
 
-    this.s3Client = new S3Client(clientOptions);
-    return this.s3Client;
+    // 不缓存 S3Client，每次都创建新的，确保使用最新的配置
+    return new S3Client(clientOptions);
   }
 
   /**
@@ -92,7 +109,9 @@ export class S3Provider implements StorageProvider {
     try {
       const { file, filename, contentType, folder } = params;
       const s3 = this.getS3Client();
-      const { bucketName } = this.config;
+      // 直接从 process.env 读取 bucketName
+      const bucketName =
+        process.env.STORAGE_BUCKET_NAME || this.config.bucketName;
 
       if (!bucketName) {
         throw new ConfigurationError('Storage bucket name is not configured');
@@ -119,8 +138,8 @@ export class S3Provider implements StorageProvider {
 
       await s3.send(command);
 
-      // Generate the URL
-      const { publicUrl } = this.config;
+      // Generate the URL - 直接从 process.env 读取 publicUrl
+      const publicUrl = process.env.STORAGE_PUBLIC_URL || this.config.publicUrl;
       let url: string;
 
       if (publicUrl) {
@@ -159,7 +178,9 @@ export class S3Provider implements StorageProvider {
   public async deleteFile(key: string): Promise<void> {
     try {
       const s3 = this.getS3Client();
-      const { bucketName } = this.config;
+      // 直接从 process.env 读取 bucketName
+      const bucketName =
+        process.env.STORAGE_BUCKET_NAME || this.config.bucketName;
 
       if (!bucketName) {
         throw new ConfigurationError('Storage bucket name is not configured');
@@ -187,6 +208,74 @@ export class S3Provider implements StorageProvider {
   }
 
   /**
+   * Download a file from S3
+   */
+  public async downloadFile(key: string): Promise<DownloadFileResult> {
+    try {
+      const s3 = this.getS3Client();
+      // 直接从 process.env 读取 bucketName，确保在 Cloudflare Workers 中正确获取
+      const bucketName =
+        process.env.STORAGE_BUCKET_NAME || this.config.bucketName;
+
+      console.log('[S3Provider] downloadFile:', {
+        key,
+        bucketName,
+        hasBucketName: !!bucketName,
+      });
+
+      if (!bucketName) {
+        throw new ConfigurationError('Storage bucket name is not configured');
+      }
+
+      const command = new GetObjectCommand({
+        Bucket: bucketName,
+        Key: key,
+      });
+
+      console.log('[S3Provider] Sending GetObjectCommand...');
+      const response = await s3.send(command);
+      console.log('[S3Provider] GetObjectCommand response:', {
+        hasBody: !!response.Body,
+        contentType: response.ContentType,
+        contentLength: response.ContentLength,
+      });
+
+      if (!response.Body) {
+        throw new StorageError('File not found or empty');
+      }
+
+      // Convert stream to buffer
+      const chunks: Uint8Array[] = [];
+      for await (const chunk of response.Body as AsyncIterable<Uint8Array>) {
+        chunks.push(chunk);
+      }
+      const content = Buffer.concat(chunks);
+
+      console.log('[S3Provider] downloadFile success:', {
+        key,
+        contentLength: content.length,
+      });
+
+      return {
+        content,
+        contentType: response.ContentType,
+      };
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Unknown error occurred during file download';
+      console.error('[S3Provider] downloadFile error:', {
+        key,
+        message,
+        errorName: error instanceof Error ? error.name : 'Unknown',
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+      throw new StorageError(message);
+    }
+  }
+
+  /**
    * Generate a pre-signed URL for direct browser uploads
    */
   public async getPresignedUploadUrl(
@@ -195,7 +284,9 @@ export class S3Provider implements StorageProvider {
     try {
       const { filename, contentType, folder, expiresIn = 3600 } = params;
       const s3 = this.getS3Client();
-      const { bucketName } = this.config;
+      // 直接从 process.env 读取 bucketName
+      const bucketName =
+        process.env.STORAGE_BUCKET_NAME || this.config.bucketName;
 
       if (!bucketName) {
         throw new ConfigurationError('Storage bucket name is not configured');

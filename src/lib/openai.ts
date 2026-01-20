@@ -7,7 +7,8 @@ export const getOpenAI = () => {
   if (!_openai) {
     _openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
-      baseURL: process.env.OPENAI_BASE_URL || 'https://future-api.vodeshop.com/v1',
+      baseURL:
+        process.env.OPENAI_BASE_URL || 'https://future-api.vodeshop.com/v1',
     });
   }
   return _openai;
@@ -39,6 +40,10 @@ ${isZh ? '**重要：所有文本内容必须使用中文回复，包括 summary
 - Flying style: {flyingStyle}
 - Frame size: {frameSize}
 - Additional notes: {additionalNotes}
+
+## Input Data:
+1. **Blackbox Log**: Contains flight data including gyro readings, PID outputs, motor outputs, RC commands, etc. Use this to analyze flight characteristics and identify issues.
+2. **CLI Dump (if provided)**: Contains the user's current Betaflight settings exported via "diff all" command. This shows their current PID values, filter settings, rates, and other configurations. Use this as the baseline and only modify settings that need optimization.
 
 ## Your Task:
 1. Analyze the gyro noise patterns and identify resonance frequencies

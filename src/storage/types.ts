@@ -64,6 +64,14 @@ export interface PresignedUploadUrlParams {
 }
 
 /**
+ * Download file result
+ */
+export interface DownloadFileResult {
+  content: Buffer;
+  contentType?: string;
+}
+
+/**
  * Storage provider interface
  */
 export interface StorageProvider {
@@ -71,6 +79,11 @@ export interface StorageProvider {
    * Upload a file to storage
    */
   uploadFile(params: UploadFileParams): Promise<UploadFileResult>;
+
+  /**
+   * Download a file from storage
+   */
+  downloadFile(key: string): Promise<DownloadFileResult>;
 
   /**
    * Delete a file from storage

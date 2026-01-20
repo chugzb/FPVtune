@@ -82,43 +82,51 @@ export const tutorialFeedback = pgTable("tutorial_feedback", {
 export const tuneOrder = pgTable("tune_order", {
 	id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
 	orderNumber: text('order_number').unique().notNull(),
-	
+
 	// Creem 支付信息
 	creemCheckoutId: text('creem_checkout_id'),
 	creemCustomerId: text('creem_customer_id'),
-	
+
 	// 用户信息
 	customerEmail: text('customer_email').notNull(),
 	locale: text('locale').default('en'),
-	
+
 	// 用户输入参数
 	blackboxFilename: text('blackbox_filename'),
 	blackboxFileSize: integer('blackbox_file_size'),
+	blackboxContent: text('blackbox_content'), // 存储文件内容（前50KB），避免 R2 下载问题
+	cliDumpFilename: text('cli_dump_filename'),
+	cliDumpFileSize: integer('cli_dump_file_size'),
+	cliDumpUrl: text('cli_dump_url'),
+	cliDumpContent: text('cli_dump_content'), // 存储 CLI dump 内容
 	problems: text('problems'),
 	goals: text('goals'),
 	flyingStyle: text('flying_style'),
 	frameSize: text('frame_size'),
 	additionalNotes: text('additional_notes'),
-	
+
 	// AI 分析结果
 	analysisResult: jsonb('analysis_result'),
 	cliCommands: text('cli_commands'),
-	
+
 	// 文件存证
 	pdfUrl: text('pdf_url'),
 	pdfHash: text('pdf_hash'),
 	blackboxUrl: text('blackbox_url'),
-	
+
+	// 结果链接
+	resultUrl: text('result_url'),
+
 	// 邮件追踪
 	emailSentAt: timestamp('email_sent_at'),
 	emailMessageId: text('email_message_id'),
 	emailDeliveredAt: timestamp('email_delivered_at'),
-	
+
 	// 订单状态: pending -> paid -> processing -> completed / failed
 	status: text('status').default('pending').notNull(),
 	amount: integer('amount'),
 	currency: text('currency').default('USD'),
-	
+
 	// 时间戳
 	createdAt: timestamp('created_at').notNull().defaultNow(),
 	paidAt: timestamp('paid_at'),

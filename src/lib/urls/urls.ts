@@ -1,15 +1,21 @@
 import { routing } from '@/i18n/routing';
 import type { Locale } from 'next-intl';
 
-const baseUrl =
-  process.env.NEXT_PUBLIC_BASE_URL ??
-  `http://localhost:${process.env.PORT ?? 3000}`;
-
 /**
  * Get the base URL of the application
+ * Uses window.location.origin in browser, falls back to env vars on server
  */
 export function getBaseUrl(): string {
-  return baseUrl;
+  // In browser, use current origin
+  if (typeof window !== 'undefined') {
+    return window.location.origin;
+  }
+
+  // On server, use environment variable
+  return (
+    process.env.NEXT_PUBLIC_BASE_URL ??
+    `http://localhost:${process.env.PORT ?? 3000}`
+  );
 }
 
 /**
@@ -23,6 +29,7 @@ export function shouldAppendLocale(locale?: Locale | null): boolean {
  * Get the URL of the application with the locale appended
  */
 export function getUrlWithLocale(url: string, locale?: Locale | null): string {
+  const baseUrl = getBaseUrl();
   return shouldAppendLocale(locale)
     ? `${baseUrl}/${locale}${url}`
     : `${baseUrl}${url}`;

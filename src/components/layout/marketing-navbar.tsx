@@ -13,6 +13,7 @@ import {
   useLocalePathname,
   useLocaleRouter,
 } from '@/i18n/navigation';
+import { LOCALE_COOKIE_NAME } from '@/i18n/routing';
 import { useLocaleStore } from '@/stores/locale-store';
 import { type Locale, useLocale, useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
@@ -37,6 +38,8 @@ function LocaleSwitcher() {
 
   const setLocale = (nextLocale: Locale) => {
     setCurrentLocale(nextLocale);
+    // Set cookie for next-intl to persist the preference
+    document.cookie = `${LOCALE_COOKIE_NAME}=${nextLocale}; path=/; max-age=31536000; SameSite=Lax`;
     startTransition(() => {
       router.replace(
         // @ts-expect-error -- TypeScript will validate that only known `params`

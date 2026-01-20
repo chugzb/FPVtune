@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/sidebar';
 import { websiteConfig } from '@/config/website';
 import { useLocalePathname, useLocaleRouter } from '@/i18n/navigation';
-import { LOCALES, routing } from '@/i18n/routing';
+import { LOCALES, LOCALE_COOKIE_NAME, routing } from '@/i18n/routing';
 import { authClient } from '@/lib/auth-client';
 import { useLocaleStore } from '@/stores/locale-store';
 import { usePaymentStore } from '@/stores/payment-store';
@@ -61,6 +61,8 @@ export function SidebarUser({ user, className }: SidebarUserProps) {
 
   const setLocale = (nextLocale: Locale) => {
     setCurrentLocale(nextLocale);
+    // Set cookie for next-intl to persist the preference
+    document.cookie = `${LOCALE_COOKIE_NAME}=${nextLocale}; path=/; max-age=31536000; SameSite=Lax`;
 
     startTransition(() => {
       router.replace(
@@ -100,7 +102,7 @@ export function SidebarUser({ user, className }: SidebarUserProps) {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="cursor-pointer data-[state=open]:bg-sidebar-accent 
+              className="cursor-pointer data-[state=open]:bg-sidebar-accent
               data-[state=open]:text-sidebar-accent-foreground"
             >
               <UserAvatar

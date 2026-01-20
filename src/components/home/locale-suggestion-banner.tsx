@@ -2,6 +2,7 @@
 
 import { websiteConfig } from '@/config/website';
 import { useLocalePathname, useLocaleRouter } from '@/i18n/navigation';
+import { LOCALE_COOKIE_NAME } from '@/i18n/routing';
 import { useLocaleStore } from '@/stores/locale-store';
 import { X } from 'lucide-react';
 import { type Locale, useLocale } from 'next-intl';
@@ -54,8 +55,10 @@ export function LocaleSuggestionBanner() {
   const handleSwitch = () => {
     if (!suggestedLocale) return;
 
-    // Save user's language preference
+    // Save user's language preference to localStorage
     localStorage.setItem(LOCALE_PREFERENCE_KEY, suggestedLocale);
+    // Also set the cookie for next-intl to persist the preference
+    document.cookie = `${LOCALE_COOKIE_NAME}=${suggestedLocale}; path=/; max-age=31536000; SameSite=Lax`;
     setCurrentLocale(suggestedLocale);
     startTransition(() => {
       router.replace(
@@ -70,6 +73,8 @@ export function LocaleSuggestionBanner() {
   const handleDismiss = () => {
     // Save current locale as user's preference (they chose to keep it)
     localStorage.setItem(LOCALE_PREFERENCE_KEY, currentLocale);
+    // Also set the cookie for next-intl to persist the preference
+    document.cookie = `${LOCALE_COOKIE_NAME}=${currentLocale}; path=/; max-age=31536000; SameSite=Lax`;
     setIsDismissed(true);
   };
 

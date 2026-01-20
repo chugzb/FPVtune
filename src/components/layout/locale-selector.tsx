@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/select';
 import { websiteConfig } from '@/config/website';
 import { useLocalePathname, useLocaleRouter } from '@/i18n/navigation';
-import { DEFAULT_LOCALE } from '@/i18n/routing';
+import { DEFAULT_LOCALE, LOCALE_COOKIE_NAME } from '@/i18n/routing';
 import { useLocaleStore } from '@/stores/locale-store';
 import { type Locale, useLocale } from 'next-intl';
 import { useParams } from 'next/navigation';
@@ -45,6 +45,8 @@ export default function LocaleSelector() {
 
   const onSelectChange = (nextLocale: Locale) => {
     setCurrentLocale(nextLocale);
+    // Set cookie for next-intl to persist the preference
+    document.cookie = `${LOCALE_COOKIE_NAME}=${nextLocale}; path=/; max-age=31536000; SameSite=Lax`;
 
     startTransition(() => {
       router.replace(

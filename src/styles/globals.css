@@ -416,6 +416,32 @@ body {
   scrollbar-width: none; /* Firefox */
 }
 
+/* CLI Commands white scrollbar */
+.cli-scrollbar {
+  -ms-overflow-style: auto !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
+}
+
+.cli-scrollbar::-webkit-scrollbar {
+  display: block !important;
+  width: 6px;
+  height: 6px;
+}
+
+.cli-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.cli-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 3px;
+}
+
+.cli-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.6);
+}
+
 /* Blog MDX Content Styles - Fix dark mode colors */
 .dark .prose {
   --tw-prose-body: oklch(0.85 0.01 255.51);

@@ -1,0 +1,85 @@
+Traceback (most recent call last):
+  File "/Users/a1/A1项目/fpv/test_production_complete.py", line 119, in test_complete_flow
+    page.get_by_role('button', name='Continue').click()
+  File "/Users/a1/Library/Python/3.9/lib/python/site-packages/playwright/sync_api/_generated.py", line 15637, in click
+    self._sync(
+  File "/Users/a1/Library/Python/3.9/lib/python/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+    return task.result()
+  File "/Users/a1/Library/Python/3.9/lib/python/site-packages/playwright/_impl/_locator.py", line 162, in click
+    return await self._frame._click(self._selector, strict=True, **params)
+  File "/Users/a1/Library/Python/3.9/lib/python/site-packages/playwright/_impl/_frame.py", line 566, in _click
+    await self._channel.send("click", self._timeout, locals_to_params(locals()))
+  File "/Users/a1/Library/Python/3.9/lib/python/site-packages/playwright/_impl/_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+  File "/Users/a1/Library/Python/3.9/lib/python/site-packages/playwright/_impl/_connection.py", line 559, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for get_by_role("button", name="Continue")
+    - locator resolved to <button disabled type="button" class="flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all bg-white/10 text-gray-500 cursor-not-allowed">…</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is not enabled
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is not enabled
+    - retrying click action
+      - waiting 100ms
+    59 × waiting for element to be visible, enabled and stable
+       - element is not enabled
+     - retrying click action
+       - waiting 500ms
+
+
+=== 开始测试生产环境 ===
+
+步骤 1: 访问 https://fpvtune.com/tune
+[CONSOLE ERROR] Failed to load resource: net::ERR_CONNECTION_CLOSED
+[API] 200 https://fpvtune.com/api/auth/get-session
+✓ 页面加载完成
+
+步骤 2: 上传 Blackbox 文件
+✓ 文件已上传
+[CONSOLE ERROR] Failed to load resource: net::ERR_CONNECTION_CLOSED
+✓ 进入问题选择页面
+
+步骤 3: 选择问题 - Prop Wash
+✓ 已选择 Prop Wash
+
+步骤 4: 选择目标 - Locked-in Feel
+✓ 已选择 Locked-in Feel
+
+步骤 5: 选择飞行风格 - Freestyle
+✓ 已选择 Freestyle
+
+步骤 6: 选择机架尺寸 - 5 inch
+当前 URL: https://fpvtune.com/tune
+
+❌ 测试失败: Locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for get_by_role("button", name="Continue")
+    - locator resolved to <button disabled type="button" class="flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all bg-white/10 text-gray-500 cursor-not-allowed">…</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is not enabled
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is not enabled
+    - retrying click action
+      - waiting 100ms
+    59 × waiting for element to be visible, enabled and stable
+       - element is not enabled
+     - retrying click action
+       - waiting 500ms
+
+
+=== 控制台错误汇总 ===
+1. Failed to load resource: net::ERR_CONNECTION_CLOSED
+2. Failed to load resource: net::ERR_CONNECTION_CLOSED
+
+=== API 调用汇总 ===
+200 - https://fpvtune.com/api/auth/get-session
+
+=== 测试完成 ===

@@ -14,6 +14,7 @@ import {
   useLocalePathname,
   useLocaleRouter,
 } from '@/i18n/navigation';
+import { LOCALE_COOKIE_NAME } from '@/i18n/routing';
 import { useLocaleStore } from '@/stores/locale-store';
 import {
   Activity,
@@ -54,6 +55,8 @@ function HomeLocaleSwitcher() {
 
   const setLocale = (nextLocale: Locale) => {
     setCurrentLocale(nextLocale);
+    // Set cookie for next-intl to persist the preference
+    document.cookie = `${LOCALE_COOKIE_NAME}=${nextLocale}; path=/; max-age=31536000; SameSite=Lax`;
     startTransition(() => {
       router.replace(
         // @ts-expect-error -- TypeScript will validate that only known `params`
@@ -119,6 +122,12 @@ export function FPVtuneHome() {
             >
               {t('nav.howItWorks')}
             </a>
+            <LocaleLink
+              href="/pricing"
+              className="hover:text-white transition-colors"
+            >
+              {t('nav.pricing')}
+            </LocaleLink>
             <LocaleLink
               href="/guides"
               className="hover:text-white transition-colors"
@@ -186,36 +195,12 @@ export function FPVtuneHome() {
         </div>
       </header>
 
-      {/* Stats Section */}
+      {/* Compatibility Badge */}
       <section className="border-y border-white/5 bg-black/40 backdrop-blur-sm relative z-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8">
-          <div className="text-center md:text-left">
-            <div className="text-xl sm:text-2xl font-bold text-white">
-              0.02s
-            </div>
-            <div className="text-[10px] sm:text-xs text-gray-500 font-mono uppercase mt-1">
-              {t('landing.stats.analysisSpeed')}
-            </div>
-          </div>
-          <div className="text-center md:text-left">
-            <div className="text-2xl font-bold text-white">98.5%</div>
-            <div className="text-[10px] sm:text-xs text-gray-500 font-mono uppercase mt-1">
-              {t('landing.stats.noiseReduction')}
-            </div>
-          </div>
-          <div className="text-center md:text-left">
-            <div className="text-xl sm:text-2xl font-bold text-white">54k+</div>
-            <div className="text-[10px] sm:text-xs text-gray-500 font-mono uppercase mt-1">
-              {t('landing.stats.dronesTuned')}
-            </div>
-          </div>
-          <div className="text-center md:text-left flex items-center justify-center md:justify-start gap-2">
-            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
-            <div className="text-xs sm:text-sm text-gray-300 font-medium">
-              Betaflight 4.3+
-              <br />
-              {t('landing.stats.compatible')}
-            </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 flex items-center justify-center gap-2">
+          <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
+          <div className="text-xs sm:text-sm text-gray-300 font-medium">
+            Betaflight 4.5+ {t('landing.stats.compatible')}
           </div>
         </div>
       </section>
