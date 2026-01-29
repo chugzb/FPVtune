@@ -176,8 +176,8 @@ export function TuneWizard() {
       case 4:
         return formData.flyingStyle !== '';
       case 5:
-        // 机架尺寸和电机信息必填，重量选填
-        return formData.frameSize !== '' && formData.motorSize !== '' && formData.motorKv !== '';
+        // 机架尺寸、电机信息、电池类型、螺旋桨、电机温度必填，重量选填
+        return formData.frameSize !== '' && formData.motorSize !== '' && formData.motorKv !== '' && formData.battery !== '' && formData.propeller !== '' && formData.motorTemp !== '';
       case 6:
         return formData.email !== '';
       default:
@@ -1051,7 +1051,7 @@ function StepHardware({
       {/* Battery Type Selection */}
       <div className="space-y-3">
         <label className="block text-sm font-medium text-white">
-          {t('battery')} <span className="text-gray-500">({t('optional')})</span>
+          {t('battery')} <span className="text-red-400">*</span>
         </label>
         <div className="grid grid-cols-3 gap-3">
           {batteryOptions.map((opt) => (
@@ -1081,7 +1081,7 @@ function StepHardware({
       {/* Propeller Input */}
       <div className="space-y-3">
         <label htmlFor="propeller" className="block text-sm font-medium text-white">
-          {t('propeller')} <span className="text-gray-500">({t('optional')})</span>
+          {t('propeller')} <span className="text-red-400">*</span>
         </label>
         <input
           id="propeller"
@@ -1100,7 +1100,7 @@ function StepHardware({
       {/* Motor Temperature Selection */}
       <div className="space-y-3">
         <label className="block text-sm font-medium text-white">
-          {t('motorTemp')} <span className="text-gray-500">({t('optional')})</span>
+          {t('motorTemp')} <span className="text-red-400">*</span>
         </label>
         <div className="grid grid-cols-3 gap-3">
           {motorTempOptions.map((opt) => (

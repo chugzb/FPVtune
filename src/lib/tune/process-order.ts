@@ -102,16 +102,19 @@ async function runAIAnalysis(
     // 从响应中提取 JSON（可能包含 markdown 或思考过程）
     let jsonStr = result;
 
+    // 移除 <think>...</think> 标签及其内容
+    jsonStr = jsonStr.replace(/<think>[\s\S]*?<\/think>/gi, '');
+
     // 尝试提取 ```json ... ``` 代码块
-    const jsonMatch = result.match(/```json\s*([\s\S]*?)\s*```/);
+    const jsonMatch = jsonStr.match(/```json\s*([\s\S]*?)\s*```/);
     if (jsonMatch) {
       jsonStr = jsonMatch[1];
     } else {
       // 尝试找到第一个 { 和最后一个 }
-      const firstBrace = result.indexOf('{');
-      const lastBrace = result.lastIndexOf('}');
+      const firstBrace = jsonStr.indexOf('{');
+      const lastBrace = jsonStr.lastIndexOf('}');
       if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-        jsonStr = result.substring(firstBrace, lastBrace + 1);
+        jsonStr = jsonStr.substring(firstBrace, lastBrace + 1);
       }
     }
 
