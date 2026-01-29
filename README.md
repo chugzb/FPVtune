@@ -1,12 +1,12 @@
 # FPVTune
 
-AI-Powered FPV Drone Tuning Assistant
+Neural Network-Powered FPV Drone Tuning Assistant
 
-FPVTune is an AI-powered assistant for FPV drone PID tuning and configuration optimization. Built with Next.js 15, deployed on Cloudflare Pages.
+FPVTune is a neural network-powered assistant for FPV drone PID tuning and configuration optimization. Built with Next.js 15, deployed on Cloudflare Pages.
 
 ## Features
 
-- AI-powered PID tuning recommendations
+- Neural network-powered PID tuning recommendations
 - Flight controller configuration analysis
 - Blackbox log analysis
 - Multi-language support (English/Chinese)

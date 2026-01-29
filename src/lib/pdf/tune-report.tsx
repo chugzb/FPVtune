@@ -1,12 +1,12 @@
+import type { AnalysisResult } from '@/types/tune';
 import {
   Document,
+  Font,
   Page,
+  StyleSheet,
   Text,
   View,
-  StyleSheet,
-  Font,
 } from '@react-pdf/renderer';
-import type { AnalysisResult } from '@/types/tune';
 
 Font.register({
   family: 'Inter',
@@ -253,7 +253,8 @@ export function TuneReport({
         {/* Title */}
         <Text style={styles.title}>PID Tuning Analysis Report</Text>
         <Text style={styles.subtitle}>
-          AI-optimized Betaflight settings for {flyingStyle} flying on {frameSize}" frame
+          Neural network-optimized Betaflight settings for {flyingStyle} flying
+          on {frameSize}" frame
         </Text>
 
         {/* Analysis Summary */}
@@ -268,20 +269,27 @@ export function TuneReport({
             <View style={styles.issueBox}>
               <Text style={styles.issueTitle}>Issues Identified</Text>
               {analysis.analysis.issues.map((issue: string, i: number) => (
-                <Text key={i} style={styles.issueItem}>• {issue}</Text>
+                <Text key={i} style={styles.issueItem}>
+                  • {issue}
+                </Text>
               ))}
             </View>
           )}
 
           {/* Recommendations */}
-          {analysis.analysis.recommendations && analysis.analysis.recommendations.length > 0 && (
-            <View style={styles.recommendBox}>
-              <Text style={styles.recommendTitle}>Recommendations</Text>
-              {analysis.analysis.recommendations.map((rec: string, i: number) => (
-                <Text key={i} style={styles.recommendItem}>• {rec}</Text>
-              ))}
-            </View>
-          )}
+          {analysis.analysis.recommendations &&
+            analysis.analysis.recommendations.length > 0 && (
+              <View style={styles.recommendBox}>
+                <Text style={styles.recommendTitle}>Recommendations</Text>
+                {analysis.analysis.recommendations.map(
+                  (rec: string, i: number) => (
+                    <Text key={i} style={styles.recommendItem}>
+                      • {rec}
+                    </Text>
+                  )
+                )}
+              </View>
+            )}
         </View>
 
         {/* PID Values */}
@@ -325,35 +333,51 @@ export function TuneReport({
           <View style={styles.filterGrid}>
             <View style={styles.filterItem}>
               <Text style={styles.filterLabel}>Gyro LPF</Text>
-              <Text style={styles.filterValue}>{analysis.filters.gyro_lowpass_hz} Hz</Text>
+              <Text style={styles.filterValue}>
+                {analysis.filters.gyro_lowpass_hz} Hz
+              </Text>
             </View>
             <View style={styles.filterItem}>
               <Text style={styles.filterLabel}>Gyro LPF2</Text>
-              <Text style={styles.filterValue}>{analysis.filters.gyro_lowpass2_hz} Hz</Text>
+              <Text style={styles.filterValue}>
+                {analysis.filters.gyro_lowpass2_hz} Hz
+              </Text>
             </View>
             <View style={styles.filterItem}>
               <Text style={styles.filterLabel}>D-term LPF</Text>
-              <Text style={styles.filterValue}>{analysis.filters.dterm_lowpass_hz} Hz</Text>
+              <Text style={styles.filterValue}>
+                {analysis.filters.dterm_lowpass_hz} Hz
+              </Text>
             </View>
             <View style={styles.filterItem}>
               <Text style={styles.filterLabel}>D-term LPF2</Text>
-              <Text style={styles.filterValue}>{analysis.filters.dterm_lowpass2_hz} Hz</Text>
+              <Text style={styles.filterValue}>
+                {analysis.filters.dterm_lowpass2_hz} Hz
+              </Text>
             </View>
             <View style={styles.filterItem}>
               <Text style={styles.filterLabel}>Dyn Notch Count</Text>
-              <Text style={styles.filterValue}>{analysis.filters.dyn_notch_count}</Text>
+              <Text style={styles.filterValue}>
+                {analysis.filters.dyn_notch_count}
+              </Text>
             </View>
             <View style={styles.filterItem}>
               <Text style={styles.filterLabel}>Dyn Notch Q</Text>
-              <Text style={styles.filterValue}>{analysis.filters.dyn_notch_q}</Text>
+              <Text style={styles.filterValue}>
+                {analysis.filters.dyn_notch_q}
+              </Text>
             </View>
             <View style={styles.filterItem}>
               <Text style={styles.filterLabel}>Dyn Notch Min</Text>
-              <Text style={styles.filterValue}>{analysis.filters.dyn_notch_min_hz} Hz</Text>
+              <Text style={styles.filterValue}>
+                {analysis.filters.dyn_notch_min_hz} Hz
+              </Text>
             </View>
             <View style={styles.filterItem}>
               <Text style={styles.filterLabel}>Dyn Notch Max</Text>
-              <Text style={styles.filterValue}>{analysis.filters.dyn_notch_max_hz} Hz</Text>
+              <Text style={styles.filterValue}>
+                {analysis.filters.dyn_notch_max_hz} Hz
+              </Text>
             </View>
           </View>
         </View>
@@ -364,7 +388,9 @@ export function TuneReport({
             Generated by FPVtune AI • {customerEmail}
           </Text>
           {pdfHash && (
-            <Text style={styles.footerHash}>Hash: {pdfHash.substring(0, 16)}...</Text>
+            <Text style={styles.footerHash}>
+              Hash: {pdfHash.substring(0, 16)}...
+            </Text>
           )}
         </View>
       </Page>
@@ -393,19 +419,29 @@ export function TuneReport({
         <View style={[styles.section, { marginTop: 30 }]}>
           <Text style={styles.sectionTitle}>How to Apply</Text>
           <View style={styles.recommendBox}>
-            <Text style={styles.recommendItem}>1. Connect your flight controller via USB</Text>
-            <Text style={styles.recommendItem}>2. Open Betaflight Configurator</Text>
+            <Text style={styles.recommendItem}>
+              1. Connect your flight controller via USB
+            </Text>
+            <Text style={styles.recommendItem}>
+              2. Open Betaflight Configurator
+            </Text>
             <Text style={styles.recommendItem}>3. Go to the CLI tab</Text>
-            <Text style={styles.recommendItem}>4. Copy all commands above and paste into CLI</Text>
+            <Text style={styles.recommendItem}>
+              4. Copy all commands above and paste into CLI
+            </Text>
             <Text style={styles.recommendItem}>5. Press Enter to execute</Text>
-            <Text style={styles.recommendItem}>6. Type "save" and press Enter to save settings</Text>
-            <Text style={styles.recommendItem}>7. Disconnect and test fly safely!</Text>
+            <Text style={styles.recommendItem}>
+              6. Type "save" and press Enter to save settings
+            </Text>
+            <Text style={styles.recommendItem}>
+              7. Disconnect and test fly safely!
+            </Text>
           </View>
         </View>
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            FPVtune.com • AI-Powered Betaflight PID Tuning
+            FPVtune.com • Neural Network-Powered Betaflight PID Tuning
           </Text>
           <Text style={styles.footerText}>Page 2 of 2</Text>
         </View>

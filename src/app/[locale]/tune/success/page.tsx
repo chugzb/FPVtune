@@ -4,16 +4,19 @@ import { Logo } from '@/components/ui/logo';
 import { cn } from '@/lib/utils';
 import {
   AlertCircle,
+  ArrowLeft,
   Check,
   CheckCircle,
+  ChevronDown,
+  ChevronUp,
   Copy,
   Download,
   Loader2,
-  Mail,
-  Sparkles,
+  X,
   Zap,
 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useCallback, useEffect, useState } from 'react';
 
@@ -26,19 +29,15 @@ interface AnalysisResult {
     recommendations: string[];
   };
   pid: {
-    roll: { p: number; i: number; d: number; f: number };
-    pitch: { p: number; i: number; d: number; f: number };
-    yaw: { p: number; i: number; d: number; f: number };
+    roll: { p: number; i: number; d: number };
+    pitch: { p: number; i: number; d: number };
+    yaw: { p: number; i: number; d: number };
   };
   filters: {
     gyro_lowpass_hz: number;
-    gyro_lowpass2_hz: number;
     dterm_lowpass_hz: number;
-    dterm_lowpass2_hz: number;
     dyn_notch_count: number;
     dyn_notch_q: number;
-    dyn_notch_min_hz: number;
-    dyn_notch_max_hz: number;
   };
   cli_commands: string;
 }
@@ -47,72 +46,74 @@ interface OrderData {
   orderNumber: string;
   status: OrderStatus;
   email: string;
-  problems: string;
-  goals: string;
-  flyingStyle: string;
-  frameSize: string;
-  analysis: AnalysisResult | null;
-  cliCommands: string | null;
+  analysis?: AnalysisResult;
 }
 
-function SuccessContent() {
-  const t = useTranslations('TunePage.success');
-  const tResults = useTranslations('TunePage.wizard.results');
-  const tStyles = useTranslations('TunePage.wizard.styles.items');
-  const tFrames = useTranslations('TunePage.wizard.frames.items');
-  const tProblems = useTranslations('TunePage.wizard.problems.items');
-  const tGoals = useTranslations('TunePage.wizard.goals.items');
+function SuccessPageContent() {
+  const t = useTranslations('TunePage.wizard.results');
+  const tSuccess = useTranslations('TunePage.success');
   const locale = useLocale();
   const searchParams = useSearchParams();
   const orderNumber = searchParams.get('order');
 
-  const [mounted, setMounted] = useState(false);
   const [order, setOrder] = useState<OrderData | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showResults, setShowResults] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  const [sections, setSections] = useState({
+    summaryDetail: false,
+    issues: false,
+    recommendations: false,
+    filters: false,
+  });
+
+  const isZh = locale === 'zh';
+
   const fetchOrderStatus = useCallback(async () => {
-    if (!orderNumber) return;
+    if (!orderNumber) {
+      setError(isZh ? '缺少订单号' : 'Missing order number');
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await fetch(`/api/tune/order/${orderNumber}`);
       if (!response.ok) {
         if (response.status === 404) {
-          setError(t('error.notFound'));
+          setError(tSuccess('error.notFound'));
         } else {
-          setError(t('error.loadFailed'));
+          setError(tSuccess('error.loadFailed'));
         }
+        setLoading(false);
         return;
       }
 
       const data = await response.json();
       setOrder(data.order);
+      setLoading(false);
     } catch {
-      setError(t('error.loadFailed'));
+      setError(tSuccess('error.loadFailed'));
+      setLoading(false);
     }
-  }, [orderNumber, t]);
+  }, [orderNumber, tSuccess, isZh]);
 
   useEffect(() => {
-    setMounted(true);
     fetchOrderStatus();
   }, [fetchOrderStatus]);
 
-  // 轮询订单状态
+  // 轮询未完成的订单
   useEffect(() => {
-    if (!orderNumber || !order) return;
+    if (!order) return;
     if (order.status === 'completed' || order.status === 'failed') return;
 
     const interval = setInterval(fetchOrderStatus, 3000);
     return () => clearInterval(interval);
-  }, [orderNumber, order, fetchOrderStatus]);
+  }, [order, fetchOrderStatus]);
 
-  // 当订单完成时自动显示结果
-  useEffect(() => {
-    if (order?.status === 'completed' && order.analysis) {
-      setShowResults(true);
-    }
-  }, [order?.status, order?.analysis]);
+  const toggleSection = (key: keyof typeof sections) => {
+    setSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const handleCopy = async () => {
     if (!order?.analysis?.cli_commands) return;
@@ -140,558 +141,486 @@ function SuccessContent() {
     URL.revokeObjectURL(url);
   };
 
-  // 获取可读名称
-  const getStyleName = (id: string) => {
-    try {
-      return tStyles(`${id}.name` as any);
-    } catch {
-      return id;
-    }
+  const getOneLineConclusion = (text: string) => {
+    if (!text)
+      return isZh ? '已生成调参方案' : 'Tuning recommendations generated';
+    const first = text.split(/(?<=[。！？.!?])/)[0]?.trim();
+    if (!first) return text.length > 80 ? `${text.slice(0, 80)}...` : text;
+    return first.length <= 80 ? first : `${first.slice(0, 80)}...`;
   };
 
-  const getFrameName = (id: string) => {
-    try {
-      return tFrames(`${id}.name` as any);
-    } catch {
-      return id;
-    }
-  };
+  const issueLabels = isZh
+    ? ['高风险', '手感问题', '热量风险', '响应不足', '动态过激', '噪声关注']
+    : [
+        'High Risk',
+        'Feel Issue',
+        'Heat Risk',
+        'Low Response',
+        'Over Dynamic',
+        'Noise',
+      ];
 
-  const getProblemNames = (ids: string) => {
-    if (!ids) return [];
-    return ids.split(', ').map((id) => {
-      try {
-        return tProblems(`${id.trim()}.name` as any);
-      } catch {
-        return id;
-      }
-    });
-  };
+  const expectedEffects = isZh
+    ? [
+        '降低桨洗振荡，抑制 D 峰值',
+        '减少滤波延迟，提升跟随性',
+        '高油门锁定感更稳定',
+        '提升跟手感，减小滞后',
+        '急加减油更稳',
+        '陷波更贴合噪声段',
+        '逐步扩大余量',
+      ]
+    : [
+        'Reduce propwash, suppress D peaks',
+        'Reduce filter delay, improve tracking',
+        'More stable lock-in at high throttle',
+        'Better stick feel, less lag',
+        'Smoother throttle transitions',
+        'Notch better aligned to noise',
+        'Gradually increase headroom',
+      ];
 
-  const getGoalNames = (ids: string) => {
-    if (!ids) return [];
-    return ids.split(', ').map((id) => {
-      try {
-        return tGoals(`${id.trim()}.name` as any);
-      } catch {
-        return id;
-      }
-    });
-  };
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#030304] flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-blue-500 animate-spin mx-auto mb-4" />
+          <p className="text-gray-400">{isZh ? '加载中...' : 'Loading...'}</p>
+        </div>
+      </div>
+    );
+  }
 
-  const getStatusIcon = (status: OrderStatus) => {
-    switch (status) {
-      case 'paid':
-        return <CheckCircle className="w-5 h-5 text-green-400" />;
-      case 'processing':
-        return <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />;
-      case 'completed':
-        return <CheckCircle className="w-5 h-5 text-green-400" />;
-      case 'failed':
-        return <AlertCircle className="w-5 h-5 text-red-400" />;
-      default:
-        return <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />;
-    }
-  };
-
+  // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-[#030304] text-white flex flex-col items-center justify-center px-6">
-        <AlertCircle className="w-16 h-16 text-red-400 mb-4" />
-        <h1 className="text-2xl font-bold mb-2">{error}</h1>
-        <a
-          href={`/${locale}/tune`}
-          className="mt-4 px-6 py-3 bg-blue-500 hover:bg-blue-600 rounded-xl font-medium transition-colors"
-        >
-          {t('newAnalysis')}
-        </a>
+      <div className="min-h-screen bg-[#030304] flex items-center justify-center">
+        <div className="text-center max-w-md mx-4">
+          <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-white mb-2">{error}</h2>
+          <Link
+            href={`/${locale}/tune`}
+            className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/15 rounded-xl font-medium transition-colors text-white"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            {isZh ? '返回' : 'Go Back'}
+          </Link>
+        </div>
       </div>
     );
   }
 
-  // 显示结果页面
-  if (showResults && order?.analysis) {
+  // Processing state (not yet completed)
+  if (order && order.status !== 'completed') {
     return (
-      <ResultsView
-        order={order}
-        tResults={tResults}
-        locale={locale}
-        copied={copied}
-        onCopy={handleCopy}
-        onDownload={handleDownload}
-        onBack={() => setShowResults(false)}
-      />
+      <div className="min-h-screen bg-[#030304] flex items-center justify-center">
+        <div className="text-center max-w-md mx-4">
+          <Loader2 className="w-16 h-16 text-blue-500 animate-spin mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-white mb-2">
+            {tSuccess('status.processing')}
+          </h2>
+          <p className="text-gray-400 mb-4">
+            {tSuccess('status.processingHint')}
+          </p>
+          <div className="bg-white/5 rounded-xl border border-white/10 p-4">
+            <p className="text-sm text-gray-400 mb-1">
+              {tSuccess('orderNumber')}
+            </p>
+            <p className="font-mono text-lg text-white">{orderNumber}</p>
+          </div>
+        </div>
+      </div>
     );
   }
+
+  // No analysis data
+  if (!order?.analysis) {
+    return (
+      <div className="min-h-screen bg-[#030304] flex items-center justify-center">
+        <div className="text-center max-w-md mx-4">
+          <AlertCircle className="w-16 h-16 text-amber-400 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-white mb-2">
+            {isZh ? '分析结果不可用' : 'Analysis not available'}
+          </h2>
+          <p className="text-gray-400 mb-6">
+            {isZh
+              ? '请检查您的邮箱获取完整报告'
+              : 'Please check your email for the full report'}
+          </p>
+          <Link
+            href={`/${locale}/tune`}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/15 rounded-xl font-medium transition-colors text-white"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            {isZh ? '返回' : 'Go Back'}
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const result = order.analysis;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#030304] via-[#0a0b0f] to-[#030304] text-white flex flex-col relative overflow-hidden">
-      {/* Animated Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-green-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
-      </div>
-
+    <div className="min-h-screen bg-[#030304] text-white">
       {/* Header */}
-      <header className="border-b border-white/5 bg-[#030304]/80 backdrop-blur-xl relative z-10">
-        <div className="max-w-4xl mx-auto px-6 h-16 flex justify-center items-center">
-          <a
-            href="/"
-            className="flex items-center hover:opacity-80 transition-opacity"
-          >
+      <header className="fixed top-0 w-full z-50 border-b border-white/5 bg-[#030304]/80 backdrop-blur-xl">
+        <div className="max-w-4xl mx-auto px-6 h-16 flex justify-between items-center">
+          <Link href="/" className="flex items-center">
             <Logo className="h-6 w-auto" />
-          </a>
+          </Link>
+          <Link
+            href={`/${locale}/tune`}
+            className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            {isZh ? '新分析' : 'New Analysis'}
+          </Link>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center px-6 py-16 relative z-10">
-        <div
-          className={cn(
-            'max-w-lg w-full text-center space-y-6 transition-all duration-1000',
-            mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          )}
-        >
-          {/* Success Icon */}
-          <div className="relative">
-            <div className="w-20 h-20 bg-gradient-to-br from-green-500/30 to-emerald-500/30 rounded-full flex items-center justify-center mx-auto relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-full animate-ping" />
-              <CheckCircle
-                className="w-10 h-10 text-green-400 relative z-10"
-                strokeWidth={2.5}
-              />
+      <main className="pt-24 pb-12 px-6">
+        <div className="max-w-2xl mx-auto space-y-6">
+          {/* Success Header */}
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-8 h-8 text-green-400" />
             </div>
-            <Sparkles className="w-5 h-5 text-yellow-400 absolute top-0 right-1/3 animate-bounce" />
-          </div>
-
-          {/* Title */}
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold">{t('title')}</h1>
+            <h1 className="text-2xl font-bold mb-2">{t('title')}</h1>
             <p className="text-gray-400">{t('description')}</p>
+            {orderNumber && (
+              <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-white/5 rounded-lg">
+                <Zap className="w-4 h-4 text-blue-400" />
+                <span className="text-sm text-gray-400">
+                  {tSuccess('orderNumber')}:
+                </span>
+                <span className="font-mono text-white">{orderNumber}</span>
+              </div>
+            )}
           </div>
 
-          {/* Order Number */}
-          {orderNumber && (
-            <div className="bg-white/5 rounded-xl border border-white/10 p-4">
-              <p className="text-sm text-gray-400 mb-1 flex items-center justify-center gap-2">
-                <Zap className="w-4 h-4" />
-                {t('orderNumber')}
-              </p>
-              <p className="font-mono text-lg text-white">{orderNumber}</p>
+          {/* Analysis Summary */}
+          <div className="bg-white/5 rounded-xl border border-white/10 p-5">
+            <h3 className="font-medium text-white mb-3">
+              {t('analysisSummary')}
+            </h3>
+            <div className="rounded-lg bg-black/20 p-3 text-sm leading-relaxed text-white/85">
+              <div className="flex items-start gap-2">
+                <span className="inline-flex rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs text-emerald-300 flex-shrink-0">
+                  {isZh ? '结论' : 'Summary'}
+                </span>
+                <p className="flex-1">
+                  {getOneLineConclusion(result.analysis.summary)}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="mt-3 inline-flex items-center gap-2 text-xs text-white/60 hover:text-white/80"
+              onClick={() => toggleSection('summaryDetail')}
+            >
+              {sections.summaryDetail ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              )}
+              {sections.summaryDetail
+                ? isZh
+                  ? '收起详细摘要'
+                  : 'Collapse details'
+                : isZh
+                  ? '展开详细摘要'
+                  : 'Expand details'}
+            </button>
+            {sections.summaryDetail && (
+              <div className="mt-3 rounded-lg bg-black/20 p-4 text-sm leading-relaxed text-white/75 whitespace-pre-wrap">
+                {result.analysis.summary}
+              </div>
+            )}
+          </div>
+
+          {/* Issues */}
+          {result.analysis.issues.length > 0 && (
+            <div className="bg-white/5 rounded-xl border border-white/10 p-5">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-medium text-white">
+                  {t('issuesIdentified')}
+                </h3>
+                <button
+                  type="button"
+                  className="text-xs text-white/60 hover:text-white/80 flex items-center gap-1"
+                  onClick={() => toggleSection('issues')}
+                >
+                  {sections.issues ? (
+                    <ChevronUp className="w-4 h-4" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4" />
+                  )}
+                  {sections.issues
+                    ? isZh
+                      ? '收起'
+                      : 'Collapse'
+                    : isZh
+                      ? '展开'
+                      : 'Expand'}
+                </button>
+              </div>
+              {sections.issues ? (
+                <ul className="space-y-3">
+                  {result.analysis.issues.map((issue, i) => (
+                    <li
+                      key={i}
+                      className="rounded-lg bg-black/20 p-3 text-sm leading-relaxed text-white/80"
+                    >
+                      <div className="mb-2 flex items-center gap-2">
+                        <span className="inline-flex rounded-full bg-amber-500/15 px-2 py-0.5 text-xs text-amber-300">
+                          {issueLabels[i] || (isZh ? '提示' : 'Note')}
+                        </span>
+                        <span className="text-xs text-white/45">#{i + 1}</span>
+                      </div>
+                      <div className="whitespace-pre-wrap">{issue}</div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-xs text-white/55">
+                  {isZh
+                    ? `已折叠 ${result.analysis.issues.length} 个问题（点击展开查看）`
+                    : `${result.analysis.issues.length} issues collapsed (click to expand)`}
+                </p>
+              )}
             </div>
           )}
 
-          {/* Status Progress */}
-          <div className="space-y-3">
-            {/* Step 1: Payment */}
-            <StatusCard
-              icon={<CheckCircle className="w-5 h-5 text-green-400" />}
-              title={t('status.paid')}
-              hint={t('status.paidHint')}
-              isActive={false}
-              isCompleted={true}
-            />
-
-            {/* Step 2: Processing */}
-            <StatusCard
-              icon={getStatusIcon(
-                order?.status === 'processing'
-                  ? 'processing'
-                  : order?.status === 'completed' || order?.status === 'failed'
-                    ? 'completed'
-                    : 'pending'
+          {/* Recommendations */}
+          {result.analysis.recommendations.length > 0 && (
+            <div className="bg-white/5 rounded-xl border border-white/10 p-5">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-medium text-white">
+                  {t('recommendations')}
+                </h3>
+                <button
+                  type="button"
+                  className="text-xs text-white/60 hover:text-white/80 flex items-center gap-1"
+                  onClick={() => toggleSection('recommendations')}
+                >
+                  {sections.recommendations ? (
+                    <ChevronUp className="w-4 h-4" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4" />
+                  )}
+                  {sections.recommendations
+                    ? isZh
+                      ? '收起'
+                      : 'Collapse'
+                    : isZh
+                      ? '展开'
+                      : 'Expand'}
+                </button>
+              </div>
+              {sections.recommendations ? (
+                <ul className="space-y-3">
+                  {result.analysis.recommendations.map((rec, i) => (
+                    <li
+                      key={i}
+                      className="rounded-lg bg-black/20 p-3 text-sm leading-relaxed text-white/80"
+                    >
+                      <div className="whitespace-pre-wrap">{rec}</div>
+                      <div className="mt-2 text-xs text-white/55">
+                        {isZh ? '预期效果：' : 'Expected: '}
+                        {expectedEffects[i] ||
+                          (isZh ? '整体锁定感更强' : 'Better overall feel')}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-xs text-white/55">
+                  {isZh
+                    ? `已折叠 ${result.analysis.recommendations.length} 条建议（点击展开查看）`
+                    : `${result.analysis.recommendations.length} recommendations collapsed (click to expand)`}
+                </p>
               )}
-              title={t('status.processing')}
-              hint={t('status.processingHint')}
-              isActive={order?.status === 'processing'}
-              isCompleted={
-                order?.status === 'completed' || order?.status === 'failed'
-              }
-              isFailed={order?.status === 'failed'}
-            />
+            </div>
+          )}
 
-            {/* Step 3: Email */}
-            <StatusCard
-              icon={
-                order?.status === 'completed' ? (
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                ) : (
-                  <Mail className="w-5 h-5 text-gray-400" />
-                )
-              }
-              title={
-                order?.status === 'completed'
-                  ? t('emailSent')
-                  : t('status.sendingEmail')
-              }
-              hint={
-                order?.status === 'completed'
-                  ? t('emailSentHint')
-                  : t('status.sendingEmailHint')
-              }
-              isActive={false}
-              isCompleted={order?.status === 'completed'}
-            />
+          {/* PID Values */}
+          <div className="bg-white/5 rounded-xl border border-white/10 overflow-hidden">
+            <div className="px-5 py-4 border-b border-white/10">
+              <h3 className="font-medium text-white">{t('optimizedPID')}</h3>
+            </div>
+            <div className="p-5">
+              <div className="grid grid-cols-4 gap-2 text-center text-xs mb-3">
+                <div className="text-gray-500">{t('axis')}</div>
+                <div className="text-gray-500">P</div>
+                <div className="text-gray-500">I</div>
+                <div className="text-gray-500">D</div>
+              </div>
+              <div className="space-y-2">
+                {['roll', 'pitch', 'yaw'].map((axis) => (
+                  <div
+                    key={axis}
+                    className="grid grid-cols-4 gap-2 text-center bg-white/5 rounded-lg py-3"
+                  >
+                    <div className="text-white font-medium">{t(axis)}</div>
+                    <div className="text-white font-mono">
+                      {result.pid[axis as keyof typeof result.pid].p}
+                    </div>
+                    <div className="text-white font-mono">
+                      {result.pid[axis as keyof typeof result.pid].i}
+                    </div>
+                    <div className="text-white font-mono">
+                      {result.pid[axis as keyof typeof result.pid].d}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
-          {/* User Configuration Summary */}
-          {order && (
-            <div className="bg-white/5 rounded-xl border border-white/10 p-4 text-left">
-              <h3 className="text-sm font-medium text-white mb-3">
-                {t('yourConfig')}
-              </h3>
-              <div className="space-y-2 text-sm">
+          {/* Filter Settings */}
+          <div className="bg-white/5 rounded-xl border border-white/10 overflow-hidden">
+            <div className="px-5 py-4 border-b border-white/10 flex justify-between items-center">
+              <h3 className="font-medium text-white">{t('filterSettings')}</h3>
+              <button
+                type="button"
+                className="text-xs text-white/60 hover:text-white/80 flex items-center gap-1"
+                onClick={() => toggleSection('filters')}
+              >
+                {sections.filters ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
+                {sections.filters
+                  ? isZh
+                    ? '收起'
+                    : 'Collapse'
+                  : isZh
+                    ? '展开'
+                    : 'Expand'}
+              </button>
+            </div>
+            {sections.filters ? (
+              <div className="p-5 grid grid-cols-2 gap-4 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-400">{t('problems')}</span>
-                  <span className="text-white text-right max-w-[200px]">
-                    {getProblemNames(order.problems).join(', ') || '-'}
+                  <span className="text-gray-500">{t('gyroLPF')}</span>
+                  <span className="text-white font-mono">
+                    {result.filters.gyro_lowpass_hz} Hz
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">{t('goals')}</span>
-                  <span className="text-white text-right max-w-[200px]">
-                    {getGoalNames(order.goals).join(', ') || '-'}
+                  <span className="text-gray-500">{t('dtermLPF')}</span>
+                  <span className="text-white font-mono">
+                    {result.filters.dterm_lowpass_hz} Hz
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">{t('flyingStyle')}</span>
-                  <span className="text-white">
-                    {getStyleName(order.flyingStyle)}
+                  <span className="text-gray-500">{t('dynNotchCount')}</span>
+                  <span className="text-white font-mono">
+                    {result.filters.dyn_notch_count}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">{t('frameSize')}</span>
-                  <span className="text-white">
-                    {getFrameName(order.frameSize)}
+                  <span className="text-gray-500">{t('dynNotchQ')}</span>
+                  <span className="text-white font-mono">
+                    {result.filters.dyn_notch_q}
                   </span>
                 </div>
               </div>
-            </div>
-          )}
-
-          {/* Action Buttons */}
-          <div className="flex gap-3">
-            {order?.status === 'completed' && order.analysis && (
-              <button
-                type="button"
-                onClick={() => setShowResults(true)}
-                className="flex-1 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 font-semibold transition-all"
-              >
-                {t('viewResults')}
-              </button>
+            ) : (
+              <div className="px-5 py-3 text-xs text-white/55">
+                {isZh
+                  ? '已折叠滤波器设置（点击展开查看）'
+                  : 'Filter settings collapsed (click to expand)'}
+              </div>
             )}
-            <a
-              href={`/${locale}`}
-              className={cn(
-                'py-3.5 rounded-xl bg-white/10 hover:bg-white/20 font-semibold transition-all border border-white/20',
-                order?.status === 'completed' && order.analysis
-                  ? 'flex-1'
-                  : 'flex-1'
-              )}
-            >
-              {t('backToHome')}
-            </a>
           </div>
-        </div>
-      </main>
-    </div>
-  );
-}
 
-function StatusCard({
-  icon,
-  title,
-  hint,
-  isActive,
-  isCompleted,
-  isFailed,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  hint: string;
-  isActive: boolean;
-  isCompleted: boolean;
-  isFailed?: boolean;
-}) {
-  return (
-    <div
-      className={cn(
-        'flex items-start gap-4 rounded-xl p-4 backdrop-blur-sm transition-all',
-        isActive
-          ? 'bg-blue-500/10 border border-blue-500/30'
-          : isCompleted
-            ? isFailed
-              ? 'bg-red-500/10 border border-red-500/30'
-              : 'bg-green-500/10 border border-green-500/30'
-            : 'bg-white/5 border border-white/10'
-      )}
-    >
-      <div
-        className={cn(
-          'w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0',
-          isActive
-            ? 'bg-blue-500/20'
-            : isCompleted
-              ? isFailed
-                ? 'bg-red-500/20'
-                : 'bg-green-500/20'
-              : 'bg-white/10'
-        )}
-      >
-        {icon}
-      </div>
-      <div className="text-left flex-1">
-        <p
-          className={cn(
-            'text-sm font-medium mb-0.5',
-            isActive
-              ? 'text-blue-300'
-              : isCompleted
-                ? isFailed
-                  ? 'text-red-300'
-                  : 'text-green-300'
-                : 'text-gray-400'
-          )}
-        >
-          {title}
-        </p>
-        <p className="text-xs text-gray-500">{hint}</p>
-      </div>
-    </div>
-  );
-}
-
-function ResultsView({
-  order,
-  tResults,
-  locale,
-  copied,
-  onCopy,
-  onDownload,
-  onBack,
-}: {
-  order: OrderData;
-  tResults: any;
-  locale: string;
-  copied: boolean;
-  onCopy: () => void;
-  onDownload: () => void;
-  onBack: () => void;
-}) {
-  const result = order.analysis!;
-
-  return (
-    <div className="min-h-screen bg-[#030304] text-white">
-      <header className="border-b border-white/5 bg-[#030304]/80 backdrop-blur-xl sticky top-0 z-10">
-        <div className="max-w-2xl mx-auto px-6 h-16 flex justify-between items-center">
-          <button
-            type="button"
-            onClick={onBack}
-            className="text-gray-400 hover:text-white transition-colors"
-          >
-            Back
-          </button>
-          <Logo className="h-6 w-auto" />
-          <div className="w-10" />
-        </div>
-      </header>
-
-      <main className="max-w-2xl mx-auto px-6 py-8 space-y-6">
-        {/* Success Header */}
-        <div className="text-center">
-          <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-3">
-            <CheckCircle className="w-6 h-6 text-white" />
-          </div>
-          <h1 className="text-xl font-bold mb-1">{tResults('title')}</h1>
-          <p className="text-gray-500 text-sm">{tResults('description')}</p>
-        </div>
-
-        {/* Analysis Summary */}
-        <div className="bg-white/5 rounded-xl border border-white/10 p-5">
-          <h3 className="font-medium text-white mb-3 text-sm">
-            {tResults('analysisSummary')}
-          </h3>
-          <p className="text-gray-400 text-sm leading-relaxed">
-            {result.analysis.summary}
-          </p>
-        </div>
-
-        {/* Issues Found */}
-        {result.analysis.issues.length > 0 && (
-          <div className="bg-white/5 rounded-xl border border-white/10 p-5">
-            <h3 className="font-medium text-white mb-3 text-sm">
-              {tResults('issuesIdentified')}
-            </h3>
-            <ul className="space-y-2">
-              {result.analysis.issues.map((issue, i) => (
-                <li key={i} className="text-gray-400 text-sm flex gap-2">
-                  <span className="text-gray-500 flex-shrink-0">-</span>
-                  <span>{issue}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {/* Recommendations */}
-        {result.analysis.recommendations.length > 0 && (
-          <div className="bg-white/5 rounded-xl border border-white/10 p-5">
-            <h3 className="font-medium text-white mb-3 text-sm">
-              {tResults('recommendations')}
-            </h3>
-            <ul className="space-y-2">
-              {result.analysis.recommendations.map((rec, i) => (
-                <li key={i} className="text-gray-400 text-sm flex gap-2">
-                  <span className="text-gray-500 flex-shrink-0">-</span>
-                  <span>{rec}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {/* PID Values */}
-        <div className="bg-white/5 rounded-xl border border-white/10 overflow-hidden">
-          <div className="px-5 py-3 border-b border-white/10">
-            <h3 className="font-medium text-white text-sm">
-              {tResults('optimizedPID')}
-            </h3>
-          </div>
-          <div className="p-5">
-            <div className="grid grid-cols-4 gap-2 text-center text-xs mb-3">
-              <div className="text-gray-500">{tResults('axis')}</div>
-              <div className="text-gray-500">P</div>
-              <div className="text-gray-500">I</div>
-              <div className="text-gray-500">D</div>
-            </div>
-            <div className="space-y-2">
-              {['roll', 'pitch', 'yaw'].map((axis) => (
-                <div
-                  key={axis}
-                  className="grid grid-cols-4 gap-2 text-center bg-white/5 rounded-lg py-2.5"
+          {/* CLI Commands */}
+          <div className="bg-white/5 rounded-xl border border-white/10 overflow-hidden">
+            <div className="px-5 py-4 border-b border-white/10 flex justify-between items-center">
+              <h3 className="font-medium text-white">{t('cliCommands')}</h3>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={handleCopy}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/15 rounded-lg text-xs transition-colors"
                 >
-                  <div className="text-white text-sm">{tResults(axis)}</div>
-                  <div className="text-white text-sm font-mono">
-                    {result.pid[axis as keyof typeof result.pid].p}
-                  </div>
-                  <div className="text-white text-sm font-mono">
-                    {result.pid[axis as keyof typeof result.pid].i}
-                  </div>
-                  <div className="text-white text-sm font-mono">
-                    {result.pid[axis as keyof typeof result.pid].d}
-                  </div>
-                </div>
+                  {copied ? (
+                    <Check className="w-3.5 h-3.5 text-green-400" />
+                  ) : (
+                    <Copy className="w-3.5 h-3.5" />
+                  )}
+                  {copied ? t('copied') : t('copy')}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDownload}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-black hover:bg-gray-200 rounded-lg text-xs font-medium transition-colors"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  {t('download')}
+                </button>
+              </div>
+            </div>
+            <div className="mx-5 mt-4 rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-200/80">
+              {isZh
+                ? '建议粘贴前先 diff all 备份，如有异常振动或发热请立即回退'
+                : 'Backup with "diff all" before pasting. Revert immediately if abnormal vibration or heat occurs'}
+            </div>
+            <div className="p-5 max-h-60 overflow-y-auto bg-black/20 mx-5 mb-5 mt-3 rounded-lg">
+              <pre className="text-xs text-gray-400 font-mono whitespace-pre-wrap">
+                {result.cli_commands}
+              </pre>
+            </div>
+          </div>
+
+          {/* Instructions */}
+          <div className="bg-white/5 rounded-xl border border-white/10 p-5">
+            <h3 className="font-medium text-white mb-4">{t('howToApply')}</h3>
+            <ol className="space-y-3 text-gray-400 text-sm">
+              {[1, 2, 3, 4, 5].map((step) => (
+                <li key={step} className="flex gap-3">
+                  <span className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-xs text-white flex-shrink-0">
+                    {step}
+                  </span>
+                  <span className="pt-0.5">{t(`applySteps.step${step}`)}</span>
+                </li>
               ))}
-            </div>
+            </ol>
+          </div>
+
+          {/* Back Button */}
+          <div className="pt-4">
+            <Link
+              href={`/${locale}/tune`}
+              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-white/10 hover:bg-white/15 font-medium transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              {t('backToHome')}
+            </Link>
           </div>
         </div>
-
-        {/* Filter Settings */}
-        <div className="bg-white/5 rounded-xl border border-white/10 overflow-hidden">
-          <div className="px-5 py-3 border-b border-white/10">
-            <h3 className="font-medium text-white text-sm">
-              {tResults('filterSettings')}
-            </h3>
-          </div>
-          <div className="p-5 grid grid-cols-2 gap-3 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-500">{tResults('gyroLPF')}</span>
-              <span className="text-white font-mono">
-                {result.filters.gyro_lowpass_hz} Hz
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-500">{tResults('dtermLPF')}</span>
-              <span className="text-white font-mono">
-                {result.filters.dterm_lowpass_hz} Hz
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-500">{tResults('dynNotchCount')}</span>
-              <span className="text-white font-mono">
-                {result.filters.dyn_notch_count}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-500">{tResults('dynNotchQ')}</span>
-              <span className="text-white font-mono">
-                {result.filters.dyn_notch_q}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* CLI Commands */}
-        <div className="bg-white/5 rounded-xl border border-white/10 overflow-hidden">
-          <div className="px-5 py-3 border-b border-white/10 flex justify-between items-center">
-            <h3 className="font-medium text-white text-sm">
-              {tResults('cliCommands')}
-            </h3>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={onCopy}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/15 rounded-lg text-xs transition-colors"
-              >
-                <Copy className="w-3.5 h-3.5" />
-                {copied ? tResults('copied') : tResults('copy')}
-              </button>
-              <button
-                type="button"
-                onClick={onDownload}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-black hover:bg-gray-200 rounded-lg text-xs font-medium transition-colors"
-              >
-                <Download className="w-3.5 h-3.5" />
-                {tResults('download')}
-              </button>
-            </div>
-          </div>
-          <div className="p-4 max-h-60 overflow-y-auto bg-black/20 cli-scrollbar">
-            <pre className="text-xs text-gray-400 font-mono whitespace-pre-wrap">
-              {result.cli_commands}
-            </pre>
-          </div>
-        </div>
-
-        {/* Instructions */}
-        <div className="bg-white/5 rounded-xl border border-white/10 p-5">
-          <h3 className="font-medium text-white mb-3 text-sm">
-            {tResults('howToApply')}
-          </h3>
-          <ol className="space-y-2 text-gray-400 text-sm">
-            {[1, 2, 3, 4, 5].map((step) => (
-              <li key={step} className="flex gap-3">
-                <span className="text-gray-500 font-mono text-xs w-4">
-                  {step}.
-                </span>
-                <span>{tResults(`applySteps.step${step}`)}</span>
-              </li>
-            ))}
-          </ol>
-        </div>
-
-        {/* Back to Home */}
-        <a
-          href={`/${locale}`}
-          className="block w-full text-center py-3.5 rounded-xl bg-white/10 hover:bg-white/15 text-sm font-medium transition-colors"
-        >
-          {tResults('backToHome')}
-        </a>
       </main>
+    </div>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen bg-[#030304] flex items-center justify-center">
+      <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
     </div>
   );
 }
 
 export default function SuccessPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-[#030304] flex items-center justify-center">
-          <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-        </div>
-      }
-    >
-      <SuccessContent />
+    <Suspense fallback={<LoadingFallback />}>
+      <SuccessPageContent />
     </Suspense>
   );
 }

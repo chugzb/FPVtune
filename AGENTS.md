@@ -40,6 +40,12 @@ Usage notes:
 </skill>
 
 <skill>
+<name>cloudflare-skill</name>
+<description>全面的 Cloudflare 服务管理技能，包括 Workers、KV Storage、R2、Pages、DNS 和 Routes 的部署和配置。当需要部署 Cloudflare 服务、管理 Worker 容器、配置 KV/R2 存储或设置 DNS/路由时使用。</description>
+<location>project</location>
+</skill>
+
+<skill>
 <name>doc-coauthoring</name>
 <description>Guide users through a structured workflow for co-authoring documentation. Use when user wants to write documentation, proposals, technical specs, decision docs, or similar structured content. This workflow helps users efficiently transfer context, refine content through iteration, and verify the doc works for readers. Trigger when user mentions writing docs, creating proposals, drafting specs, or similar documentation tasks.</description>
 <location>project</location>
@@ -66,6 +72,12 @@ Usage notes:
 <skill>
 <name>mcp-builder</name>
 <description>Guide for creating high-quality MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools. Use when building MCP servers to integrate external APIs or services, whether in Python (FastMCP) or Node/TypeScript (MCP SDK).</description>
+<location>project</location>
+</skill>
+
+<skill>
+<name>multi-agent-patterns</name>
+<description>基于 Anthropic 研究的多代理模式指南，用于构建 AI 代理系统。当需要设计多代理架构、实现代理协作、或构建复杂的 AI 工作流时使用此技能。</description>
 <location>project</location>
 </skill>
 

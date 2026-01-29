@@ -1,10 +1,6 @@
 import db from '@/db';
 import { tuneOrder } from '@/db/schema';
-import {
-  convertBBLForAI,
-  extractBBLHeader,
-  isBBLFormat,
-} from '@/lib/tune/bbl-parser';
+import { extractBBLHeader, isBBLFormat } from '@/lib/tune/bbl-parser';
 import { eq } from 'drizzle-orm';
 import { type NextRequest, NextResponse } from 'next/server';
 
@@ -55,9 +51,6 @@ export async function POST(request: NextRequest) {
     // 提取头部
     const header = extractBBLHeader(rawBuffer);
 
-    // 转换为 AI 格式
-    const aiContent = await convertBBLForAI(rawBuffer);
-
     return NextResponse.json({
       success: true,
       debug: {
@@ -67,9 +60,8 @@ export async function POST(request: NextRequest) {
         firstBytesHex: firstBytesHex.slice(0, 200),
         isBBLFormat: isBBL,
         headerLength: header.length,
-        headerPreview: header.slice(0, 500),
-        aiContentLength: aiContent.length,
-        aiContentPreview: aiContent.slice(0, 1000),
+        headerLines: header.split('\n').length,
+        headerPreview: header.slice(0, 1000),
       },
     });
   } catch (error) {

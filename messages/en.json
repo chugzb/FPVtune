@@ -1,8 +1,8 @@
 {
   "Metadata": {
     "name": "FPVTune",
-    "title": "FPVTune - AI-Powered FPV Drone Tuning Assistant",
-    "description": "FPVTune is an AI-powered assistant for FPV drone PID tuning and configuration optimization"
+    "title": "FPVTune - Neural Network-Powered FPV Drone Tuning Assistant",
+    "description": "FPVTune is a neural network-powered assistant for FPV drone PID tuning and configuration optimization"
   },
   "Common": {
     "login": "Log in",
@@ -32,13 +32,13 @@
   },
   "PricingPage": {
     "meta": {
-      "title": "Pricing - FPVtune AI PID Tuning",
-      "description": "Get AI-optimized Betaflight PID settings for your FPV drone. One-time payment, instant results."
+      "title": "Pricing - FPVtune Smart PID Tuning",
+      "description": "Get neural network-optimized Betaflight PID settings for your FPV drone. One-time payment, instant results."
     },
     "title": "Simple, Transparent Pricing",
     "subtitle": "Pay only when you're satisfied with the analysis results. No subscription, no hidden fees.",
     "badge": "Launch Special",
-    "productName": "AI PID Analysis",
+    "productName": "Smart PID Analysis",
     "productDesc": "Complete Betaflight PID tuning analysis for your FPV drone",
     "discount": "50% off launch discount",
     "perAnalysis": "One-time payment per analysis",
@@ -46,7 +46,7 @@
     "features": {
       "pid": {
         "title": "Optimized PID Values",
-        "desc": "AI-calculated P, I, D gains for all axes"
+        "desc": "Neural network-calculated P, I, D gains for all axes"
       },
       "filter": {
         "title": "Filter Settings",
@@ -76,8 +76,8 @@
         "desc": "Upload your .BBL or .BFL file from Betaflight"
       },
       "step2": {
-        "title": "AI Analysis",
-        "desc": "Our AI analyzes gyro noise and flight characteristics"
+        "title": "Smart Analysis",
+        "desc": "Our neural network analyzes gyro noise and flight characteristics"
       },
       "step3": {
         "title": "Get Results",
@@ -190,10 +190,10 @@
   },
   "AboutPage": {
     "title": "About",
-    "description": "This is FPVTune, an AI SaaS template built with modern technologies, helping you build your SaaS faster and better.",
+    "description": "FPVTune is a neural network-powered FPV drone tuning assistant that helps pilots quickly get optimized PID settings.",
     "authorName": "FPVTune",
-    "authorBio": "AI SaaS Boilerplate",
-    "introduction": "👋 Hi there! This is FPVTune, an AI SaaS template built with modern technologies, helping you build your SaaS faster and better. If you have any questions, welcome to contact me.",
+    "authorBio": "Neural Network-Powered Tuning Assistant",
+    "introduction": "👋 Hi there! FPVTune is a neural network-powered FPV drone tuning assistant that helps pilots quickly get optimized PID settings. If you have any questions, welcome to contact me.",
     "talkWithMe": "Talk with me",
     "followMe": "Follow me on X"
   },
@@ -356,23 +356,23 @@
         "title": "Docs"
       },
       "ai": {
-        "title": "AI Tools",
+        "title": "Smart Tools",
         "items": {
           "text": {
-            "title": "AI Text",
-            "description": "Show how to use AI to write stunning text"
+            "title": "Smart Text",
+            "description": "Show how to use neural networks to write stunning text"
           },
           "image": {
-            "title": "AI Image",
-            "description": "Show how to use AI to generate beautiful images"
+            "title": "Smart Image",
+            "description": "Show how to use neural networks to generate beautiful images"
           },
           "video": {
-            "title": "AI Video",
-            "description": "Show how to use AI to generate amazing videos"
+            "title": "Smart Video",
+            "description": "Show how to use neural networks to generate amazing videos"
           },
           "audio": {
-            "title": "AI Audio",
-            "description": "Show how to use AI to generate wonderful audio"
+            "title": "Smart Audio",
+            "description": "Show how to use neural networks to generate wonderful audio"
           }
         }
       },
@@ -474,7 +474,7 @@
       }
     },
     "footer": {
-      "tagline": "AI-powered PID tuning for smoother FPV flights",
+      "tagline": "Neural network-powered PID tuning for smoother FPV flights",
       "product": {
         "title": "Product",
         "items": {
@@ -678,7 +678,7 @@
   },
   "HomePage": {
     "title": "FPVTune",
-    "description": "AI-powered FPV drone PID tuning and configuration optimization assistant",
+    "description": "Neural network-powered FPV drone PID tuning and configuration optimization assistant",
     "nav": {
       "features": "Features",
       "howItWorks": "How It Works",
@@ -688,10 +688,10 @@
       "startTuning": "Start Tuning"
     },
     "landing": {
-      "heroBadge": "AI-Powered Betaflight PID Tuning",
+      "heroBadge": "Neural Network-Powered Betaflight PID Tuning",
       "heroTitle1": "Betaflight PID Tuning",
-      "heroTitle2": "Made Simple with AI",
-      "heroDesc": "Upload your Betaflight blackbox logs and get optimized PID settings in seconds. Our AI analyzes gyro noise, identifies resonance frequencies, and generates the perfect tune for your FPV drone.",
+      "heroTitle2": "Made Simple with Neural Networks",
+      "heroDesc": "Upload your Betaflight blackbox logs and get optimized PID settings in seconds. Our neural network analyzes gyro noise, identifies resonance frequencies, and generates the perfect tune for your FPV drone.",
       "startTuningNow": "Start Tuning Now",
       "stats": {
         "analysisSpeed": "Analysis Speed",
@@ -719,8 +719,8 @@
         "midThrottleDesc": "Vibrations at certain throttle positions due to motor resonance frequencies."
       },
       "howItWorksSection": {
-        "title": "How AI-Powered Analysis Works",
-        "desc": "FPVtune analyzes your blackbox data using advanced machine learning to generate optimized settings tailored to your specific drone configuration.",
+        "title": "How Neural Network-Powered Analysis Works",
+        "desc": "FPVtune analyzes your blackbox data using advanced neural networks to generate optimized settings tailored to your specific drone configuration.",
         "step1Title": "1. Upload Blackbox Log",
         "step1Desc": "Record a short flight with blackbox logging enabled in Betaflight Configurator. Upload the .BBL or .BFL file to FPVtune. We support Betaflight 4.5 and newer log formats.",
         "step2Title": "2. AI Analysis",
@@ -732,16 +732,16 @@
         "title": "Advanced Analysis Features",
         "desc": "Everything you need to achieve the perfect tune for your FPV drone, from noise analysis to thermal prediction.",
         "spectral": "Gyro Noise Spectral Analysis",
-        "spectralDesc": "Visualizes gyro noise and D-term resonance across the frequency spectrum. Our AI identifies the exact frequencies where dynamic notch filters should be placed for optimal noise reduction without adding latency.",
+        "spectralDesc": "Visualizes gyro noise and D-term resonance across the frequency spectrum. Our neural network identifies the exact frequencies where dynamic notch filters should be placed for optimal noise reduction without adding latency.",
         "cliExport": "One-Click CLI Export",
         "cliExportDesc": "Generate Betaflight CLI commands instantly. Copy and paste directly into your flight controller for immediate results.",
         "thermal": "Motor Thermal Prediction",
-        "thermalDesc": "Aggressive PID tuning can overheat motors. Our AI predicts motor temperature based on your noise profile and recommends safe D-gain limits to protect your hardware.",
+        "thermalDesc": "Aggressive PID tuning can overheat motors. Our neural network predicts motor temperature based on your noise profile and recommends safe D-gain limits to protect your hardware.",
         "estMaxTemp": "Est. Max Temp",
         "dynamicFilter": "Dynamic Filter Tuning",
         "dynamicFilterDesc": "Automatically configure gyro lowpass, D-term lowpass, and dynamic notch filters. Minimize filtering delay while maintaining clean motor signals for the smoothest possible flight.",
         "propWashElim": "Prop Wash Elimination",
-        "propWashElimDesc": "Our AI optimizes D_min, D_max, and feedforward settings specifically to eliminate prop wash oscillation during aggressive maneuvers and quick descents."
+        "propWashElimDesc": "Our neural network optimizes D_min, D_max, and feedforward settings specifically to eliminate prop wash oscillation during aggressive maneuvers and quick descents."
       },
       "supported": {
         "title": "PID Tuning for Every FPV Drone",
@@ -759,7 +759,7 @@
       },
       "whyChoose": {
         "title": "Why Choose FPVtune?",
-        "desc": "Stop guessing and start flying with confidence. Our AI-powered approach delivers consistent, reliable results that traditional methods cannot match.",
+        "desc": "Stop guessing and start flying with confidence. Our neural network-powered approach delivers consistent, reliable results that traditional methods cannot match.",
         "traditional": "Traditional PID Tuning",
         "traditionalItems": {
           "item1": "Hours of test flights required",
@@ -789,7 +789,7 @@
         "filter": "Filter Settings in Betaflight PID Tuning",
         "filterDesc": "Proper filter configuration is essential for successful Betaflight PID tuning. Gyro and D-term lowpass filters remove noise that can cause motor heating. Dynamic notch filters target specific resonance frequencies. FPVtune automatically calculates optimal filter cutoffs based on your blackbox data.",
         "feedforward": "Feedforward in Modern Betaflight PID Tuning",
-        "feedforwardDesc": "Feedforward anticipates stick movements for instant response. Advanced Betaflight PID tuning includes feedforward optimization to reduce latency and improve stick feel. Our AI analyzes your flying style to recommend feedforward values that match your preferences.",
+        "feedforwardDesc": "Feedforward anticipates stick movements for instant response. Advanced Betaflight PID tuning includes feedforward optimization to reduce latency and improve stick feel. Our neural network analyzes your flying style to recommend feedforward values that match your preferences.",
         "rpm": "RPM Filtering and Betaflight PID Tuning",
         "rpmDesc": "Bidirectional DShot enables RPM-based filtering for cleaner motor signals. When performing Betaflight PID tuning with RPM filtering, you can run higher PID gains with less filtering delay. FPVtune detects RPM filter status and adjusts recommendations accordingly."
       },
@@ -797,33 +797,33 @@
         "title": "Betaflight PID Tuning FAQ",
         "desc": "Common questions about Betaflight PID tuning and how FPVtune can help you achieve the perfect tune.",
         "q1": "What is the best way to start Betaflight PID tuning?",
-        "a1": "The best approach to Betaflight PID tuning is to start with a clean blackbox log from a hover and light maneuvers. Upload this log to FPVtune for AI analysis. Our system will identify noise patterns and generate optimized PID settings as a starting point for your tune.",
+        "a1": "The best approach to Betaflight PID tuning is to start with a clean blackbox log from a hover and light maneuvers. Upload this log to FPVtune for smart analysis. Our system will identify noise patterns and generate optimized PID settings as a starting point for your tune.",
         "q2": "How long does Betaflight PID tuning usually take?",
         "a2": "Traditional Betaflight PID tuning can take hours or even days of test flights and adjustments. With FPVtune, you can get optimized PID settings in under 30 seconds. Simply upload your blackbox log and receive instant recommendations tailored to your drone.",
         "q3": "Can FPVtune help with Betaflight PID tuning for racing drones?",
-        "a3": "Yes, FPVtune supports Betaflight PID tuning for all drone types including racing quads. Our AI has been trained on thousands of racing drone logs and understands the specific requirements for low-latency, high-response tunes that competitive pilots need.",
+        "a3": "Yes, FPVtune supports Betaflight PID tuning for all drone types including racing quads. Our neural network has been trained on thousands of racing drone logs and understands the specific requirements for low-latency, high-response tunes that competitive pilots need.",
         "q4": "Do I need experience with Betaflight PID tuning to use FPVtune?",
-        "a4": "No prior Betaflight PID tuning experience is required. FPVtune is designed for pilots of all skill levels. Our AI handles the complex analysis and provides ready-to-use CLI commands. Just copy and paste into Betaflight Configurator to apply your optimized tune.",
+        "a4": "No prior Betaflight PID tuning experience is required. FPVtune is designed for pilots of all skill levels. Our neural network handles the complex analysis and provides ready-to-use CLI commands. Just copy and paste into Betaflight Configurator to apply your optimized tune.",
         "q5": "What Betaflight versions are supported for PID tuning?",
-        "a5": "FPVtune supports Betaflight PID tuning for versions 4.3, 4.4, and 4.5. Our AI understands the differences between firmware versions and generates appropriate settings for your specific Betaflight installation. We regularly update our models to support the latest Betaflight releases."
+        "a5": "FPVtune supports Betaflight PID tuning for versions 4.3, 4.4, and 4.5. Our neural network understands the differences between firmware versions and generates appropriate settings for your specific Betaflight installation. We regularly update our models to support the latest Betaflight releases."
       },
       "cta": {
         "title": "Ready to Optimize Your Drone?",
-        "desc": "Get AI-optimized Betaflight PID settings in seconds. Pay only when you are satisfied with the analysis results.",
+        "desc": "Get neural network-optimized Betaflight PID settings in seconds. Pay only when you are satisfied with the analysis results.",
         "supportedFiles": "Supports .BBL and .BFL files from Betaflight 4.5+"
       },
       "footer": {
-        "tagline": "AI-powered Betaflight PID tuning for FPV pilots worldwide.",
+        "tagline": "Neural network-powered Betaflight PID tuning for FPV pilots worldwide.",
         "copyright": "FPVtune. All rights reserved."
       }
     },
     "hero": {
-      "badge": "AI-Powered Drone Tuning",
-      "title": "AI-Powered FPV Tuning Assistant",
-      "titleLine1": "AI-Powered FPV",
+      "badge": "Neural Network-Powered Drone Tuning",
+      "title": "Neural Network-Powered FPV Tuning Assistant",
+      "titleLine1": "Neural Network-Powered FPV",
       "titleLine2": "Tuning Assistant",
-      "description": "Upload your Blackbox logs and let AI analyze your flight data. Get optimized PID settings, filter recommendations, and rate profiles in seconds.",
-      "introduction": "AI-Powered Drone Tuning",
+      "description": "Upload your Blackbox logs and let our neural network analyze your flight data. Get optimized PID settings, filter recommendations, and rate profiles in seconds.",
+      "introduction": "Neural Network-Powered Drone Tuning",
       "primary": "Start Tuning",
       "secondary": "View Docs",
       "stats": {
@@ -1063,13 +1063,13 @@
     },
     "calltoaction": {
       "title": "Start Tuning Today",
-      "description": "Join thousands of FPV pilots who have optimized their quads with AI-powered tuning. Get smoother flights, better response, and more confidence in the air.",
+      "description": "Join thousands of FPV pilots who have optimized their quads with neural network-powered tuning. Get smoother flights, better response, and more confidence in the air.",
       "primaryButton": "Start Free",
       "secondaryButton": "Learn More"
     },
     "tuning": {
       "title": "Start Tuning",
-      "description": "Upload your Blackbox log file and let AI analyze your flight data",
+      "description": "Upload your Blackbox log file and let our neural network analyze your flight data",
       "upload": {
         "title": "Upload Blackbox Log",
         "description": "Supports Betaflight, INAV, and Emuflight log files",
@@ -1080,7 +1080,7 @@
       "features": {
         "pid": {
           "title": "PID Optimization",
-          "description": "AI analyzes gyro data and motor output to recommend optimal P, I, D values for your specific setup"
+          "description": "Neural network analyzes gyro data and motor output to recommend optimal P, I, D values for your specific setup"
         },
         "filter": {
           "title": "Filter Settings",
@@ -1100,8 +1100,8 @@
         "description": "Upload your Blackbox log file from Betaflight, INAV, or Emuflight"
       },
       "step2": {
-        "title": "AI Analysis",
-        "description": "Our AI analyzes flight characteristics, identifies issues, and calculates optimal settings"
+        "title": "Smart Analysis",
+        "description": "Our neural network analyzes flight characteristics, identifies issues, and calculates optimal settings"
       },
       "step3": {
         "title": "Get Results",
@@ -1139,17 +1139,48 @@
         "problems": "Problems",
         "goals": "Goals",
         "style": "Style",
-        "frame": "Frame",
+        "hardware": "Hardware",
         "payment": "Payment"
+      },
+      "hardware": {
+        "title": "Your Hardware Setup",
+        "description": "Tell us about your quad's hardware for optimized tuning",
+        "frameSize": "Frame Size",
+        "motor": "Motor",
+        "motorSizePlaceholder": "2207",
+        "motorSizeUnit": "Stator",
+        "motorKvPlaceholder": "2450",
+        "motorHint": "Check your motor label (stator size + KV value)",
+        "battery": "Battery Type",
+        "batteryHint": "Select your battery configuration",
+        "batteryOptions": {
+          "4s": "4S (14.8V)",
+          "5s": "5S (18.5V)",
+          "6s": "6S (22.2V)"
+        },
+        "propeller": "Propeller",
+        "propellerPlaceholder": "e.g. HQ 5043",
+        "propellerHint": "Propeller brand and model",
+        "motorTemp": "Motor Temperature",
+        "motorTempHint": "Motor temperature after flying",
+        "motorTempOptions": {
+          "normal": "Normal (warm to touch)",
+          "warm": "Warm (hot but touchable)",
+          "hot": "Hot (too hot to touch)"
+        },
+        "weight": "Takeoff Weight",
+        "weightPlaceholder": "e.g. 650",
+        "weightHint": "Total weight with battery, skip if unknown",
+        "optional": "optional"
       },
       "upload": {
         "title": "Upload Your Flight Data",
-        "description": "Upload your Betaflight blackbox log for AI analysis",
+        "description": "Upload your Betaflight blackbox log for neural network analysis",
         "blackboxLog": "Blackbox Log",
         "blackboxRequired": "*",
         "blackboxHint": ".bbl, .bfl or .txt file from Betaflight",
         "cliDump": "CLI Dump",
-        "cliDumpOptional": "(Optional)",
+        "cliDumpRequired": "*",
         "cliDumpHint": "Current configuration from Betaflight CLI",
         "howToExport": "How to export?",
         "tip": "Tip:",
@@ -1270,12 +1301,17 @@
         "tuningGoals": "Tuning Goals",
         "flyingStyle": "Flying Style",
         "frameSize": "Frame Size",
+        "motor": "Motor",
+        "battery": "Battery Type",
+        "propeller": "Propeller",
+        "motorTemp": "Motor Temperature",
+        "weight": "Takeoff Weight",
         "additionalNotes": "Additional Notes",
         "oneTimePayment": "One-time payment",
         "launchDiscount": "50% Launch Discount",
         "limitedOffer": "Limited Offer",
         "features": {
-          "pid": "AI-optimized PID values for Roll, Pitch, Yaw",
+          "pid": "Neural network-optimized PID values for Roll, Pitch, Yaw",
           "filter": "Filter settings (Gyro, D-term, Dynamic Notch)",
           "feedforward": "Feedforward configuration",
           "cli": "Ready-to-paste CLI commands",
@@ -1295,7 +1331,7 @@
       },
       "results": {
         "title": "Your Tune is Ready",
-        "description": "AI-optimized settings based on your blackbox analysis",
+        "description": "Neural network-optimized settings based on your blackbox analysis",
         "analysisSummary": "Analysis Summary",
         "issuesIdentified": "Issues Identified",
         "recommendations": "Recommendations",
@@ -1338,7 +1374,7 @@
         "paid": "Payment Received",
         "paidHint": "Your payment has been confirmed",
         "processing": "Analyzing Flight Data",
-        "processingHint": "AI is analyzing your blackbox data and generating optimized settings...",
+        "processingHint": "Neural network is analyzing your blackbox data and generating optimized settings...",
         "completed": "Analysis Complete",
         "completedHint": "Your tuning report is ready",
         "failed": "Processing Failed",
@@ -1363,10 +1399,10 @@
     },
     "form": {
       "hero": {
-        "badge": "AI-Powered Smart Tuning",
+        "badge": "Neural Network-Powered Smart Tuning",
         "titleLine1": "Customize Your",
         "titleLine2": "Perfect PID",
-        "description": "Upload Blackbox logs and flight controller config, AI analyzes your flight data and generates a custom tuning solution for your specific setup"
+        "description": "Upload Blackbox logs and flight controller config, our neural network analyzes your flight data and generates a custom tuning solution for your specific setup"
       },
       "header": {
         "pricing": "Pricing",
@@ -1393,7 +1429,7 @@
       "features": {
         "blackbox": {
           "title": "Blackbox Deep Analysis",
-          "description": "AI analyzes your flight logs, identifies vibration, overshoot, latency issues, and pinpoints tuning direction."
+          "description": "Neural network analyzes your flight logs, identifies vibration, overshoot, latency issues, and pinpoints tuning direction."
         },
         "hardware": {
           "title": "Hardware-Adaptive Optimization",
@@ -1406,14 +1442,14 @@
       },
       "faq": {
         "title": "FAQ",
-        "description": "Common questions about AI tuning",
+        "description": "Common questions about neural network tuning",
         "items": {
           "q1": {
             "question": "What files do I need to upload?",
             "answer": "Blackbox log files (.bbl/.bfl) for flight data analysis, CLI dump for current config. Recommend recording 30+ seconds of normal flight."
           },
           "q2": {
-            "question": "How long does AI analysis take?",
+            "question": "How long does neural network analysis take?",
             "answer": "Usually completes within 1-2 minutes. Complex log files may take longer, you'll be notified by email when done."
           },
           "q3": {
@@ -1422,7 +1458,7 @@
           },
           "q4": {
             "question": "Can I use the generated parameters directly?",
-            "answer": "AI-generated parameters are an optimized starting point based on your data. Recommend test flying in a safe environment and fine-tuning based on feel."
+            "answer": "Neural network-generated parameters are an optimized starting point based on your data. Recommend test flying in a safe environment and fine-tuning based on feel."
           },
           "q5": {
             "question": "Is my data secure?",
@@ -1443,7 +1479,7 @@
     }
   },
   "SkillsPage": {
-    "title": "FPVTune - AI Smart Tuning Tool",
+    "title": "FPVTune - Smart Tuning Tool",
     "description": "Upload Blackbox logs and flight controller config, AI analyzes your flight data and generates a custom PID tuning solution for your specific setup."
   },
   "Guides": {

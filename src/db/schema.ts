@@ -103,6 +103,12 @@ export const tuneOrder = pgTable("tune_order", {
 	goals: text('goals'),
 	flyingStyle: text('flying_style'),
 	frameSize: text('frame_size'),
+	motorSize: text('motor_size'),
+	motorKv: text('motor_kv'),
+	battery: text('battery'),
+	propeller: text('propeller'),
+	motorTemp: text('motor_temp'),
+	weight: text('weight'),
 	additionalNotes: text('additional_notes'),
 
 	// AI 分析结果

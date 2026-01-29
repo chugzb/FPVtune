@@ -3,25 +3,28 @@
 import { Logo } from '@/components/ui/logo';
 import { cn } from '@/lib/utils';
 import {
+  AlertCircle,
   ArrowLeft,
   ArrowRight,
   Check,
   CheckCircle,
-  Copy,
-  Download,
   FileText,
   Loader2,
   Lock,
+  Mail,
   Shield,
   Terminal,
   Upload,
+  X,
   Zap,
 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { useCallback, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 
-type WizardStep = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+type WizardStep = 1 | 2 | 3 | 4 | 5 | 6;
+type OrderStatus = 'pending' | 'paid' | 'processing' | 'completed' | 'failed';
 
 interface FormData {
   blackboxFile: File | null;
@@ -32,37 +35,19 @@ interface FormData {
   customGoal: string;
   flyingStyle: string;
   frameSize: string;
+  motorSize: string;
+  motorKv: string;
+  battery: string;
+  propeller: string;
+  motorTemp: string;
+  weight: string;
   email: string;
 }
 
-interface AnalysisResult {
-  analysis: {
-    summary: string;
-    issues: string[];
-    recommendations: string[];
-  };
-  pid: {
-    roll: { p: number; i: number; d: number; f: number };
-    pitch: { p: number; i: number; d: number; f: number };
-    yaw: { p: number; i: number; d: number; f: number };
-  };
-  filters: {
-    gyro_lowpass_hz: number;
-    gyro_lowpass2_hz: number;
-    dterm_lowpass_hz: number;
-    dterm_lowpass2_hz: number;
-    dyn_notch_count: number;
-    dyn_notch_q: number;
-    dyn_notch_min_hz: number;
-    dyn_notch_max_hz: number;
-  };
-  other: {
-    dshot_bidir: boolean;
-    motor_output_limit: number;
-    throttle_boost: number;
-    anti_gravity_gain: number;
-  };
-  cli_commands: string;
+interface OrderData {
+  orderNumber: string;
+  status: OrderStatus;
+  email: string;
 }
 
 const TOTAL_STEPS = 6;
@@ -81,7 +66,11 @@ const frameIds = ['inch2_3', 'inch5', 'inch7', 'inch10plus'];
 
 export function TuneWizard() {
   const t = useTranslations('TunePage.wizard');
+  const tSuccess = useTranslations('TunePage.success');
   const locale = useLocale();
+  const searchParams = useSearchParams();
+  const orderNumber = searchParams.get('order');
+
   const [currentStep, setCurrentStep] = useState<WizardStep>(1);
   const [formData, setFormData] = useState<FormData>({
     blackboxFile: null,
@@ -92,28 +81,94 @@ export function TuneWizard() {
     customGoal: '',
     flyingStyle: '',
     frameSize: '',
+    motorSize: '',
+    motorKv: '',
+    battery: '',
+    propeller: '',
+    motorTemp: '',
+    weight: '',
     email: '',
   });
   const [isProcessing, setIsProcessing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(
-    null
-  );
   const [error, setError] = useState<string | null>(null);
   const [testCode, setTestCode] = useState('');
+
+  // 处理中弹窗相关
+  const [showProcessingModal, setShowProcessingModal] = useState(false);
+  const [order, setOrder] = useState<OrderData | null>(null);
+  const [orderError, setOrderError] = useState<string | null>(null);
+
+  // 数据不足错误弹窗
+  const [showDataErrorModal, setShowDataErrorModal] = useState(false);
+  const [dataErrorInfo, setDataErrorInfo] = useState<{
+    error: string;
+    details: string;
+    code?: string;
+  } | null>(null);
+
+  // 获取订单状态
+  const fetchOrderStatus = useCallback(async () => {
+    if (!orderNumber) return;
+
+    try {
+      const response = await fetch(`/api/tune/order/${orderNumber}`);
+      if (!response.ok) {
+        if (response.status === 404) {
+          setOrderError(tSuccess('error.notFound'));
+        } else {
+          setOrderError(tSuccess('error.loadFailed'));
+        }
+        return;
+      }
+
+      const data = await response.json();
+      setOrder(data.order);
+
+      // 处理完成后跳转到结果页面
+      if (data.order.status === 'completed') {
+        window.location.href = `/${locale}/tune/success?order=${orderNumber}`;
+      }
+    } catch {
+      setOrderError(tSuccess('error.loadFailed'));
+    }
+  }, [orderNumber, tSuccess, locale]);
+
+  // 检测 URL 中的 order 参数，显示处理中弹窗
+  useEffect(() => {
+    if (orderNumber) {
+      setShowProcessingModal(true);
+      fetchOrderStatus();
+    }
+  }, [orderNumber, fetchOrderStatus]);
+
+  // 轮询订单状态
+  useEffect(() => {
+    if (!orderNumber || !order) return;
+    if (order.status === 'completed' || order.status === 'failed') return;
+
+    const interval = setInterval(fetchOrderStatus, 3000);
+    return () => clearInterval(interval);
+  }, [orderNumber, order, fetchOrderStatus]);
+
+  const handleCloseProcessingModal = () => {
+    setShowProcessingModal(false);
+    // 清除 URL 中的 order 参数
+    window.history.replaceState({}, '', `/${locale}/tune`);
+  };
 
   const stepLabels = [
     t('steps.upload'),
     t('steps.problems'),
     t('steps.goals'),
     t('steps.style'),
-    t('steps.frame'),
+    t('steps.hardware'),
     t('steps.payment'),
   ];
 
   const canProceed = useCallback(() => {
     switch (currentStep) {
       case 1:
-        return formData.blackboxFile !== null;
+        return formData.blackboxFile !== null && formData.cliDumpFile !== null;
       case 2:
         return formData.problems.length > 0;
       case 3:
@@ -121,7 +176,8 @@ export function TuneWizard() {
       case 4:
         return formData.flyingStyle !== '';
       case 5:
-        return formData.frameSize !== '';
+        // 机架尺寸和电机信息必填，重量选填
+        return formData.frameSize !== '' && formData.motorSize !== '' && formData.motorKv !== '';
       case 6:
         return formData.email !== '';
       default:
@@ -187,6 +243,12 @@ export function TuneWizard() {
       apiFormData.append('customGoal', formData.customGoal);
       apiFormData.append('flyingStyle', formData.flyingStyle);
       apiFormData.append('frameSize', formData.frameSize);
+      apiFormData.append('motorSize', formData.motorSize);
+      apiFormData.append('motorKv', formData.motorKv);
+      apiFormData.append('battery', formData.battery);
+      apiFormData.append('propeller', formData.propeller);
+      apiFormData.append('motorTemp', formData.motorTemp);
+      apiFormData.append('weight', formData.weight);
       apiFormData.append('additionalNotes', formData.additionalNotes);
       apiFormData.append('email', formData.email);
       apiFormData.append('locale', locale);
@@ -209,6 +271,24 @@ export function TuneWizard() {
         throw new Error('No checkout URL returned');
       }
     } catch (err) {
+      // 检查是否是数据不足错误
+      if (err instanceof Error && err.message) {
+        const isDataError =
+          err.message.includes('飞行数据不足') ||
+          err.message.includes('Insufficient flight data') ||
+          err.message.includes('未检测到飞行数据') ||
+          err.message.includes('No flight data detected');
+        if (isDataError) {
+          setDataErrorInfo({
+            error: err.message,
+            details: '',
+            code: 'INSUFFICIENT_FLIGHT_DATA',
+          });
+          setShowDataErrorModal(true);
+          setIsProcessing(false);
+          return;
+        }
+      }
       setError(err instanceof Error ? err.message : 'An error occurred');
       setIsProcessing(false);
     }
@@ -237,6 +317,12 @@ export function TuneWizard() {
       apiFormData.append('customGoal', formData.customGoal);
       apiFormData.append('flyingStyle', formData.flyingStyle);
       apiFormData.append('frameSize', formData.frameSize);
+      apiFormData.append('motorSize', formData.motorSize);
+      apiFormData.append('motorKv', formData.motorKv);
+      apiFormData.append('battery', formData.battery);
+      apiFormData.append('propeller', formData.propeller);
+      apiFormData.append('motorTemp', formData.motorTemp);
+      apiFormData.append('weight', formData.weight);
       apiFormData.append('additionalNotes', formData.additionalNotes);
       apiFormData.append('email', formData.email);
       apiFormData.append('locale', locale);
@@ -255,13 +341,45 @@ export function TuneWizard() {
 
       const result = await response.json();
 
-      // 跳转到成功页面（和真实支付流程一致）
+      // 更新 URL 并显示订单弹窗
       if (result.orderNumber) {
-        window.location.href = `/${locale}/tune/success?order=${result.orderNumber}`;
+        window.history.pushState(
+          {},
+          '',
+          `/${locale}/tune?order=${result.orderNumber}`
+        );
+        setShowProcessingModal(true);
+        // 开始获取订单状态
+        const orderResponse = await fetch(
+          `/api/tune/order/${result.orderNumber}`
+        );
+        if (orderResponse.ok) {
+          const orderData = await orderResponse.json();
+          setOrder(orderData.order);
+        }
+        setIsProcessing(false);
       } else {
         throw new Error('No order number returned');
       }
     } catch (err) {
+      // 检查是否是数据不足错误
+      if (err instanceof Error && err.message) {
+        const isDataError =
+          err.message.includes('飞行数据不足') ||
+          err.message.includes('Insufficient flight data') ||
+          err.message.includes('未检测到飞行数据') ||
+          err.message.includes('No flight data detected');
+        if (isDataError) {
+          setDataErrorInfo({
+            error: err.message,
+            details: '',
+            code: 'INSUFFICIENT_FLIGHT_DATA',
+          });
+          setShowDataErrorModal(true);
+          setIsProcessing(false);
+          return;
+        }
+      }
       setError(err instanceof Error ? err.message : 'An error occurred');
       setIsProcessing(false);
     }
@@ -269,6 +387,32 @@ export function TuneWizard() {
 
   return (
     <div className="min-h-screen bg-[#030304] text-white">
+      {/* 处理中弹窗 */}
+      {showProcessingModal && (
+        <ProcessingModal
+          order={order}
+          orderNumber={orderNumber}
+          orderError={orderError}
+          onClose={handleCloseProcessingModal}
+          tSuccess={tSuccess}
+          locale={locale}
+        />
+      )}
+
+      {/* 数据不足错误弹窗 */}
+      {showDataErrorModal && dataErrorInfo && (
+        <InsufficientDataModal
+          error={dataErrorInfo.error}
+          details={dataErrorInfo.details}
+          code={dataErrorInfo.code}
+          onClose={() => {
+            setShowDataErrorModal(false);
+            setDataErrorInfo(null);
+          }}
+          locale={locale}
+        />
+      )}
+
       {/* Header */}
       <header className="fixed top-0 w-full z-50 border-b border-white/5 bg-[#030304]/80 backdrop-blur-xl">
         <div className="max-w-4xl mx-auto px-6 h-16 flex justify-between items-center">
@@ -360,10 +504,34 @@ export function TuneWizard() {
             />
           )}
           {currentStep === 5 && (
-            <StepFrameSize
-              selected={formData.frameSize}
-              onSelect={(size) =>
+            <StepHardware
+              frameSize={formData.frameSize}
+              motorSize={formData.motorSize}
+              motorKv={formData.motorKv}
+              battery={formData.battery}
+              propeller={formData.propeller}
+              motorTemp={formData.motorTemp}
+              weight={formData.weight}
+              onFrameSizeChange={(size) =>
                 setFormData((prev) => ({ ...prev, frameSize: size }))
+              }
+              onMotorSizeChange={(motorSize) =>
+                setFormData((prev) => ({ ...prev, motorSize }))
+              }
+              onMotorKvChange={(motorKv) =>
+                setFormData((prev) => ({ ...prev, motorKv }))
+              }
+              onBatteryChange={(battery) =>
+                setFormData((prev) => ({ ...prev, battery }))
+              }
+              onPropellerChange={(propeller) =>
+                setFormData((prev) => ({ ...prev, propeller }))
+              }
+              onMotorTempChange={(motorTemp) =>
+                setFormData((prev) => ({ ...prev, motorTemp }))
+              }
+              onWeightChange={(weight) =>
+                setFormData((prev) => ({ ...prev, weight }))
               }
             />
           )}
@@ -381,9 +549,6 @@ export function TuneWizard() {
               onTestCodeChange={setTestCode}
               onTestCodeSubmit={handleTestCodeSubmit}
             />
-          )}
-          {currentStep === 7 && analysisResult && (
-            <StepResults result={analysisResult} />
           )}
         </div>
       </main>
@@ -532,7 +697,7 @@ function StepUpload({
             <div className="flex-1">
               <p className="font-semibold text-white mb-1">
                 {t('cliDump')}{' '}
-                <span className="text-gray-500">{t('cliDumpOptional')}</span>
+                <span className="text-red-400">{t('cliDumpRequired')}</span>
               </p>
               {cliDumpFile ? (
                 <p className="text-sm text-green-400">{cliDumpFile.name}</p>
@@ -770,44 +935,222 @@ function StepFlyingStyle({
   );
 }
 
-// Step 5: Frame Size
-function StepFrameSize({
-  selected,
-  onSelect,
+// Step 5: Hardware Info (Frame Size + Motor + Battery + Propeller + Motor Temp + Weight)
+function StepHardware({
+  frameSize,
+  motorSize,
+  motorKv,
+  battery,
+  propeller,
+  motorTemp,
+  weight,
+  onFrameSizeChange,
+  onMotorSizeChange,
+  onMotorKvChange,
+  onBatteryChange,
+  onPropellerChange,
+  onMotorTempChange,
+  onWeightChange,
 }: {
-  selected: string;
-  onSelect: (size: string) => void;
+  frameSize: string;
+  motorSize: string;
+  motorKv: string;
+  battery: string;
+  propeller: string;
+  motorTemp: string;
+  weight: string;
+  onFrameSizeChange: (size: string) => void;
+  onMotorSizeChange: (size: string) => void;
+  onMotorKvChange: (kv: string) => void;
+  onBatteryChange: (battery: string) => void;
+  onPropellerChange: (propeller: string) => void;
+  onMotorTempChange: (temp: string) => void;
+  onWeightChange: (weight: string) => void;
 }) {
-  const t = useTranslations('TunePage.wizard.frames');
+  const t = useTranslations('TunePage.wizard.hardware');
+  const tFrames = useTranslations('TunePage.wizard.frames');
+
+  const batteryOptions = ['4s', '5s', '6s'];
+  const motorTempOptions = ['normal', 'warm', 'hot'];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div className="text-center">
         <h1 className="text-3xl font-bold mb-3">{t('title')}</h1>
         <p className="text-gray-400">{t('description')}</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        {frameIds.map((id) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => onSelect(id)}
-            className={cn(
-              'p-6 rounded-xl border-2 text-left transition-all',
-              selected === id
-                ? 'border-blue-500 bg-blue-500/10'
-                : 'border-white/10 hover:border-white/20 hover:bg-white/5'
-            )}
-          >
-            <div className="text-4xl font-bold text-white mb-2">
-              {t(`items.${id}.name` as any)}
-            </div>
-            <p className="text-sm text-gray-500">
-              {t(`items.${id}.description` as any)}
-            </p>
-          </button>
-        ))}
+      {/* Frame Size Selection */}
+      <div className="space-y-3">
+        <label className="block text-sm font-medium text-white">
+          {t('frameSize')} <span className="text-red-400">*</span>
+        </label>
+        <div className="grid grid-cols-2 gap-3">
+          {frameIds.map((id) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => onFrameSizeChange(id)}
+              className={cn(
+                'p-4 rounded-xl border-2 text-left transition-all',
+                frameSize === id
+                  ? 'border-blue-500 bg-blue-500/10'
+                  : 'border-white/10 hover:border-white/20 hover:bg-white/5'
+              )}
+            >
+              <div className="text-2xl font-bold text-white mb-1">
+                {tFrames(`items.${id}.name` as any)}
+              </div>
+              <p className="text-xs text-gray-500">
+                {tFrames(`items.${id}.description` as any)}
+              </p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Motor Input - Two fields: Size and KV */}
+      <div className="space-y-3">
+        <label className="block text-sm font-medium text-white">
+          {t('motor')} <span className="text-red-400">*</span>
+        </label>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="relative">
+            <input
+              id="motorSize"
+              type="text"
+              value={motorSize}
+              onChange={(e) => onMotorSizeChange(e.target.value)}
+              placeholder={t('motorSizePlaceholder')}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:border-blue-500"
+            />
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-xs">
+              {t('motorSizeUnit')}
+            </span>
+          </div>
+          <div className="relative">
+            <input
+              id="motorKv"
+              type="text"
+              value={motorKv}
+              onChange={(e) => onMotorKvChange(e.target.value)}
+              placeholder={t('motorKvPlaceholder')}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:border-blue-500"
+            />
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-xs">
+              KV
+            </span>
+          </div>
+        </div>
+        <p className="text-xs text-gray-500 flex items-center gap-1.5">
+          <span className="text-blue-400">&#9432;</span>
+          {t('motorHint')}
+        </p>
+      </div>
+
+      {/* Battery Type Selection */}
+      <div className="space-y-3">
+        <label className="block text-sm font-medium text-white">
+          {t('battery')} <span className="text-gray-500">({t('optional')})</span>
+        </label>
+        <div className="grid grid-cols-3 gap-3">
+          {batteryOptions.map((opt) => (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => onBatteryChange(opt)}
+              className={cn(
+                'p-3 rounded-xl border-2 text-center transition-all',
+                battery === opt
+                  ? 'border-blue-500 bg-blue-500/10'
+                  : 'border-white/10 hover:border-white/20 hover:bg-white/5'
+              )}
+            >
+              <span className="text-white font-medium">
+                {t(`batteryOptions.${opt}` as any)}
+              </span>
+            </button>
+          ))}
+        </div>
+        <p className="text-xs text-gray-500 flex items-center gap-1.5">
+          <span className="text-blue-400">&#9432;</span>
+          {t('batteryHint')}
+        </p>
+      </div>
+
+      {/* Propeller Input */}
+      <div className="space-y-3">
+        <label htmlFor="propeller" className="block text-sm font-medium text-white">
+          {t('propeller')} <span className="text-gray-500">({t('optional')})</span>
+        </label>
+        <input
+          id="propeller"
+          type="text"
+          value={propeller}
+          onChange={(e) => onPropellerChange(e.target.value)}
+          placeholder={t('propellerPlaceholder')}
+          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:border-blue-500"
+        />
+        <p className="text-xs text-gray-500 flex items-center gap-1.5">
+          <span className="text-blue-400">&#9432;</span>
+          {t('propellerHint')}
+        </p>
+      </div>
+
+      {/* Motor Temperature Selection */}
+      <div className="space-y-3">
+        <label className="block text-sm font-medium text-white">
+          {t('motorTemp')} <span className="text-gray-500">({t('optional')})</span>
+        </label>
+        <div className="grid grid-cols-3 gap-3">
+          {motorTempOptions.map((opt) => (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => onMotorTempChange(opt)}
+              className={cn(
+                'p-3 rounded-xl border-2 text-center transition-all',
+                motorTemp === opt
+                  ? 'border-blue-500 bg-blue-500/10'
+                  : 'border-white/10 hover:border-white/20 hover:bg-white/5'
+              )}
+            >
+              <span className="text-white text-sm">
+                {t(`motorTempOptions.${opt}` as any)}
+              </span>
+            </button>
+          ))}
+        </div>
+        <p className="text-xs text-gray-500 flex items-center gap-1.5">
+          <span className="text-blue-400">&#9432;</span>
+          {t('motorTempHint')}
+        </p>
+      </div>
+
+      {/* Weight Input (Optional) */}
+      <div className="space-y-3">
+        <label htmlFor="weight" className="block text-sm font-medium text-white">
+          {t('weight')} <span className="text-gray-500">({t('optional')})</span>
+        </label>
+        <div className="relative">
+          <input
+            id="weight"
+            type="number"
+            value={weight}
+            onChange={(e) => onWeightChange(e.target.value)}
+            placeholder={t('weightPlaceholder')}
+            min="50"
+            max="10000"
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-16 text-white placeholder:text-gray-500 focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          />
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">
+            g
+          </span>
+        </div>
+        <p className="text-xs text-gray-500 flex items-center gap-1.5">
+          <span className="text-blue-400">&#9432;</span>
+          {t('weightHint')}
+        </p>
       </div>
     </div>
   );
@@ -840,6 +1183,7 @@ function StepPayment({
   const tFrames = useTranslations('TunePage.wizard.frames.items');
   const tProblems = useTranslations('TunePage.wizard.problems.items');
   const tGoals = useTranslations('TunePage.wizard.goals.items');
+  const tHardware = useTranslations('TunePage.wizard.hardware');
   const [showTestCode, setShowTestCode] = useState(false);
 
   const styleName = tStyles(`${formData.flyingStyle}.name` as any);
@@ -851,6 +1195,11 @@ function StepPayment({
   const allGoals = formData.customGoal
     ? [...goalNames, formData.customGoal]
     : goalNames;
+
+  // 获取电机温度的翻译文本
+  const motorTempName = formData.motorTemp
+    ? tHardware(`motorTempOptions.${formData.motorTemp}` as any)
+    : '';
 
   return (
     <div className="space-y-6">
@@ -889,6 +1238,34 @@ function StepPayment({
             <span className="text-gray-400">{t('frameSize')}</span>
             <span className="text-white">{sizeName}</span>
           </div>
+          <div className="p-4 flex justify-between">
+            <span className="text-gray-400">{t('motor')}</span>
+            <span className="text-white">{formData.motorSize} {formData.motorKv}KV</span>
+          </div>
+          {formData.battery && (
+            <div className="p-4 flex justify-between">
+              <span className="text-gray-400">{t('battery')}</span>
+              <span className="text-white">{formData.battery.toUpperCase()}</span>
+            </div>
+          )}
+          {formData.propeller && (
+            <div className="p-4 flex justify-between">
+              <span className="text-gray-400">{t('propeller')}</span>
+              <span className="text-white">{formData.propeller}</span>
+            </div>
+          )}
+          {formData.motorTemp && (
+            <div className="p-4 flex justify-between">
+              <span className="text-gray-400">{t('motorTemp')}</span>
+              <span className="text-white">{motorTempName}</span>
+            </div>
+          )}
+          {formData.weight && (
+            <div className="p-4 flex justify-between">
+              <span className="text-gray-400">{t('weight')}</span>
+              <span className="text-white">{formData.weight} g</span>
+            </div>
+          )}
           {formData.additionalNotes && (
             <div className="p-4">
               <span className="text-gray-400 block mb-1">
@@ -1050,7 +1427,941 @@ function StepPayment({
   );
 }
 
-// Step 7: Results
+// 处理中弹窗 - 简单的状态显示弹窗
+function ProcessingModal({
+  order,
+  orderNumber,
+  orderError,
+  onClose,
+  tSuccess,
+  locale,
+}: {
+  order: OrderData | null;
+  orderNumber: string | null;
+  orderError: string | null;
+  onClose: () => void;
+  tSuccess: any;
+  locale: string;
+}) {
+  const isZh = locale === 'zh';
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
+
+  const getStatusIcon = (status: OrderStatus) => {
+    switch (status) {
+      case 'paid':
+        return <CheckCircle className="w-5 h-5 text-green-400" />;
+      case 'processing':
+        return <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />;
+      case 'completed':
+        return <CheckCircle className="w-5 h-5 text-green-400" />;
+      case 'failed':
+        return <AlertCircle className="w-5 h-5 text-red-400" />;
+      default:
+        return <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />;
+    }
+  };
+
+  // 错误状态
+  if (orderError) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div
+          className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+          onClick={onClose}
+        />
+        <div className="relative w-full max-w-md mx-4 bg-[#0a0b0f] border border-white/10 rounded-2xl shadow-2xl p-8 text-center">
+          <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-white mb-2">{orderError}</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="mt-6 px-6 py-3 bg-white/10 hover:bg-white/15 rounded-xl font-medium transition-colors"
+          >
+            {isZh ? '关闭' : 'Close'}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // 处理中弹窗
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="relative w-full max-w-lg mx-4 bg-[#0a0b0f] border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">
+              <CheckCircle className="w-5 h-5 text-green-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-white">
+                {tSuccess('title')}
+              </h2>
+              <p className="text-xs text-gray-500">{tSuccess('description')}</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 space-y-4">
+          {/* Order Number */}
+          {orderNumber && (
+            <div className="bg-white/5 rounded-xl border border-white/10 p-4 text-center">
+              <p className="text-sm text-gray-400 mb-1 flex items-center justify-center gap-2">
+                <Zap className="w-4 h-4" />
+                {tSuccess('orderNumber')}
+              </p>
+              <p className="font-mono text-lg text-white">{orderNumber}</p>
+            </div>
+          )}
+
+          {/* Status Steps */}
+          <div className="space-y-3">
+            <ProcessingStatusCard
+              icon={<CheckCircle className="w-5 h-5 text-green-400" />}
+              title={tSuccess('status.paid')}
+              hint={tSuccess('status.paidHint')}
+              isActive={false}
+              isCompleted={true}
+            />
+            <ProcessingStatusCard
+              icon={getStatusIcon(
+                order?.status === 'processing'
+                  ? 'processing'
+                  : order?.status === 'completed' || order?.status === 'failed'
+                    ? 'completed'
+                    : 'pending'
+              )}
+              title={tSuccess('status.processing')}
+              hint={tSuccess('status.processingHint')}
+              isActive={order?.status === 'processing'}
+              isCompleted={
+                order?.status === 'completed' || order?.status === 'failed'
+              }
+              isFailed={order?.status === 'failed'}
+            />
+            <ProcessingStatusCard
+              icon={
+                order?.status === 'completed' ? (
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                ) : (
+                  <Mail className="w-5 h-5 text-gray-400" />
+                )
+              }
+              title={
+                order?.status === 'completed'
+                  ? tSuccess('emailSent')
+                  : tSuccess('status.sendingEmail')
+              }
+              hint={
+                order?.status === 'completed'
+                  ? tSuccess('emailSentHint')
+                  : tSuccess('status.sendingEmailHint')
+              }
+              isActive={false}
+              isCompleted={order?.status === 'completed'}
+            />
+          </div>
+
+          {/* Close Button */}
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-full py-3.5 rounded-xl bg-white/10 hover:bg-white/20 font-semibold transition-all border border-white/20 text-sm"
+            >
+              {isZh ? '关闭' : 'Close'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 处理中状态卡片
+function ProcessingStatusCard({
+  icon,
+  title,
+  hint,
+  isActive,
+  isCompleted,
+  isFailed,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  hint: string;
+  isActive: boolean;
+  isCompleted: boolean;
+  isFailed?: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        'flex items-start gap-4 rounded-xl p-4 backdrop-blur-sm transition-all',
+        isActive
+          ? 'bg-blue-500/10 border border-blue-500/30'
+          : isCompleted
+            ? isFailed
+              ? 'bg-red-500/10 border border-red-500/30'
+              : 'bg-green-500/10 border border-green-500/30'
+            : 'bg-white/5 border border-white/10'
+      )}
+    >
+      <div
+        className={cn(
+          'w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0',
+          isActive
+            ? 'bg-blue-500/20'
+            : isCompleted
+              ? isFailed
+                ? 'bg-red-500/20'
+                : 'bg-green-500/20'
+              : 'bg-white/10'
+        )}
+      >
+        {icon}
+      </div>
+      <div className="text-left flex-1">
+        <p
+          className={cn(
+            'text-sm font-medium mb-0.5',
+            isActive
+              ? 'text-blue-300'
+              : isCompleted
+                ? isFailed
+                  ? 'text-red-300'
+                  : 'text-green-300'
+                : 'text-gray-400'
+          )}
+        >
+          {title}
+        </p>
+        <p className="text-xs text-gray-500">{hint}</p>
+      </div>
+    </div>
+  );
+}
+
+// 订单状态弹窗
+function OrderStatusModal({
+  order,
+  orderNumber,
+  orderError,
+  showResults,
+  onShowResults,
+  onClose,
+  tSuccess,
+  tResults,
+  locale,
+  copied,
+  onCopy,
+  onDownload,
+}: {
+  order: OrderData | null;
+  orderNumber: string | null;
+  orderError: string | null;
+  showResults: boolean;
+  onShowResults: () => void;
+  onClose: () => void;
+  tSuccess: any;
+  tResults: any;
+  locale: string;
+  copied: boolean;
+  onCopy: () => void;
+  onDownload: () => void;
+}) {
+  const isZh = locale === 'zh';
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
+
+  const getStatusIcon = (status: OrderStatus) => {
+    switch (status) {
+      case 'paid':
+        return <CheckCircle className="w-5 h-5 text-green-400" />;
+      case 'processing':
+        return <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />;
+      case 'completed':
+        return <CheckCircle className="w-5 h-5 text-green-400" />;
+      case 'failed':
+        return <AlertCircle className="w-5 h-5 text-red-400" />;
+      default:
+        return <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />;
+    }
+  };
+
+  // 如果显示结果弹窗
+  if (showResults && order?.analysis) {
+    return (
+      <ResultsModal
+        order={order}
+        tResults={tResults}
+        locale={locale}
+        copied={copied}
+        onCopy={onCopy}
+        onDownload={onDownload}
+        onClose={onClose}
+      />
+    );
+  }
+
+  // 错误状态
+  if (orderError) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div
+          className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+          onClick={onClose}
+        />
+        <div className="relative w-full max-w-md mx-4 bg-[#0a0b0f] border border-white/10 rounded-2xl shadow-2xl p-8 text-center">
+          <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-white mb-2">{orderError}</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="mt-6 px-6 py-3 bg-white/10 hover:bg-white/15 rounded-xl font-medium transition-colors"
+          >
+            {isZh ? '关闭' : 'Close'}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // 订单状态弹窗
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="relative w-full max-w-lg mx-4 bg-[#0a0b0f] border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">
+              <CheckCircle className="w-5 h-5 text-green-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-white">
+                {tSuccess('title')}
+              </h2>
+              <p className="text-xs text-gray-500">{tSuccess('description')}</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 space-y-4">
+          {/* Order Number */}
+          {orderNumber && (
+            <div className="bg-white/5 rounded-xl border border-white/10 p-4 text-center">
+              <p className="text-sm text-gray-400 mb-1 flex items-center justify-center gap-2">
+                <Zap className="w-4 h-4" />
+                {tSuccess('orderNumber')}
+              </p>
+              <p className="font-mono text-lg text-white">{orderNumber}</p>
+            </div>
+          )}
+
+          {/* Status Steps */}
+          <div className="space-y-3">
+            <StatusCard
+              icon={<CheckCircle className="w-5 h-5 text-green-400" />}
+              title={tSuccess('status.paid')}
+              hint={tSuccess('status.paidHint')}
+              isActive={false}
+              isCompleted={true}
+            />
+            <StatusCard
+              icon={getStatusIcon(
+                order?.status === 'processing'
+                  ? 'processing'
+                  : order?.status === 'completed' || order?.status === 'failed'
+                    ? 'completed'
+                    : 'pending'
+              )}
+              title={tSuccess('status.processing')}
+              hint={tSuccess('status.processingHint')}
+              isActive={order?.status === 'processing'}
+              isCompleted={
+                order?.status === 'completed' || order?.status === 'failed'
+              }
+              isFailed={order?.status === 'failed'}
+            />
+            <StatusCard
+              icon={
+                order?.status === 'completed' ? (
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                ) : (
+                  <Mail className="w-5 h-5 text-gray-400" />
+                )
+              }
+              title={
+                order?.status === 'completed'
+                  ? tSuccess('emailSent')
+                  : tSuccess('status.sendingEmail')
+              }
+              hint={
+                order?.status === 'completed'
+                  ? tSuccess('emailSentHint')
+                  : tSuccess('status.sendingEmailHint')
+              }
+              isActive={false}
+              isCompleted={order?.status === 'completed'}
+            />
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-3 pt-2">
+            {order?.status === 'completed' && order.analysis && (
+              <button
+                type="button"
+                onClick={onShowResults}
+                className="flex-1 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 font-semibold transition-all text-sm"
+              >
+                {tSuccess('viewResults')}
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 font-semibold transition-all border border-white/20 text-sm"
+            >
+              {isZh ? '关闭' : 'Close'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 状态卡片
+function StatusCard({
+  icon,
+  title,
+  hint,
+  isActive,
+  isCompleted,
+  isFailed,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  hint: string;
+  isActive: boolean;
+  isCompleted: boolean;
+  isFailed?: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        'flex items-start gap-4 rounded-xl p-4 backdrop-blur-sm transition-all',
+        isActive
+          ? 'bg-blue-500/10 border border-blue-500/30'
+          : isCompleted
+            ? isFailed
+              ? 'bg-red-500/10 border border-red-500/30'
+              : 'bg-green-500/10 border border-green-500/30'
+            : 'bg-white/5 border border-white/10'
+      )}
+    >
+      <div
+        className={cn(
+          'w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0',
+          isActive
+            ? 'bg-blue-500/20'
+            : isCompleted
+              ? isFailed
+                ? 'bg-red-500/20'
+                : 'bg-green-500/20'
+              : 'bg-white/10'
+        )}
+      >
+        {icon}
+      </div>
+      <div className="text-left flex-1">
+        <p
+          className={cn(
+            'text-sm font-medium mb-0.5',
+            isActive
+              ? 'text-blue-300'
+              : isCompleted
+                ? isFailed
+                  ? 'text-red-300'
+                  : 'text-green-300'
+                : 'text-gray-400'
+          )}
+        >
+          {title}
+        </p>
+        <p className="text-xs text-gray-500">{hint}</p>
+      </div>
+    </div>
+  );
+}
+
+// 结果弹窗
+function ResultsModal({
+  order,
+  tResults,
+  locale,
+  copied,
+  onCopy,
+  onDownload,
+  onClose,
+}: {
+  order: OrderData;
+  tResults: any;
+  locale: string;
+  copied: boolean;
+  onCopy: () => void;
+  onDownload: () => void;
+  onClose: () => void;
+}) {
+  const result = order.analysis!;
+  const isZh = locale === 'zh';
+
+  const [sections, setSections] = useState({
+    summaryDetail: false,
+    issues: false,
+    recommendations: false,
+    filters: false,
+  });
+
+  const toggleSection = (key: keyof typeof sections) => {
+    setSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const getOneLineConclusion = (text: string) => {
+    if (!text)
+      return isZh ? '已生成调参方案' : 'Tuning recommendations generated';
+    const first = text.split(/(?<=[。！？.!?])/)[0]?.trim();
+    if (!first) return text.length > 80 ? `${text.slice(0, 80)}...` : text;
+    return first.length <= 80 ? first : `${first.slice(0, 80)}...`;
+  };
+
+  const issueLabels = isZh
+    ? ['高风险', '手感问题', '热量风险', '响应不足', '动态过激', '噪声关注']
+    : [
+        'High Risk',
+        'Feel Issue',
+        'Heat Risk',
+        'Low Response',
+        'Over Dynamic',
+        'Noise',
+      ];
+
+  const expectedEffects = isZh
+    ? [
+        '降低桨洗振荡，抑制 D 峰值',
+        '减少滤波延迟，提升跟随性',
+        '高油门锁定感更稳定',
+        '提升跟手感，减小滞后',
+        '急加减油更稳',
+        '陷波更贴合噪声段',
+        '逐步扩大余量',
+      ]
+    : [
+        'Reduce propwash, suppress D peaks',
+        'Reduce filter delay, improve tracking',
+        'More stable lock-in at high throttle',
+        'Better stick feel, less lag',
+        'Smoother throttle transitions',
+        'Notch better aligned to noise',
+        'Gradually increase headroom',
+      ];
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="relative w-full max-w-2xl max-h-[90vh] mx-4 bg-[#0a0b0f] border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center">
+              <CheckCircle className="w-4 h-4 text-green-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-white">
+                {tResults('title')}
+              </h2>
+              <p className="text-xs text-gray-500">{tResults('description')}</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-5">
+          {/* Analysis Summary */}
+          <div className="bg-white/5 rounded-xl border border-white/10 p-4">
+            <h3 className="font-medium text-white mb-3 text-sm">
+              {tResults('analysisSummary')}
+            </h3>
+            <div className="rounded-lg bg-black/20 p-3 text-sm leading-relaxed text-white/85">
+              <div className="flex items-start gap-2">
+                <span className="inline-flex rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs text-emerald-300 flex-shrink-0">
+                  {isZh ? '结论' : 'Summary'}
+                </span>
+                <p className="flex-1">
+                  {getOneLineConclusion(result.analysis.summary)}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="mt-3 inline-flex items-center gap-2 text-xs text-white/60 hover:text-white/80"
+              onClick={() => toggleSection('summaryDetail')}
+            >
+              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/10">
+                {sections.summaryDetail ? '-' : '+'}
+              </span>
+              {sections.summaryDetail
+                ? isZh
+                  ? '收起详细摘要'
+                  : 'Collapse details'
+                : isZh
+                  ? '展开详细摘要'
+                  : 'Expand details'}
+            </button>
+            {sections.summaryDetail && (
+              <div className="mt-3 rounded-lg bg-black/20 p-4 text-sm leading-relaxed text-white/75 whitespace-pre-wrap">
+                {result.analysis.summary}
+              </div>
+            )}
+          </div>
+
+          {/* Issues */}
+          {result.analysis.issues.length > 0 && (
+            <div className="bg-white/5 rounded-xl border border-white/10 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-medium text-white text-sm">
+                  {tResults('issuesIdentified')}
+                </h3>
+                <button
+                  type="button"
+                  className="text-xs text-white/60 hover:text-white/80"
+                  onClick={() => toggleSection('issues')}
+                >
+                  {sections.issues
+                    ? isZh
+                      ? '收起'
+                      : 'Collapse'
+                    : isZh
+                      ? '展开'
+                      : 'Expand'}
+                </button>
+              </div>
+              {sections.issues ? (
+                <ul className="space-y-3">
+                  {result.analysis.issues.map((issue, i) => (
+                    <li
+                      key={i}
+                      className="rounded-lg bg-black/20 p-3 text-sm leading-relaxed text-white/80"
+                    >
+                      <div className="mb-2 flex items-center gap-2">
+                        <span className="inline-flex rounded-full bg-amber-500/15 px-2 py-0.5 text-xs text-amber-300">
+                          {issueLabels[i] || (isZh ? '提示' : 'Note')}
+                        </span>
+                        <span className="text-xs text-white/45">#{i + 1}</span>
+                      </div>
+                      <div className="whitespace-pre-wrap">{issue}</div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-xs text-white/55">
+                  {isZh
+                    ? `已折叠 ${result.analysis.issues.length} 个问题（点击展开查看）`
+                    : `${result.analysis.issues.length} issues collapsed (click to expand)`}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Recommendations */}
+          {result.analysis.recommendations.length > 0 && (
+            <div className="bg-white/5 rounded-xl border border-white/10 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-medium text-white text-sm">
+                  {tResults('recommendations')}
+                </h3>
+                <button
+                  type="button"
+                  className="text-xs text-white/60 hover:text-white/80"
+                  onClick={() => toggleSection('recommendations')}
+                >
+                  {sections.recommendations
+                    ? isZh
+                      ? '收起'
+                      : 'Collapse'
+                    : isZh
+                      ? '展开'
+                      : 'Expand'}
+                </button>
+              </div>
+              {sections.recommendations ? (
+                <ul className="space-y-3">
+                  {result.analysis.recommendations.map((rec, i) => (
+                    <li
+                      key={i}
+                      className="rounded-lg bg-black/20 p-3 text-sm leading-relaxed text-white/80"
+                    >
+                      <div className="whitespace-pre-wrap">{rec}</div>
+                      <div className="mt-2 text-xs text-white/55">
+                        {isZh ? '预期效果：' : 'Expected: '}
+                        {expectedEffects[i] ||
+                          (isZh ? '整体锁定感更强' : 'Better overall feel')}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-xs text-white/55">
+                  {isZh
+                    ? `已折叠 ${result.analysis.recommendations.length} 条建议（点击展开查看）`
+                    : `${result.analysis.recommendations.length} recommendations collapsed (click to expand)`}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* PID Values */}
+          <div className="bg-white/5 rounded-xl border border-white/10 overflow-hidden">
+            <div className="px-4 py-3 border-b border-white/10">
+              <h3 className="font-medium text-white text-sm">
+                {tResults('optimizedPID')}
+              </h3>
+            </div>
+            <div className="p-4">
+              <div className="grid grid-cols-4 gap-2 text-center text-xs mb-3">
+                <div className="text-gray-500">{tResults('axis')}</div>
+                <div className="text-gray-500">P</div>
+                <div className="text-gray-500">I</div>
+                <div className="text-gray-500">D</div>
+              </div>
+              <div className="space-y-2">
+                {['roll', 'pitch', 'yaw'].map((axis) => (
+                  <div
+                    key={axis}
+                    className="grid grid-cols-4 gap-2 text-center bg-white/5 rounded-lg py-2.5"
+                  >
+                    <div className="text-white text-sm">{tResults(axis)}</div>
+                    <div className="text-white text-sm font-mono">
+                      {result.pid[axis as keyof typeof result.pid].p}
+                    </div>
+                    <div className="text-white text-sm font-mono">
+                      {result.pid[axis as keyof typeof result.pid].i}
+                    </div>
+                    <div className="text-white text-sm font-mono">
+                      {result.pid[axis as keyof typeof result.pid].d}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Filter Settings */}
+          <div className="bg-white/5 rounded-xl border border-white/10 overflow-hidden">
+            <div className="px-4 py-3 border-b border-white/10 flex justify-between items-center">
+              <h3 className="font-medium text-white text-sm">
+                {tResults('filterSettings')}
+              </h3>
+              <button
+                type="button"
+                className="text-xs text-white/60 hover:text-white/80"
+                onClick={() => toggleSection('filters')}
+              >
+                {sections.filters
+                  ? isZh
+                    ? '收起'
+                    : 'Collapse'
+                  : isZh
+                    ? '展开'
+                    : 'Expand'}
+              </button>
+            </div>
+            {sections.filters ? (
+              <div className="p-4 grid grid-cols-2 gap-3 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">{tResults('gyroLPF')}</span>
+                  <span className="text-white font-mono">
+                    {result.filters.gyro_lowpass_hz} Hz
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">{tResults('dtermLPF')}</span>
+                  <span className="text-white font-mono">
+                    {result.filters.dterm_lowpass_hz} Hz
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">
+                    {tResults('dynNotchCount')}
+                  </span>
+                  <span className="text-white font-mono">
+                    {result.filters.dyn_notch_count}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">{tResults('dynNotchQ')}</span>
+                  <span className="text-white font-mono">
+                    {result.filters.dyn_notch_q}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="px-4 py-3 text-xs text-white/55">
+                {isZh
+                  ? '已折叠滤波器设置（点击展开查看）'
+                  : 'Filter settings collapsed (click to expand)'}
+              </div>
+            )}
+          </div>
+
+          {/* CLI Commands */}
+          <div className="bg-white/5 rounded-xl border border-white/10 overflow-hidden">
+            <div className="px-4 py-3 border-b border-white/10 flex justify-between items-center">
+              <h3 className="font-medium text-white text-sm">
+                {tResults('cliCommands')}
+              </h3>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={onCopy}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/15 rounded-lg text-xs transition-colors"
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                  {copied ? tResults('copied') : tResults('copy')}
+                </button>
+                <button
+                  type="button"
+                  onClick={onDownload}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-black hover:bg-gray-200 rounded-lg text-xs font-medium transition-colors"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  {tResults('download')}
+                </button>
+              </div>
+            </div>
+            <div className="mx-4 mt-4 rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-200/80">
+              {isZh
+                ? '建议粘贴前先 diff all 备份，如有异常振动或发热请立即回退'
+                : 'Backup with "diff all" before pasting. Revert immediately if abnormal vibration or heat occurs'}
+            </div>
+            <div className="p-4 max-h-60 overflow-y-auto bg-black/20">
+              <pre className="text-xs text-gray-400 font-mono whitespace-pre-wrap">
+                {result.cli_commands}
+              </pre>
+            </div>
+          </div>
+
+          {/* Instructions */}
+          <div className="bg-white/5 rounded-xl border border-white/10 p-4">
+            <h3 className="font-medium text-white mb-3 text-sm">
+              {tResults('howToApply')}
+            </h3>
+            <ol className="space-y-2 text-gray-400 text-sm">
+              {[1, 2, 3, 4, 5].map((step) => (
+                <li key={step} className="flex gap-3">
+                  <span className="text-gray-500 font-mono text-xs w-4">
+                    {step}.
+                  </span>
+                  <span>{tResults(`applySteps.step${step}`)}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-4 border-t border-white/10 flex-shrink-0">
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-full py-3 rounded-xl bg-white/10 hover:bg-white/15 text-sm font-medium transition-colors"
+          >
+            {isZh ? '关闭' : 'Close'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Step 7: Results (保留用于本地测试)
 function StepResults({ result }: { result: AnalysisResult }) {
   const t = useTranslations('TunePage.wizard.results');
   const [copied, setCopied] = useState(false);
@@ -1300,6 +2611,118 @@ function StepResults({ result }: { result: AnalysisResult }) {
       >
         {t('backToHome')}
       </a>
+    </div>
+  );
+}
+
+// 数据不足错误弹窗
+function InsufficientDataModal({
+  error,
+  details,
+  code,
+  onClose,
+  locale,
+}: {
+  error: string;
+  details: string;
+  code?: string;
+  onClose: () => void;
+  locale: string;
+}) {
+  const isZh = locale === 'zh';
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
+
+  const isGroundIdle = code === 'GROUND_IDLE_ONLY';
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="relative w-full max-w-md mx-4 bg-[#0a0b0f] border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center gap-4 px-6 py-5 border-b border-white/10 bg-orange-500/10">
+          <div className="w-12 h-12 bg-orange-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+            <AlertCircle className="w-6 h-6 text-orange-400" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-white">{error}</h2>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 space-y-4">
+          {/* 问题说明 */}
+          <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+            <p className="text-sm text-gray-300 leading-relaxed">
+              {isGroundIdle
+                ? isZh
+                  ? '您上传的黑盒日志看起来只包含地面怠速数据，没有检测到实际飞行。AI 调参需要真实的飞行数据来分析您的飞控表现。'
+                  : 'Your blackbox log appears to contain only ground idle data with no actual flight detected. AI tuning requires real flight data to analyze your flight controller performance.'
+                : isZh
+                  ? '您上传的黑盒日志飞行时间太短。AI 调参需要足够的飞行数据来准确分析您的飞控表现并生成优化建议。'
+                  : 'Your blackbox log has insufficient flight duration. AI tuning requires enough flight data to accurately analyze your flight controller performance and generate optimization recommendations.'}
+            </p>
+          </div>
+
+          {/* 建议 */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-medium text-white">
+              {isZh ? '建议' : 'Suggestions'}
+            </h3>
+            <ul className="space-y-2 text-sm text-gray-400">
+              <li className="flex items-start gap-2">
+                <span className="text-orange-400 mt-0.5">•</span>
+                <span>
+                  {isZh
+                    ? '录制一段至少 30 秒的飞行数据（包含各种动作）'
+                    : 'Record at least 30 seconds of flight data (with various maneuvers)'}
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-orange-400 mt-0.5">•</span>
+                <span>
+                  {isZh
+                    ? '确保黑盒记录在起飞后开始，而不是地面怠速时'
+                    : 'Make sure blackbox recording starts after takeoff, not during ground idle'}
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-orange-400 mt-0.5">•</span>
+                <span>
+                  {isZh
+                    ? '检查黑盒设置，确保采样率足够（建议 2kHz）'
+                    : 'Check blackbox settings, ensure sample rate is sufficient (2kHz recommended)'}
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          {/* 关闭按钮 */}
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-full mt-2 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 font-semibold transition-all border border-white/20 text-sm"
+          >
+            {isZh ? '知道了' : 'Got it'}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

@@ -7,8 +7,7 @@ export const getOpenAI = () => {
   if (!_openai) {
     _openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
-      baseURL:
-        process.env.OPENAI_BASE_URL || 'https://future-api.vodeshop.com/v1',
+      baseURL: process.env.OPENAI_BASE_URL || 'https://gemini-api.cn/v1',
     });
   }
   return _openai;
@@ -22,66 +21,56 @@ export const openai = new Proxy({} as OpenAI, {
 });
 
 // 默认模型
-export const DEFAULT_MODEL = process.env.OPENAI_MODEL || 'gpt-5.1-2025-11-13';
+export const DEFAULT_MODEL = process.env.OPENAI_MODEL || 'gpt-5.2-codex';
 
 // Blackbox 分析 Prompt
 export const getBlackboxAnalysisPrompt = (locale: string) => {
   const isZh = locale === 'zh';
 
-  return `You are an expert FPV drone tuning specialist with deep knowledge of Betaflight PID tuning, filter configuration, and flight dynamics.
+  return `FPV PID tuning expert. Output ONLY valid JSON, no other text.
 
-Analyze the provided blackbox log data and user configuration to generate optimized PID settings.
-
-${isZh ? '**重要：所有文本内容必须使用中文回复，包括 summary、issues、recommendations。CLI 命令保持英文。**' : ''}
+${isZh ? '所有文本内容使用中文。' : 'All text content in English.'}
 
 ## User Configuration:
-- Problems to fix: {problems}
-- Tuning goals: {goals}
+- Problems: {problems}
+- Goals: {goals}
 - Flying style: {flyingStyle}
 - Frame size: {frameSize}
-- Additional notes: {additionalNotes}
+- Motor: {motorSize} {motorKv}KV
+- Battery: {battery}
+- Propeller: {propeller}
+- Motor temperature after flight: {motorTemp}
+- Weight: {weight}g
+- Notes: {additionalNotes}
 
-## Input Data:
-1. **Blackbox Log**: Contains flight data including gyro readings, PID outputs, motor outputs, RC commands, etc. Use this to analyze flight characteristics and identify issues.
-2. **CLI Dump (if provided)**: Contains the user's current Betaflight settings exported via "diff all" command. This shows their current PID values, filter settings, rates, and other configurations. Use this as the baseline and only modify settings that need optimization.
-
-## Your Task:
-1. Analyze the gyro noise patterns and identify resonance frequencies
-2. Evaluate the current PID response and identify issues
-3. Generate optimized PID values for Roll, Pitch, and Yaw
-4. Configure appropriate filter settings (Gyro lowpass, D-term lowpass, Dynamic notch)
-5. Set feedforward values based on flying style
-6. Provide CLI commands ready to paste into Betaflight
-
-## Output Format:
-Provide your response in the following JSON structure (${isZh ? 'text content in Chinese' : 'text content in English'}):
+## Required JSON structure:
 {
   "analysis": {
-    "summary": "${isZh ? '分析摘要（中文）' : 'Brief summary of findings'}",
-    "issues": ["${isZh ? '问题列表（中文）' : 'List of identified issues'}"],
-    "recommendations": ["${isZh ? '建议列表（中文）' : 'List of key recommendations'}"]
+    "summary": "${isZh ? '分析结论（中文，50-100字）' : 'Analysis summary (50-100 words)'}",
+    "issues": ["${isZh ? '问题1' : 'Issue 1'}", "${isZh ? '问题2' : 'Issue 2'}"],
+    "recommendations": ["${isZh ? '建议1' : 'Recommendation 1'}", "${isZh ? '建议2' : 'Recommendation 2'}"]
   },
   "pid": {
-    "roll": { "p": number, "i": number, "d": number, "f": number },
-    "pitch": { "p": number, "i": number, "d": number, "f": number },
-    "yaw": { "p": number, "i": number, "d": number, "f": number }
+    "roll": {"p": num, "i": num, "d": num, "f": num},
+    "pitch": {"p": num, "i": num, "d": num, "f": num},
+    "yaw": {"p": num, "i": num, "d": num, "f": num}
   },
   "filters": {
-    "gyro_lowpass_hz": number,
-    "gyro_lowpass2_hz": number,
-    "dterm_lowpass_hz": number,
-    "dterm_lowpass2_hz": number,
-    "dyn_notch_count": number,
-    "dyn_notch_q": number,
-    "dyn_notch_min_hz": number,
-    "dyn_notch_max_hz": number
+    "gyro_lowpass_hz": num,
+    "gyro_lowpass2_hz": num,
+    "dterm_lowpass_hz": num,
+    "dterm_lowpass2_hz": num,
+    "dyn_notch_count": num,
+    "dyn_notch_q": num,
+    "dyn_notch_min_hz": num,
+    "dyn_notch_max_hz": num
   },
   "other": {
-    "dshot_bidir": boolean,
-    "motor_output_limit": number,
-    "throttle_boost": number,
-    "anti_gravity_gain": number
+    "dshot_bidir": bool,
+    "motor_output_limit": num,
+    "throttle_boost": num,
+    "anti_gravity_gain": num
   },
-  "cli_commands": "# FPVtune Generated Settings\\nset p_pitch = ...\\n..."
+  "cli_commands": "set p_roll = 48\\nset i_roll = 90\\n...\\nsave"
 }`;
 };

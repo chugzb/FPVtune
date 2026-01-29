@@ -5,9 +5,9 @@ import type { Metadata } from 'next';
 const baseUrl = getBaseUrl();
 
 export const metadata: Metadata = {
-  title: 'Betaflight PID Tuning - AI Blackbox Analyzer | FPVtune',
+  title: 'Betaflight PID Tuning - Smart Blackbox Analyzer | FPVtune',
   description:
-    'AI-powered Betaflight PID tuning tool. Upload blackbox logs, get optimized PID settings instantly. Eliminate prop wash, reduce noise. Start free.',
+    'Neural network-powered Betaflight PID tuning tool. Upload blackbox logs, get optimized PID settings instantly. Eliminate prop wash, reduce noise. Start free.',
   alternates: {
     canonical: baseUrl,
   },
@@ -15,16 +15,16 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: baseUrl,
-    title: 'Betaflight PID Tuning - AI Blackbox Analyzer | FPVtune',
+    title: 'Betaflight PID Tuning - Smart Blackbox Analyzer | FPVtune',
     description:
-      'AI-powered Betaflight PID tuning tool. Upload blackbox logs, get optimized PID settings instantly. Eliminate prop wash, reduce noise. Start free.',
+      'Neural network-powered Betaflight PID tuning tool. Upload blackbox logs, get optimized PID settings instantly. Eliminate prop wash, reduce noise. Start free.',
     siteName: 'FPVtune',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Betaflight PID Tuning - AI Blackbox Analyzer | FPVtune',
+    title: 'Betaflight PID Tuning - Smart Blackbox Analyzer | FPVtune',
     description:
-      'AI-powered Betaflight PID tuning tool. Upload blackbox logs, get optimized PID settings instantly. Eliminate prop wash, reduce noise. Start free.',
+      'Neural network-powered Betaflight PID tuning tool. Upload blackbox logs, get optimized PID settings instantly. Eliminate prop wash, reduce noise. Start free.',
   },
 };
 

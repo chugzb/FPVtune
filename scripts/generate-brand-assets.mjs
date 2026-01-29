@@ -59,7 +59,7 @@ const ogImageSvg = `
     <path d="M200 12V32H196V12H200ZM200 12V16C200 16 204 12 210 12C216 12 218 16 218 20V32H214V20C214 18 212 16 208 16C204 16 200 19 200 24V32H196V12H200Z" fill="white"/>
     <path d="M224 22H238C238 17 234 12 229 12C224 12 220 17 220 22C220 27 224 32 229 32C233 32 236 30 237 27L234 25C233 27 231 28 229 28C226 28 224 26 224 22ZM229 16C232 16 234 18 234 22H224C224 18 226 16 229 16Z" fill="white"/>
   </g>
-  <text x="600" y="420" font-family="system-ui, -apple-system, sans-serif" font-size="32" fill="#9ca3af" text-anchor="middle">AI-Powered Betaflight PID Tuning</text>
+  <text x="600" y="420" font-family="system-ui, -apple-system, sans-serif" font-size="32" fill="#9ca3af" text-anchor="middle">Neural Network-Powered Betaflight PID Tuning</text>
 </svg>`;
 
 async function generateAssets() {

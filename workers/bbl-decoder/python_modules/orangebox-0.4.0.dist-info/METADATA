@@ -1,0 +1,22 @@
+Metadata-Version: 2.2
+Name: orangebox
+Version: 0.4.0
+Summary: A Cleanflight/Betaflight blackbox log parser written in Python 3
+Home-page: https://github.com/atomgomba/orangebox
+Author: Károly Kiripolszky
+Author-email: karcsi@ekezet.com
+Keywords: blackbox cleanflight betaflight
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: System :: Archiving :: Compression
+Classifier: Topic :: Scientific/Engineering :: Information Analysis
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Requires-Python: >=3.5
+License-File: LICENSE
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: requires-python
+Dynamic: summary

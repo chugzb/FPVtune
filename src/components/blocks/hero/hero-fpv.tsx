@@ -200,7 +200,7 @@ export default function HeroFPV() {
               transition={{ delay: 0.2, duration: 0.8 }}
               className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight"
             >
-              <span className="text-white">AI-Powered</span>
+              <span className="text-white">Neural Network-Powered</span>
               <br />
               <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-fuchsia-500 bg-clip-text text-transparent">
                 FPV Tuning

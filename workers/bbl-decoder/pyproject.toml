@@ -1,0 +1,15 @@
+[project]
+name = "bbl-decoder"
+version = "1.0.0"
+description = "BBL (Betaflight Blackbox Log) decoder service for FPVTune"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi",
+    "orangebox",
+]
+
+[dependency-groups]
+dev = [
+    "workers-py",
+    "workers-runtime-sdk",
+]

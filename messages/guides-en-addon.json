@@ -102,7 +102,7 @@
       },
       "what": {
         "title": "What is a CLI Dump?",
-        "description": "CLI Dump is a complete configuration export from your flight controller, including all settings, PID values, filter configurations, and more. This file can be used for backing up your configuration or having AI analyze your settings."
+        "description": "CLI Dump is a complete configuration export from your flight controller, including all settings, PID values, filter configurations, and more. This file can be used for backing up your configuration or having our neural network analyze your settings."
       },
       "steps": {
         "1": {

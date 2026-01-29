@@ -4,13 +4,7 @@ import { DEFAULT_MODEL, getBlackboxAnalysisPrompt, openai } from '@/lib/openai';
 import { downloadFile, extractKeyFromUrl } from '@/storage';
 import type { AnalysisResult } from '@/types/tune';
 import { eq } from 'drizzle-orm';
-import {
-  analysisGate,
-  convertBBLForAI,
-  extractBBLHeader,
-  isBBLFormat,
-  parseBBLFile,
-} from './bbl-parser';
+import { extractBBLHeader, isBBLFormat } from './bbl-parser';
 import {
   FRAME_NAMES,
   GOAL_NAMES,
@@ -27,6 +21,12 @@ async function runAIAnalysis(
   goals: string,
   flyingStyle: string,
   frameSize: string,
+  motorSize: string,
+  motorKv: string,
+  battery: string,
+  propeller: string,
+  motorTemp: string,
+  weight: string,
   additionalNotes: string,
   locale: string
 ): Promise<AnalysisResult> {
@@ -36,11 +36,25 @@ async function runAIAnalysis(
   const styleName = getNameById(flyingStyle, STYLE_NAMES, locale);
   const frameName = getNameById(frameSize, FRAME_NAMES, locale);
 
+  // 电机温度映射
+  const motorTempMap: Record<string, Record<string, string>> = {
+    normal: { en: 'Normal (warm to touch)', zh: '正常 (温热)' },
+    warm: { en: 'Warm (hot but touchable)', zh: '偏热 (烫手但可触摸)' },
+    hot: { en: 'Hot (too hot to touch)', zh: '过热 (无法触摸)' },
+  };
+  const motorTempName = motorTemp ? (motorTempMap[motorTemp]?.[locale] || motorTemp) : '';
+
   const prompt = getBlackboxAnalysisPrompt(locale)
     .replace('{problems}', problemNames)
     .replace('{goals}', goalNames)
     .replace('{flyingStyle}', styleName)
     .replace('{frameSize}', frameName)
+    .replace('{motorSize}', motorSize || 'Not specified')
+    .replace('{motorKv}', motorKv || 'Not specified')
+    .replace('{battery}', battery ? battery.toUpperCase() : 'Not specified')
+    .replace('{propeller}', propeller || 'Not specified')
+    .replace('{motorTemp}', motorTempName || 'Not specified')
+    .replace('{weight}', weight || 'Not specified')
     .replace('{additionalNotes}', additionalNotes || 'None');
 
   // 构建用户消息
@@ -55,6 +69,11 @@ async function runAIAnalysis(
   console.log('AI Analysis - Goals:', goalNames);
   console.log('AI Analysis - Style:', styleName);
   console.log('AI Analysis - Frame:', frameName);
+  console.log('AI Analysis - Motor:', motorSize, motorKv + 'KV');
+  console.log('AI Analysis - Battery:', battery);
+  console.log('AI Analysis - Propeller:', propeller);
+  console.log('AI Analysis - Motor Temp:', motorTempName);
+  console.log('AI Analysis - Weight:', weight);
   console.log('AI Analysis - Blackbox content length:', blackboxContent.length);
   console.log('AI Analysis - CLI dump included:', !!cliDumpContent);
 
@@ -73,7 +92,6 @@ async function runAIAnalysis(
       ],
       temperature: 0.3,
       max_tokens: 4000,
-      response_format: { type: 'json_object' },
     });
 
     const result = completion.choices[0]?.message?.content;
@@ -81,7 +99,23 @@ async function runAIAnalysis(
       throw new Error('Failed to generate analysis: empty response');
     }
 
-    return JSON.parse(result) as AnalysisResult;
+    // 从响应中提取 JSON（可能包含 markdown 或思考过程）
+    let jsonStr = result;
+
+    // 尝试提取 ```json ... ``` 代码块
+    const jsonMatch = result.match(/```json\s*([\s\S]*?)\s*```/);
+    if (jsonMatch) {
+      jsonStr = jsonMatch[1];
+    } else {
+      // 尝试找到第一个 { 和最后一个 }
+      const firstBrace = result.indexOf('{');
+      const lastBrace = result.lastIndexOf('}');
+      if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+        jsonStr = result.substring(firstBrace, lastBrace + 1);
+      }
+    }
+
+    return JSON.parse(jsonStr) as AnalysisResult;
   } catch (error) {
     console.error('OpenAI API error:', error);
     // 提取 OpenAI 错误信息
@@ -162,7 +196,7 @@ async function sendResultEmail(
     <div class="card">
       <div class="header">
         <div class="logo">FPVtune</div>
-        <p style="color: #6b7280; margin: 8px 0 0 0;">${isZh ? 'AI 驱动的 PID 调参' : 'AI-Powered PID Tuning'}</p>
+        <p style="color: #6b7280; margin: 8px 0 0 0;">${isZh ? '神经网络驱动的 PID 调参' : 'Neural Network-Powered PID Tuning'}</p>
       </div>
 
       <h2 style="text-align: center; margin: 0;">${isZh ? '您的 PID 调参报告已准备好!' : 'Your PID Tuning Report is Ready!'}</h2>
@@ -258,7 +292,7 @@ async function sendResultEmail(
     </div>
 
     <div class="footer">
-      <p>FPVtune - AI-Powered Betaflight PID Tuning</p>
+      <p>FPVtune - Neural Network-Powered Betaflight PID Tuning</p>
       <p>${isZh ? '如有问题，请联系' : 'Questions? Contact'} <a href="mailto:support@fpvtune.com">support@fpvtune.com</a></p>
     </div>
   </div>
@@ -410,49 +444,17 @@ export async function processOrder(orderId: string): Promise<void> {
       `[${order.orderNumber}] Buffer first 100 bytes: ${JSON.stringify(firstBytes)}`
     );
 
-    // 处理 BBL 文件：解析完整数据（头部配置 + 帧数据）
-    // BBL 文件是二进制格式，需要使用 WASM 解析器转换为 CSV
+    // 处理 BBL 文件：只提取头部配置（不需要帧数据）
     if (rawBuffer) {
-      // 检测是否为 BBL 格式
       if (isBBLFormat(rawBuffer)) {
-        // BBL 格式：使用完整解析器提取头部和帧数据
+        // BBL 格式：直接提取头部配置
         console.log(
-          `[${order.orderNumber}] BBL format detected, parsing full data with WASM parser...`
+          `[${order.orderNumber}] BBL format detected, extracting header...`
         );
-        try {
-          // 先解析获取统计信息用于质量检查
-          const parsed = await parseBBLFile(rawBuffer, 5000);
-
-          // 数据质量检查
-          const gateResult = analysisGate(parsed.stats);
-          if (!gateResult.analyzable) {
-            console.error(
-              `[${order.orderNumber}] Data quality check failed: ${gateResult.reason}`
-            );
-            throw new Error(`数据质量不足，无法进行分析: ${gateResult.reason}`);
-          }
-          console.log(
-            `[${order.orderNumber}] Data quality check passed: duration=${parsed.stats.duration.toFixed(1)}s, frames=${parsed.stats.totalFrames}`
-          );
-
-          blackboxContent = await convertBBLForAI(rawBuffer, {
-            maxFrames: 5000,
-          });
-          console.log(
-            `[${order.orderNumber}] BBL parsed successfully, total content: ${blackboxContent.length} chars`
-          );
-        } catch (parseError) {
-          console.error(
-            `[${order.orderNumber}] BBL parsing failed:`,
-            parseError
-          );
-          // 如果 WASM 解析失败，回退到只提取头部
-          const { extractBBLHeader } = await import('./bbl-parser');
-          blackboxContent = extractBBLHeader(rawBuffer);
-          console.log(
-            `[${order.orderNumber}] Fallback to header-only extraction: ${blackboxContent.length} chars`
-          );
-        }
+        blackboxContent = extractBBLHeader(rawBuffer);
+        console.log(
+          `[${order.orderNumber}] BBL header extracted: ${blackboxContent.length} chars, ${blackboxContent.split('\n').length} lines`
+        );
       } else {
         // 非 BBL 格式（可能是 CSV 或其他文本格式）：直接转换
         blackboxContent = rawBuffer.toString('utf-8');
@@ -503,6 +505,12 @@ export async function processOrder(orderId: string): Promise<void> {
       order.goals || '',
       order.flyingStyle || '',
       order.frameSize || '',
+      order.motorSize || '',
+      order.motorKv || '',
+      order.battery || '',
+      order.propeller || '',
+      order.motorTemp || '',
+      order.weight || '',
       order.additionalNotes || '',
       order.locale || 'en'
     );
@@ -517,25 +525,7 @@ export async function processOrder(orderId: string): Promise<void> {
       'https://fpvtune.com';
     const resultUrl = `${baseUrl}/${order.locale || 'en'}/tune/success?order=${order.orderNumber}`;
 
-    console.log(
-      `[processOrder] Sending email for order ${order.orderNumber}...`
-    );
-    const emailStartTime = Date.now();
-    const { messageId } = await sendResultEmail(
-      order.customerEmail,
-      order.orderNumber,
-      analysis,
-      order.problems || '',
-      order.goals || '',
-      order.flyingStyle || 'freestyle',
-      order.frameSize || '5',
-      order.locale || 'en',
-      resultUrl
-    );
-    console.log(
-      `[processOrder] Email sent in ${Date.now() - emailStartTime}ms, messageId: ${messageId}`
-    );
-
+    // 先保存分析结果，确保即使邮件发送失败也不会丢失
     await db
       .update(tuneOrder)
       .set({
@@ -543,12 +533,52 @@ export async function processOrder(orderId: string): Promise<void> {
         analysisResult: analysis,
         cliCommands: analysis.cli_commands,
         resultUrl: resultUrl,
-        emailSentAt: new Date(),
-        emailMessageId: messageId,
         completedAt: new Date(),
         updatedAt: new Date(),
       })
       .where(eq(tuneOrder.id, orderId));
+
+    console.log(
+      `[processOrder] Analysis saved for order ${order.orderNumber}, now sending email...`
+    );
+
+    // 尝试发送邮件，失败不影响订单状态
+    try {
+      const emailStartTime = Date.now();
+      const { messageId } = await sendResultEmail(
+        order.customerEmail,
+        order.orderNumber,
+        analysis,
+        order.problems || '',
+        order.goals || '',
+        order.flyingStyle || 'freestyle',
+        order.frameSize || '5',
+        order.locale || 'en',
+        resultUrl
+      );
+      console.log(
+        `[processOrder] Email sent in ${Date.now() - emailStartTime}ms, messageId: ${messageId}`
+      );
+
+      // 更新邮件发送状态
+      await db
+        .update(tuneOrder)
+        .set({
+          emailSentAt: new Date(),
+          emailMessageId: messageId,
+          updatedAt: new Date(),
+        })
+        .where(eq(tuneOrder.id, orderId));
+    } catch (emailError) {
+      // 邮件发送失败，记录错误但不影响订单状态
+      console.error(
+        `[processOrder] Email send failed for order ${order.orderNumber}:`,
+        emailError
+      );
+      console.log(
+        `[processOrder] Order ${order.orderNumber} completed but email not sent`
+      );
+    }
 
     const totalTime = Date.now() - startTime;
     console.log(

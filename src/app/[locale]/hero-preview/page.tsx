@@ -67,7 +67,7 @@ function HeroOptionA() {
       <div className="relative z-10 flex flex-col items-center justify-center min-h-[600px] px-4 text-center">
         <div className="mb-6 inline-flex items-center gap-1.5 rounded-full border border-teal-400/50 bg-teal-500/20 px-3 py-1 text-sm text-teal-100">
           <Zap className="h-3.5 w-3.5" />
-          <span>AI 驱动的智能调参</span>
+          <span>神经网络驱动的智能调参</span>
         </div>
         <h1 className="mb-4 text-5xl font-bold tracking-tight text-white sm:text-6xl lg:text-[72px]">
           定制你的
@@ -75,12 +75,12 @@ function HeroOptionA() {
           <span className="text-teal-400">完美 PID</span>
         </h1>
         <p className="mx-auto mb-8 max-w-xl text-lg text-gray-200">
-          上传 Blackbox 日志和飞控配置，AI 分析你的飞行数据，
+          上传 Blackbox 日志和飞控配置，神经网络分析你的飞行数据，
           生成针对你机型的专属调参方案
         </p>
         <button className="flex items-center gap-2 rounded-xl bg-teal-600 px-8 py-4 text-base font-semibold text-white hover:bg-teal-700 transition-all">
           <Zap className="h-5 w-5" />
-          开始 AI 分析
+          开始智能分析
           <ChevronRight className="h-5 w-5" />
         </button>
       </div>
@@ -98,7 +98,7 @@ function HeroOptionB() {
           <div>
             <div className="mb-6 inline-flex items-center gap-1.5 rounded-full border border-teal-200 bg-teal-50 px-3 py-1 text-sm text-teal-700">
               <Zap className="h-3.5 w-3.5" />
-              <span>AI 驱动的智能调参</span>
+              <span>神经网络驱动的智能调参</span>
             </div>
             <h1 className="mb-4 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
               定制你的
@@ -106,12 +106,12 @@ function HeroOptionB() {
               <span className="text-teal-600">完美 PID</span>
             </h1>
             <p className="mb-8 max-w-md text-lg text-gray-500">
-              上传 Blackbox 日志和飞控配置，AI 分析你的飞行数据，
+              上传 Blackbox 日志和飞控配置，神经网络分析你的飞行数据，
               生成针对你机型的专属调参方案
             </p>
             <button className="flex items-center gap-2 rounded-xl bg-teal-600 px-8 py-4 text-base font-semibold text-white hover:bg-teal-700 transition-all">
               <Zap className="h-5 w-5" />
-              开始 AI 分析
+              开始智能分析
               <ChevronRight className="h-5 w-5" />
             </button>
           </div>
@@ -147,14 +147,14 @@ function HeroOptionC() {
         <div className="text-center mb-12">
           <div className="mb-6 inline-flex items-center gap-1.5 rounded-full border border-teal-200 bg-teal-50 px-3 py-1 text-sm text-teal-700">
             <Zap className="h-3.5 w-3.5" />
-            <span>AI 驱动的智能调参</span>
+            <span>神经网络驱动的智能调参</span>
           </div>
           <h1 className="mb-4 text-5xl font-bold tracking-tight text-gray-900 sm:text-6xl">
             定制你的
             <span className="text-teal-600"> 完美 PID</span>
           </h1>
           <p className="mx-auto max-w-xl text-lg text-gray-500">
-            上传 Blackbox 日志和飞控配置，AI 分析你的飞行数据，
+            上传 Blackbox 日志和飞控配置，神经网络分析你的飞行数据，
             生成针对你机型的专属调参方案
           </p>
         </div>
@@ -176,7 +176,7 @@ function HeroOptionC() {
         <div className="text-center mt-10">
           <button className="inline-flex items-center gap-2 rounded-xl bg-teal-600 px-8 py-4 text-base font-semibold text-white hover:bg-teal-700 transition-all">
             <Zap className="h-5 w-5" />
-            开始 AI 分析
+            开始智能分析
             <ChevronRight className="h-5 w-5" />
           </button>
         </div>

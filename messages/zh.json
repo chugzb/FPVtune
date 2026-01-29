@@ -1,8 +1,8 @@
 {
   "Metadata": {
     "name": "FPVTune",
-    "title": "FPVTune - AI驱动的FPV无人机调参助手",
-    "description": "FPVTune 是一款AI驱动的FPV无人机PID调参和配置优化助手"
+    "title": "FPVTune - 神经网络驱动的FPV无人机调参助手",
+    "description": "FPVTune 是一款神经网络驱动的FPV无人机PID调参和配置优化助手"
   },
   "Common": {
     "login": "登录",
@@ -32,13 +32,13 @@
   },
   "PricingPage": {
     "meta": {
-      "title": "价格 - FPVtune AI PID调参",
-      "description": "获取AI优化的Betaflight PID设置。一次性付费，即时获取结果。"
+      "title": "价格 - FPVtune 智能PID调参",
+      "description": "获取神经网络优化的Betaflight PID设置。一次性付费，即时获取结果。"
     },
     "title": "简单透明的定价",
     "subtitle": "只有在您满意分析结果后才需付费。无订阅，无隐藏费用。",
     "badge": "上线特惠",
-    "productName": "AI PID分析",
+    "productName": "智能PID分析",
     "productDesc": "为您的FPV无人机提供完整的Betaflight PID调参分析",
     "discount": "上线特惠5折",
     "perAnalysis": "每次分析一次性付费",
@@ -46,7 +46,7 @@
     "features": {
       "pid": {
         "title": "优化的PID值",
-        "desc": "AI计算的所有轴向P、I、D增益"
+        "desc": "神经网络计算的所有轴向P、I、D增益"
       },
       "filter": {
         "title": "滤波器设置",
@@ -76,8 +76,8 @@
         "desc": "上传Betaflight的.BBL或.BFL文件"
       },
       "step2": {
-        "title": "AI分析",
-        "desc": "我们的AI分析陀螺仪噪声和飞行特性"
+        "title": "智能分析",
+        "desc": "我们的神经网络分析陀螺仪噪声和飞行特性"
       },
       "step3": {
         "title": "获取结果",
@@ -191,10 +191,10 @@
   },
   "AboutPage": {
     "title": "关于我们",
-    "description": "FPVTune 是一个使用最先进的技术栈构建的 AI SaaS 模板，它可以帮助你更快更好地构建你的 SaaS。如果你有任何问题，欢迎联系我。",
+    "description": "FPVTune 是一款神经网络驱动的FPV无人机调参助手，帮助飞手快速获得优化的PID设置。如果你有任何问题，欢迎联系我。",
     "authorName": "FPVTune",
-    "authorBio": "最好的 AI SaaS 模板",
-    "introduction": "👋 你好，这里是 FPVTune，一个使用最先进的技术栈构建的 AI SaaS 模板，它可以帮助你更快更好地构建你的 SaaS。如果你有任何问题，欢迎联系我。",
+    "authorBio": "神经网络驱动的调参助手",
+    "introduction": "👋 你好，这里是 FPVTune，一款神经网络驱动的FPV无人机调参助手，帮助飞手快速获得优化的PID设置。如果你有任何问题，欢迎联系我。",
     "talkWithMe": "联系我",
     "followMe": "关注我"
   },
@@ -357,23 +357,23 @@
         "title": "文档"
       },
       "ai": {
-        "title": "AI 工具",
+        "title": "智能工具",
         "items": {
           "text": {
-            "title": "AI 文本",
-            "description": "展示如何使用 AI 生成精彩文本"
+            "title": "智能文本",
+            "description": "展示如何使用神经网络生成精彩文本"
           },
           "image": {
-            "title": "AI 图像",
-            "description": "展示如何使用 AI 生成精美图像"
+            "title": "智能图像",
+            "description": "展示如何使用神经网络生成精美图像"
           },
           "video": {
-            "title": "AI 视频",
-            "description": "展示如何使用 AI 生成惊人视频"
+            "title": "智能视频",
+            "description": "展示如何使用神经网络生成惊人视频"
           },
           "audio": {
-            "title": "AI 音频",
-            "description": "展示如何使用 AI 生成动听音频"
+            "title": "智能音频",
+            "description": "展示如何使用神经网络生成动听音频"
           }
         }
       },
@@ -475,7 +475,7 @@
       }
     },
     "footer": {
-      "tagline": "AI智能调参，让FPV飞行更流畅",
+      "tagline": "神经网络智能调参，让FPV飞行更流畅",
       "product": {
         "title": "产品",
         "items": {
@@ -679,7 +679,7 @@
   },
   "HomePage": {
     "title": "FPVTune",
-    "description": "AI驱动的FPV无人机PID调参和配置优化助手",
+    "description": "神经网络驱动的FPV无人机PID调参和配置优化助手",
     "nav": {
       "features": "功能特性",
       "howItWorks": "工作原理",
@@ -689,10 +689,10 @@
       "startTuning": "开始调参"
     },
     "landing": {
-      "heroBadge": "AI驱动的Betaflight PID调参",
+      "heroBadge": "神经网络驱动的Betaflight PID调参",
       "heroTitle1": "Betaflight PID调参",
-      "heroTitle2": "AI让一切变简单",
-      "heroDesc": "上传您的Betaflight黑盒日志，几秒内获取优化的PID设置。我们的AI分析陀螺仪噪声，识别共振频率，为您的FPV无人机生成完美的调参方案。",
+      "heroTitle2": "神经网络让一切变简单",
+      "heroDesc": "上传您的Betaflight黑盒日志，几秒内获取优化的PID设置。我们的神经网络分析陀螺仪噪声，识别共振频率，为您的FPV无人机生成完美的调参方案。",
       "startTuningNow": "立即开始调参",
       "stats": {
         "analysisSpeed": "分析速度",
@@ -720,11 +720,11 @@
         "midThrottleDesc": "由于电机共振频率，在某些油门位置出现振动。"
       },
       "howItWorksSection": {
-        "title": "AI分析工作原理",
-        "desc": "FPVtune使用先进的机器学习分析您的黑盒数据，生成针对您特定无人机配置的优化设置。",
+        "title": "智能分析工作原理",
+        "desc": "FPVtune使用先进的神经网络分析您的黑盒数据，生成针对您特定无人机配置的优化设置。",
         "step1Title": "1. 上传黑盒日志",
         "step1Desc": "在Betaflight配置器中启用黑盒记录并录制一段短飞行。将.BBL或.BFL文件上传到FPVtune。我们支持Betaflight 4.5及更新版本的日志格式。",
-        "step2Title": "2. AI分析",
+        "step2Title": "2. 智能分析",
         "step2Desc": "我们的神经网络对您的陀螺仪数据进行频谱分析，识别噪声频率，测量阶跃响应，并将您当前的PID性能与数千个参考调参进行评估。",
         "step3Title": "3. 获取优化设置",
         "step3Desc": "获取优化的PID值、滤波器设置和前馈增益。将生成的CLI命令直接复制到Betaflight配置器中，享受完美调参的FPV无人机。"
@@ -733,16 +733,16 @@
         "title": "高级分析功能",
         "desc": "从噪声分析到温度预测，为您的FPV无人机实现完美调参所需的一切。",
         "spectral": "陀螺仪噪声频谱分析",
-        "spectralDesc": "可视化整个频谱范围内的陀螺仪噪声和D项共振。我们的AI识别动态陷波滤波器应放置的精确频率，以实现最佳噪声降低而不增加延迟。",
+        "spectralDesc": "可视化整个频谱范围内的陀螺仪噪声和D项共振。我们的神经网络识别动态陷波滤波器应放置的精确频率，以实现最佳噪声降低而不增加延迟。",
         "cliExport": "一键CLI导出",
         "cliExportDesc": "即时生成Betaflight CLI命令。直接复制粘贴到您的飞控中即可立即生效。",
         "thermal": "电机温度预测",
-        "thermalDesc": "激进的PID调参可能导致电机过热。我们的AI根据您的噪声特征预测电机温度，并推荐安全的D增益限制以保护您的硬件。",
+        "thermalDesc": "激进的PID调参可能导致电机过热。我们的神经网络根据您的噪声特征预测电机温度，并推荐安全的D增益限制以保护您的硬件。",
         "estMaxTemp": "预估最高温度",
         "dynamicFilter": "动态滤波器调参",
         "dynamicFilterDesc": "自动配置陀螺仪低通、D项低通和动态陷波滤波器。在保持干净电机信号的同时最小化滤波延迟，实现最平滑的飞行。",
         "propWashElim": "桨洗消除",
-        "propWashElimDesc": "我们的AI专门优化D_min、D_max和前馈设置，以消除激进机动和快速下降时的桨洗振荡。"
+        "propWashElimDesc": "我们的神经网络专门优化D_min、D_max和前馈设置，以消除激进机动和快速下降时的桨洗振荡。"
       },
       "supported": {
         "title": "适用于所有FPV无人机的PID调参",
@@ -760,7 +760,7 @@
       },
       "whyChoose": {
         "title": "为什么选择FPVtune？",
-        "desc": "停止猜测，自信飞行。我们的AI驱动方法提供传统方法无法匹敌的一致、可靠的结果。",
+        "desc": "停止猜测，自信飞行。我们的神经网络驱动方法提供传统方法无法匹敌的一致、可靠的结果。",
         "traditional": "传统PID调参",
         "traditionalItems": {
           "item1": "需要数小时试飞",
@@ -769,7 +769,7 @@
           "item4": "试错方法",
           "item5": "有损坏电机的风险"
         },
-        "aiTuning": "FPVtune AI调参",
+        "aiTuning": "FPVtune 智能调参",
         "aiTuningItems": {
           "item1": "30秒内出结果",
           "item2": "无需技术专业知识",
@@ -790,7 +790,7 @@
         "filter": "Betaflight PID调参中的滤波器设置",
         "filterDesc": "正确的滤波器配置对于成功的Betaflight PID调参至关重要。陀螺仪和D项低通滤波器去除可能导致电机发热的噪声。动态陷波滤波器针对特定共振频率。FPVtune根据您的黑盒数据自动计算最佳滤波器截止频率。",
         "feedforward": "现代Betaflight PID调参中的前馈",
-        "feedforwardDesc": "前馈预测摇杆移动以实现即时响应。高级Betaflight PID调参包括前馈优化以减少延迟并改善摇杆手感。我们的AI分析您的飞行风格，推荐符合您偏好的前馈值。",
+        "feedforwardDesc": "前馈预测摇杆移动以实现即时响应。高级Betaflight PID调参包括前馈优化以减少延迟并改善摇杆手感。我们的神经网络分析您的飞行风格，推荐符合您偏好的前馈值。",
         "rpm": "RPM滤波和Betaflight PID调参",
         "rpmDesc": "双向DShot启用基于RPM的滤波以获得更干净的电机信号。使用RPM滤波进行Betaflight PID调参时，您可以运行更高的PID增益而减少滤波延迟。FPVtune检测RPM滤波状态并相应调整建议。"
       },
@@ -798,33 +798,33 @@
         "title": "Betaflight PID调参常见问题",
         "desc": "关于Betaflight PID调参以及FPVtune如何帮助您实现完美调参的常见问题。",
         "q1": "开始Betaflight PID调参的最佳方式是什么？",
-        "a1": "Betaflight PID调参的最佳方法是从悬停和轻度机动的干净黑盒日志开始。将此日志上传到FPVtune进行AI分析。我们的系统将识别噪声模式并生成优化的PID设置作为您调参的起点。",
+        "a1": "Betaflight PID调参的最佳方法是从悬停和轻度机动的干净黑盒日志开始。将此日志上传到FPVtune进行智能分析。我们的系统将识别噪声模式并生成优化的PID设置作为您调参的起点。",
         "q2": "Betaflight PID调参通常需要多长时间？",
         "a2": "传统的Betaflight PID调参可能需要数小时甚至数天的试飞和调整。使用FPVtune，您可以在30秒内获得优化的PID设置。只需上传您的黑盒日志，即可收到针对您无人机的即时建议。",
         "q3": "FPVtune能帮助竞速无人机的Betaflight PID调参吗？",
-        "a3": "是的，FPVtune支持所有类型无人机的Betaflight PID调参，包括竞速四轴。我们的AI已在数千个竞速无人机日志上进行训练，了解竞技飞手所需的低延迟、高响应调参的具体要求。",
+        "a3": "是的，FPVtune支持所有类型无人机的Betaflight PID调参，包括竞速四轴。我们的神经网络已在数千个竞速无人机日志上进行训练，了解竞技飞手所需的低延迟、高响应调参的具体要求。",
         "q4": "使用FPVtune需要Betaflight PID调参经验吗？",
-        "a4": "不需要任何Betaflight PID调参经验。FPVtune专为各种技能水平的飞手设计。我们的AI处理复杂的分析并提供即用的CLI命令。只需复制粘贴到Betaflight配置器中即可应用您的优化调参。",
+        "a4": "不需要任何Betaflight PID调参经验。FPVtune专为各种技能水平的飞手设计。我们的神经网络处理复杂的分析并提供即用的CLI命令。只需复制粘贴到Betaflight配置器中即可应用您的优化调参。",
         "q5": "支持哪些Betaflight版本的PID调参？",
-        "a5": "FPVtune支持Betaflight 4.5及更新版本的PID调参。我们的AI了解固件版本之间的差异，并为您特定的Betaflight安装生成适当的设置。我们定期更新模型以支持最新的Betaflight版本。"
+        "a5": "FPVtune支持Betaflight 4.5及更新版本的PID调参。我们的神经网络了解固件版本之间的差异，并为您特定的Betaflight安装生成适当的设置。我们定期更新模型以支持最新的Betaflight版本。"
       },
       "cta": {
         "title": "准备好优化您的无人机了吗？",
-        "desc": "几秒内获取AI优化的Betaflight PID设置。只有在您对分析结果满意时才需付费。",
+        "desc": "几秒内获取神经网络优化的Betaflight PID设置。只有在您对分析结果满意时才需付费。",
         "supportedFiles": "支持Betaflight 4.5+的.BBL和.BFL文件"
       },
       "footer": {
-        "tagline": "为全球FPV飞手提供AI驱动的Betaflight PID调参。",
+        "tagline": "为全球FPV飞手提供神经网络驱动的Betaflight PID调参。",
         "copyright": "FPVtune. 保留所有权利。"
       }
     },
     "hero": {
-      "badge": "AI智能调参",
-      "title": "AI驱动的FPV调参助手",
-      "titleLine1": "AI驱动的FPV",
+      "badge": "神经网络智能调参",
+      "title": "神经网络驱动的FPV调参助手",
+      "titleLine1": "神经网络驱动的FPV",
       "titleLine2": "调参助手",
-      "description": "上传黑盒日志，让AI分析您的飞行数据。几秒内获取优化的PID设置、滤波器建议和Rate配置。",
-      "introduction": "AI智能调参",
+      "description": "上传黑盒日志，让神经网络分析您的飞行数据。几秒内获取优化的PID设置、滤波器建议和Rate配置。",
+      "introduction": "神经网络智能调参",
       "primary": "开始调参",
       "secondary": "查看文档",
       "stats": {
@@ -1070,7 +1070,7 @@
     },
     "tuning": {
       "title": "开始调参",
-      "description": "上传您的黑盒日志文件，让AI分析您的飞行数据",
+      "description": "上传您的黑盒日志文件，让神经网络分析您的飞行数据",
       "upload": {
         "title": "上传黑盒日志",
         "description": "支持 Betaflight、INAV 和 Emuflight 日志文件",
@@ -1081,7 +1081,7 @@
       "features": {
         "pid": {
           "title": "PID 优化",
-          "description": "AI 分析陀螺仪数据和电机输出，为您的设置推荐最佳 P、I、D 值"
+          "description": "神经网络分析陀螺仪数据和电机输出，为您的设置推荐最佳 P、I、D 值"
         },
         "filter": {
           "title": "滤波器设置",
@@ -1101,8 +1101,8 @@
         "description": "上传来自 Betaflight、INAV 或 Emuflight 的黑盒日志文件"
       },
       "step2": {
-        "title": "AI 分析",
-        "description": "AI 分析飞行特性，识别问题，计算最佳设置"
+        "title": "智能分析",
+        "description": "神经网络分析飞行特性，识别问题，计算最佳设置"
       },
       "step3": {
         "title": "获取结果",
@@ -1140,17 +1140,48 @@
         "problems": "问题",
         "goals": "目标",
         "style": "风格",
-        "frame": "机架",
+        "hardware": "硬件",
         "payment": "支付"
+      },
+      "hardware": {
+        "title": "你的硬件配置",
+        "description": "告诉我们你的飞机硬件信息，以便优化调参",
+        "frameSize": "机架尺寸",
+        "motor": "电机",
+        "motorSizePlaceholder": "2207",
+        "motorSizeUnit": "定子",
+        "motorKvPlaceholder": "2450",
+        "motorHint": "查看电机标签上的定子尺寸和 KV 值",
+        "battery": "电池类型",
+        "batteryHint": "选择你使用的电池规格",
+        "batteryOptions": {
+          "4s": "4S (14.8V)",
+          "5s": "5S (18.5V)",
+          "6s": "6S (22.2V)"
+        },
+        "propeller": "螺旋桨",
+        "propellerPlaceholder": "例如 HQ 5043",
+        "propellerHint": "螺旋桨品牌和型号",
+        "motorTemp": "电机温度",
+        "motorTempHint": "飞行后电机的温度情况",
+        "motorTempOptions": {
+          "normal": "正常 (温热)",
+          "warm": "偏热 (烫手但可触摸)",
+          "hot": "过热 (无法触摸)"
+        },
+        "weight": "起飞重量",
+        "weightPlaceholder": "例如 650",
+        "weightHint": "含电池的总重量，不知道可跳过",
+        "optional": "选填"
       },
       "upload": {
         "title": "上传飞行数据",
-        "description": "上传 Betaflight 黑盒日志进行 AI 分析",
+        "description": "上传 Betaflight 黑盒日志进行智能分析",
         "blackboxLog": "黑盒日志",
         "blackboxRequired": "*",
         "blackboxHint": "来自 Betaflight 的 .bbl、.bfl 或 .txt 文件",
         "cliDump": "CLI Dump",
-        "cliDumpOptional": "(可选)",
+        "cliDumpRequired": "*",
         "cliDumpHint": "来自 Betaflight CLI 的当前配置",
         "howToExport": "如何导出？",
         "tip": "提示：",
@@ -1271,12 +1302,17 @@
         "tuningGoals": "调参目标",
         "flyingStyle": "飞行风格",
         "frameSize": "机架尺寸",
+        "motor": "电机型号",
+        "battery": "电池类型",
+        "propeller": "螺旋桨",
+        "motorTemp": "电机温度",
+        "weight": "起飞重量",
         "additionalNotes": "补充说明",
         "oneTimePayment": "一次性付款",
         "launchDiscount": "首发 5 折优惠",
         "limitedOffer": "限时优惠",
         "features": {
-          "pid": "AI 优化的 Roll、Pitch、Yaw PID 值",
+          "pid": "神经网络优化的 Roll、Pitch、Yaw PID 值",
           "filter": "滤波器设置（陀螺仪、D项、动态陷波）",
           "feedforward": "前馈配置",
           "cli": "可直接粘贴的 CLI 命令",
@@ -1296,7 +1332,7 @@
       },
       "results": {
         "title": "你的调参已就绪",
-        "description": "基于黑盒分析的 AI 优化设置",
+        "description": "基于黑盒分析的神经网络优化设置",
         "analysisSummary": "分析摘要",
         "issuesIdentified": "发现的问题",
         "recommendations": "建议",
@@ -1339,7 +1375,7 @@
         "paid": "支付已确认",
         "paidHint": "您的支付已成功处理",
         "processing": "正在分析飞行数据",
-        "processingHint": "AI 正在分析您的黑盒数据并生成优化设置...",
+        "processingHint": "神经网络正在分析您的黑盒数据并生成优化设置...",
         "completed": "分析完成",
         "completedHint": "您的调参报告已准备好",
         "failed": "处理失败",
@@ -1364,10 +1400,10 @@
     },
     "form": {
       "hero": {
-        "badge": "AI 驱动的智能调参",
+        "badge": "神经网络驱动的智能调参",
         "titleLine1": "定制你的",
         "titleLine2": "完美 PID",
-        "description": "上传 Blackbox 日志和飞控配置，AI 分析你的飞行数据，生成针对你机型的专属调参方案"
+        "description": "上传 Blackbox 日志和飞控配置，神经网络分析你的飞行数据，生成针对你机型的专属调参方案"
       },
       "header": {
         "pricing": "定价",
@@ -1390,11 +1426,11 @@
         "motorKv": "电机 KV 值",
         "motorKvPlaceholder": "例如: 1855"
       },
-      "submitButton": "开始 AI 分析",
+      "submitButton": "开始智能分析",
       "features": {
         "blackbox": {
           "title": "Blackbox 深度分析",
-          "description": "AI 分析你的飞行日志，识别震动、过冲、延迟等问题，精准定位调参方向。"
+          "description": "神经网络分析你的飞行日志，识别震动、过冲、延迟等问题，精准定位调参方向。"
         },
         "hardware": {
           "title": "硬件适配优化",
@@ -1414,7 +1450,7 @@
             "answer": "Blackbox 日志文件（.bbl/.bfl）用于分析飞行数据，CLI dump 用于了解当前配置。建议录制 30 秒以上的正常飞行数据。"
           },
           "q2": {
-            "question": "AI 分析需要多长时间？",
+            "question": "智能分析需要多长时间？",
             "answer": "通常 1-2 分钟内完成分析。复杂的日志文件可能需要更长时间，分析完成后会通过邮件通知。"
           },
           "q3": {
@@ -1423,7 +1459,7 @@
           },
           "q4": {
             "question": "生成的参数可以直接使用吗？",
-            "answer": "AI 生成的参数是基于你的数据优化的起点，建议在安全环境下测试飞行，根据手感微调。"
+            "answer": "神经网络生成的参数是基于你的数据优化的起点，建议在安全环境下测试飞行，根据手感微调。"
           },
           "q5": {
             "question": "我的数据安全吗？",
@@ -1444,8 +1480,8 @@
     }
   },
   "SkillsPage": {
-    "title": "FPVTune - AI 智能调参工具",
-    "description": "上传 Blackbox 日志和飞控配置，AI 分析你的飞行数据，生成针对你机型的专属 PID 调参方案。"
+    "title": "FPVTune - 智能调参工具",
+    "description": "上传 Blackbox 日志和飞控配置，神经网络分析你的飞行数据，生成针对你机型的专属 PID 调参方案。"
   },
   "Guides": {
     "index": {
@@ -1568,8 +1604,8 @@
         "title": "下一步",
         "description": "成功导出 Blackbox 日志后，你可以：",
         "upload": {
-          "title": "上传到 FPVTune 进行 AI 分析",
-          "description": "让 AI 分析你的飞行数据，识别问题并生成优化的 PID 设置",
+          "title": "上传到 FPVTune 进行智能分析",
+          "description": "让神经网络分析你的飞行数据，识别问题并生成优化的 PID 设置",
           "link": "开始分析"
         },
         "viewer": {
@@ -1625,7 +1661,7 @@
           "backup": "在修改前备份配置",
           "restore": "出问题时快速恢复设置",
           "share": "与他人分享配置或从社区获取帮助",
-          "analyze": "让 AI 分析你的设置并提供改进建议"
+          "analyze": "让神经网络分析你的设置并提供改进建议"
         },
         "p2": "本教程将教你如何在几分钟内导出 CLI dump。"
       },
@@ -1650,7 +1686,7 @@
       },
       "what": {
         "title": "什么是 CLI Dump？",
-        "description": "CLI Dump 是飞控的完整配置导出，包含所有设置参数、PID 值、滤波器配置等。这个文件可以用于备份配置或让 AI 分析你的设置。"
+        "description": "CLI Dump 是飞控的完整配置导出，包含所有设置参数、PID 值、滤波器配置等。这个文件可以用于备份配置或让神经网络分析你的设置。"
       },
       "steps": {
         "1": {

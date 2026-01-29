@@ -20,7 +20,7 @@ export default function HeroOptionA() {
 
       <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 rounded-full bg-primary/10 text-primary text-sm font-medium">
-          AI-Powered Analysis
+          Neural Network-Powered Analysis
         </div>
 
         <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-foreground leading-[1.1] tracking-tight mb-6">

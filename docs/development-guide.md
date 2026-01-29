@@ -31,7 +31,6 @@
 
 | 工具 | 用途 |
 |-----|-----|
-| sequential-thinking | 复杂问题拆解、方案设计、根因分析 |
 | playwright | 浏览器测试、UI 验证、访问网站获取内容 |
 | shadcn-ui | 查询组件文档、安装组件 |
 | context7 | 查询最新库/框架官方文档 |
@@ -43,7 +42,6 @@
 - 查组件用法：使用 shadcn-ui 查询和安装 UI 组件
 - 访问网站：使用 playwright 获取完整内容和动态信息
 - 性能检查：使用 lighthouse 进行性能、SEO、无障碍审计
-- 复杂分析：使用 sequential-thinking 进行多步推理
 
 ## Skills 使用规范
 

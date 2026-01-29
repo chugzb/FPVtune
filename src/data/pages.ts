@@ -21,7 +21,7 @@ FPVTune is dedicated to making drone tuning accessible to everyone. We believe t
 
 ## What We Do
 
-We provide AI-powered analysis tools that help FPV pilots:
+We provide neural network-powered analysis tools that help FPV pilots:
 
 - **Analyze Flight Data**: Upload your Blackbox logs and CLI dumps for comprehensive analysis
 - **Get Instant Recommendations**: Receive optimized PID settings tailored to your flying style
@@ -30,7 +30,7 @@ We provide AI-powered analysis tools that help FPV pilots:
 
 ## Our Technology
 
-FPVTune uses advanced AI algorithms trained on thousands of flight logs to identify issues and suggest optimal settings. Our system understands:
+FPVTune uses advanced neural network algorithms trained on thousands of flight logs to identify issues and suggest optimal settings. Our system understands:
 
 - Different flight controller firmware (Betaflight, INAV, EmuFlight)
 - Various drone configurations (freestyle, racing, cinematic)
@@ -39,7 +39,7 @@ FPVTune uses advanced AI algorithms trained on thousands of flight logs to ident
 
 ## Why Choose FPVTune
 
-- **Accurate Analysis**: Our AI is trained on real-world flight data
+- **Accurate Analysis**: Our neural network is trained on real-world flight data
 - **Easy to Use**: Simple upload process, no technical knowledge required
 - **Fast Results**: Get recommendations in seconds
 - **Continuous Improvement**: We constantly update our algorithms based on user feedback
@@ -109,11 +109,11 @@ Have an idea for a new feature? We'd love to hear it! Share your suggestions on 
 
 ### What is FPVTune?
 
-FPVTune is an AI-powered tuning assistant that analyzes your drone's flight data and provides optimized PID settings.
+FPVTune is a neural network-powered tuning assistant that analyzes your drone's flight data and provides optimized PID settings.
 
 ### How does it work?
 
-Our AI has been trained on thousands of flight logs. When you upload your data, it analyzes patterns and generates optimized settings.
+Our neural network has been trained on thousands of flight logs. When you upload your data, it analyzes patterns and generates optimized settings.
 
 ### Is FPVTune free?
 
@@ -344,7 +344,7 @@ FPVTune 致力于让无人机调参变得人人可及。我们相信每位飞手
 
 ## 我们做什么
 
-我们提供 AI 驱动的分析工具，帮助 FPV 飞手：
+我们提供神经网络驱动的分析工具，帮助 FPV 飞手：
 
 - **分析飞行数据**：上传您的 Blackbox 日志和 CLI dump
 - **获取即时建议**：获得针对您飞行风格的优化 PID 设置
@@ -353,7 +353,7 @@ FPVTune 致力于让无人机调参变得人人可及。我们相信每位飞手
 
 ## 我们的技术
 
-FPVTune 使用先进的 AI 算法，基于数千份飞行日志训练而成。
+FPVTune 使用先进的神经网络算法，基于数千份飞行日志训练而成。
 
 ## 为什么选择 FPVTune
 
@@ -403,11 +403,11 @@ FPVTune 使用先进的 AI 算法，基于数千份飞行日志训练而成。
 
 ### 什么是 FPVTune？
 
-FPVTune 是一款 AI 驱动的调参助手，分析您的无人机飞行数据并提供优化的 PID 设置。
+FPVTune 是一款神经网络驱动的调参助手，分析您的无人机飞行数据并提供优化的 PID 设置。
 
 ### 如何工作？
 
-我们的 AI 基于数千份飞行日志训练。上传数据后，它会分析模式并生成优化设置。
+我们的神经网络基于数千份飞行日志训练。上传数据后，它会分析模式并生成优化设置。
 
 ### FPVTune 免费吗？
 

@@ -1,9 +1,13 @@
 import db from '@/db';
 import { tuneOrder } from '@/db/schema';
 import { CREEM_PRODUCT_ID, creem } from '@/lib/creem';
+import { isBBLFormat } from '@/lib/tune/bbl-parser';
 import { uploadFile } from '@/storage';
 import { eq } from 'drizzle-orm';
 import { type NextRequest, NextResponse } from 'next/server';
+
+// 最小文件大小要求（BBL 文件通常至少几百KB）
+const MIN_BBL_FILE_SIZE = 50 * 1024; // 50KB
 
 function generateOrderNumber(): string {
   const date = new Date();
@@ -32,6 +36,12 @@ export async function POST(request: NextRequest) {
     const goals = formData.get('goals') as string;
     const flyingStyle = formData.get('flyingStyle') as string;
     const frameSize = formData.get('frameSize') as string;
+    const motorSize = formData.get('motorSize') as string;
+    const motorKv = formData.get('motorKv') as string;
+    const battery = formData.get('battery') as string;
+    const propeller = formData.get('propeller') as string;
+    const motorTemp = formData.get('motorTemp') as string;
+    const weight = formData.get('weight') as string;
     const additionalNotes = formData.get('additionalNotes') as string;
     const locale = (formData.get('locale') as string) || 'en';
 
@@ -46,6 +56,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!cliDumpFile) {
+      return NextResponse.json(
+        { error: 'CLI Dump file is required' },
+        { status: 400 }
+      );
+    }
+
     const orderNumber = generateOrderNumber();
 
     // 读取文件内容
@@ -54,6 +71,37 @@ export async function POST(request: NextRequest) {
     console.log(
       `[${orderNumber}] Blackbox file size: ${blackboxBuffer.length} bytes`
     );
+
+    // 基本验证：检查文件格式和大小
+    if (!isBBLFormat(blackboxBuffer)) {
+      const isZh = locale === 'zh';
+      return NextResponse.json(
+        {
+          error: isZh ? '无效的黑盒文件' : 'Invalid blackbox file',
+          details: isZh
+            ? '文件不是有效的 Betaflight 黑盒日志格式'
+            : 'File is not a valid Betaflight blackbox log format',
+          code: 'INVALID_BBL_FORMAT',
+        },
+        { status: 400 }
+      );
+    }
+
+    if (blackboxBuffer.length < MIN_BBL_FILE_SIZE) {
+      const isZh = locale === 'zh';
+      return NextResponse.json(
+        {
+          error: isZh ? '黑盒文件太小' : 'Blackbox file too small',
+          details: isZh
+            ? `文件大小 ${Math.round(blackboxBuffer.length / 1024)}KB，需要至少 ${MIN_BBL_FILE_SIZE / 1024}KB 的飞行数据`
+            : `File size ${Math.round(blackboxBuffer.length / 1024)}KB, need at least ${MIN_BBL_FILE_SIZE / 1024}KB of flight data`,
+          code: 'FILE_TOO_SMALL',
+        },
+        { status: 400 }
+      );
+    }
+
+    console.log(`[${orderNumber}] BBL file validation passed`);
 
     // CLI dump 是纯文本文件
     let cliDumpContent = '';
@@ -131,6 +179,12 @@ export async function POST(request: NextRequest) {
         goals,
         flyingStyle,
         frameSize,
+        motorSize,
+        motorKv,
+        battery,
+        propeller,
+        motorTemp,
+        weight,
         additionalNotes,
         amount: 999,
         currency: 'USD',
@@ -149,7 +203,7 @@ export async function POST(request: NextRequest) {
 
     const checkout = await creem.checkouts.create({
       productId: CREEM_PRODUCT_ID,
-      successUrl: `${baseUrl}/tune/success?order=${orderNumber}`,
+      successUrl: `${baseUrl}/${locale}/tune?order=${orderNumber}`,
       customer: {
         email,
       },
