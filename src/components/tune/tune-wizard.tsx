@@ -21,7 +21,7 @@ import {
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 type WizardStep = 1 | 2 | 3 | 4 | 5 | 6;
 type OrderStatus = 'pending' | 'paid' | 'processing' | 'completed' | 'failed';
@@ -50,6 +50,30 @@ interface OrderData {
   email: string;
 }
 
+type PrecheckStatus = 'idle' | 'checking' | 'ready' | 'error';
+type PrecheckResult = {
+  status: 'ok' | 'warn';
+  file: {
+    sizeKB: number;
+  };
+  meta?: {
+    duration_s?: number;
+    sample_rate_hz?: number;
+    points?: number;
+    segments_found?: number;
+    logs_found?: number;
+    fw?: string;
+    board?: string;
+    craft?: string;
+  } | null;
+  issues: string[];
+  thresholds: {
+    minDurationSec: number;
+    minSampleRateHz: number;
+    minFileSizeKB: number;
+  };
+};
+
 const TOTAL_STEPS = 6;
 const VALID_TEST_CODES = ['JB_VIP_TEST'];
 const problemIds = [
@@ -63,9 +87,39 @@ const problemIds = [
 const goalIds = ['locked', 'smooth', 'snappy', 'efficient', 'balanced'];
 const styleIds = ['freestyle', 'racing', 'cinematic', 'longrange'];
 const frameIds = ['inch2_3', 'inch5', 'inch7', 'inch10plus'];
+const batteryOptionIds = new Set(['1s', '2s', '3s', '4s', '5s', '6s', '8s']);
+
+function parseCliDump(content: string): {
+  motorKv?: string;
+  battery?: string;
+} {
+  const motorKvMatch = content.match(/^[\t ]*set\s+motor_kv\s*=\s*(\d+)/m);
+  const batteryMatch = content.match(
+    /^[\t ]*set\s+force_battery_cell_count\s*=\s*(\d+)/m
+  );
+
+  const result: { motorKv?: string; battery?: string } = {};
+
+  if (motorKvMatch?.[1]) {
+    result.motorKv = motorKvMatch[1];
+  }
+
+  if (batteryMatch?.[1]) {
+    const cells = Number.parseInt(batteryMatch[1], 10);
+    if (!Number.isNaN(cells) && cells > 0) {
+      const battery = `${cells}s`;
+      if (batteryOptionIds.has(battery)) {
+        result.battery = battery;
+      }
+    }
+  }
+
+  return result;
+}
 
 export function TuneWizard() {
   const t = useTranslations('TunePage.wizard');
+  const tUpload = useTranslations('TunePage.wizard.upload');
   const tSuccess = useTranslations('TunePage.success');
   const locale = useLocale();
   const searchParams = useSearchParams();
@@ -92,6 +146,13 @@ export function TuneWizard() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [testCode, setTestCode] = useState('');
+  const [precheckStatus, setPrecheckStatus] = useState<PrecheckStatus>('idle');
+  const [precheckResult, setPrecheckResult] = useState<PrecheckResult | null>(
+    null
+  );
+  const [precheckError, setPrecheckError] = useState<string | null>(null);
+  const precheckRequestId = useRef(0);
+  const cliParseRequestId = useRef(0);
 
   // 处理中弹窗相关
   const [showProcessingModal, setShowProcessingModal] = useState(false);
@@ -177,7 +238,14 @@ export function TuneWizard() {
         return formData.flyingStyle !== '';
       case 5:
         // 机架尺寸、电机信息、电池类型、螺旋桨、电机温度必填，重量选填
-        return formData.frameSize !== '' && formData.motorSize !== '' && formData.motorKv !== '' && formData.battery !== '' && formData.propeller !== '' && formData.motorTemp !== '';
+        return (
+          formData.frameSize !== '' &&
+          formData.motorSize !== '' &&
+          formData.motorKv !== '' &&
+          formData.battery !== '' &&
+          formData.propeller !== '' &&
+          formData.motorTemp !== ''
+        );
       case 6:
         return formData.email !== '';
       default:
@@ -197,14 +265,101 @@ export function TuneWizard() {
     }
   };
 
-  const handleFileChange = (
+  const runPrecheck = useCallback(
+    async (file: File) => {
+      const requestId = precheckRequestId.current + 1;
+      precheckRequestId.current = requestId;
+
+      setPrecheckStatus('checking');
+      setPrecheckError(null);
+      setPrecheckResult(null);
+
+      const formData = new FormData();
+      formData.append('blackbox', file);
+      formData.append('locale', locale);
+
+      try {
+        const response = await fetch('/api/tune/precheck', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const data = await response.json().catch(() => null);
+
+        if (precheckRequestId.current !== requestId) return;
+
+        if (!response.ok) {
+          const code = data?.code as string | undefined;
+          const minKB = data?.minKB as number | undefined;
+          const errorMessage =
+            code === 'INVALID_BBL_FORMAT'
+              ? tUpload('precheck.errorInvalidFormat')
+              : code === 'FILE_TOO_SMALL'
+                ? tUpload('precheck.errorTooSmall', {
+                    minKB: minKB || 50,
+                  })
+                : tUpload('precheck.errorMissing');
+
+          setPrecheckStatus('error');
+          setPrecheckError(errorMessage);
+          return;
+        }
+
+        setPrecheckStatus('ready');
+        setPrecheckResult(data as PrecheckResult);
+      } catch (error) {
+        if (precheckRequestId.current !== requestId) return;
+        setPrecheckStatus('error');
+        setPrecheckError(
+          error instanceof Error
+            ? error.message
+            : tUpload('precheck.errorMissing')
+        );
+      }
+    },
+    [locale, tUpload]
+  );
+
+  const handleFileChange = async (
     type: 'blackbox' | 'cliDump',
     file: File | null
   ) => {
     if (type === 'blackbox') {
       setFormData((prev) => ({ ...prev, blackboxFile: file }));
+      if (file) {
+        runPrecheck(file);
+      } else {
+        setPrecheckStatus('idle');
+        setPrecheckResult(null);
+        setPrecheckError(null);
+      }
     } else {
       setFormData((prev) => ({ ...prev, cliDumpFile: file }));
+      if (!file) return;
+
+      const requestId = cliParseRequestId.current + 1;
+      cliParseRequestId.current = requestId;
+
+      try {
+        const content = await file.text();
+        if (cliParseRequestId.current !== requestId) return;
+
+        const parsed = parseCliDump(content);
+        if (!parsed.motorKv && !parsed.battery) return;
+
+        setFormData((prev) => {
+          const next = { ...prev };
+          if (parsed.motorKv && !prev.motorKv) {
+            next.motorKv = parsed.motorKv;
+          }
+          if (parsed.battery && !prev.battery) {
+            next.battery = parsed.battery;
+          }
+          return next;
+        });
+      } catch {
+        // ignore parse errors
+      }
     }
   };
 
@@ -324,7 +479,8 @@ export function TuneWizard() {
       apiFormData.append('motorTemp', formData.motorTemp);
       apiFormData.append('weight', formData.weight);
       apiFormData.append('additionalNotes', formData.additionalNotes);
-      apiFormData.append('email', formData.email);
+      // 测试模式使用默认邮箱
+      apiFormData.append('email', formData.email || 'test@fpvtune.com');
       apiFormData.append('locale', locale);
       apiFormData.append('testCode', testCode.toUpperCase());
 
@@ -473,6 +629,9 @@ export function TuneWizard() {
               blackboxFile={formData.blackboxFile}
               cliDumpFile={formData.cliDumpFile}
               onFileChange={handleFileChange}
+              precheckStatus={precheckStatus}
+              precheckResult={precheckResult}
+              precheckError={precheckError}
             />
           )}
           {currentStep === 2 && (
@@ -597,12 +756,61 @@ function StepUpload({
   blackboxFile,
   cliDumpFile,
   onFileChange,
+  precheckStatus,
+  precheckResult,
+  precheckError,
 }: {
   blackboxFile: File | null;
   cliDumpFile: File | null;
   onFileChange: (type: 'blackbox' | 'cliDump', file: File | null) => void;
+  precheckStatus: PrecheckStatus;
+  precheckResult: PrecheckResult | null;
+  precheckError: string | null;
 }) {
   const t = useTranslations('TunePage.wizard.upload');
+  const precheckTone =
+    precheckStatus === 'checking'
+      ? 'checking'
+      : precheckStatus === 'error'
+        ? 'error'
+        : precheckResult?.status === 'warn'
+          ? 'warn'
+          : precheckResult
+            ? 'ok'
+            : 'idle';
+
+  const issueLabel = (issue: string) => {
+    if (!precheckResult) return issue;
+    const thresholds = precheckResult.thresholds;
+
+    switch (issue) {
+      case 'short_duration':
+        return t('precheck.issueShortDuration', {
+          minSeconds: thresholds.minDurationSec,
+        });
+      case 'low_sample_rate':
+        return t('precheck.issueLowSampleRate', {
+          minHz: thresholds.minSampleRateHz,
+        });
+      case 'multiple_segments':
+        return t('precheck.issueMultipleSegments');
+      case 'multiple_logs':
+        return t('precheck.issueMultipleLogs');
+      case 'decoder_failed':
+        return t('precheck.issueDecoderFailed');
+      default:
+        return issue;
+    }
+  };
+
+  const formatNumber = (value: number | undefined, digits = 1) =>
+    typeof value === 'number' ? value.toFixed(digits) : '-';
+
+  const formatInt = (value: number | undefined) =>
+    typeof value === 'number' ? value.toString() : '-';
+
+  const formatText = (value: string | undefined) =>
+    value && value.trim().length > 0 ? value.trim() : '-';
 
   return (
     <div className="space-y-8">
@@ -718,6 +926,151 @@ function StepUpload({
           </div>
         </div>
       </div>
+
+      {blackboxFile && (
+        <div
+          className={cn(
+            'rounded-xl border p-4 text-sm transition-all',
+            precheckTone === 'checking'
+              ? 'border-blue-500/30 bg-blue-500/10'
+              : precheckTone === 'error'
+                ? 'border-red-500/30 bg-red-500/10'
+                : precheckTone === 'warn'
+                  ? 'border-amber-500/30 bg-amber-500/10'
+                  : precheckTone === 'ok'
+                    ? 'border-green-500/30 bg-green-500/10'
+                    : 'border-white/10 bg-white/5'
+          )}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {precheckTone === 'checking' && (
+                <Loader2 className="w-4 h-4 text-blue-400 animate-spin" />
+              )}
+              {precheckTone === 'ok' && (
+                <CheckCircle className="w-4 h-4 text-green-400" />
+              )}
+              {(precheckTone === 'warn' || precheckTone === 'error') && (
+                <AlertCircle
+                  className={cn(
+                    'w-4 h-4',
+                    precheckTone === 'error' ? 'text-red-400' : 'text-amber-400'
+                  )}
+                />
+              )}
+              <span className="font-semibold text-white">
+                {t('precheck.title')}
+              </span>
+            </div>
+            {precheckTone !== 'idle' && (
+              <span
+                className={cn(
+                  'text-xs font-medium',
+                  precheckTone === 'checking'
+                    ? 'text-blue-300'
+                    : precheckTone === 'error'
+                      ? 'text-red-300'
+                      : precheckTone === 'warn'
+                        ? 'text-amber-300'
+                        : 'text-green-300'
+                )}
+              >
+                {precheckTone === 'checking'
+                  ? t('precheck.checking')
+                  : precheckTone === 'error'
+                    ? t('precheck.statusError')
+                    : precheckTone === 'warn'
+                      ? t('precheck.statusWarn')
+                      : t('precheck.statusOk')}
+              </span>
+            )}
+          </div>
+
+          {precheckStatus === 'error' && precheckError && (
+            <p className="mt-2 text-xs text-red-300">{precheckError}</p>
+          )}
+
+          {precheckStatus === 'ready' && precheckResult && (
+            <div className="mt-3 space-y-3 text-xs text-gray-300">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500">
+                    {t('precheck.fileSize')}
+                  </span>
+                  <span>{precheckResult.file.sizeKB} KB</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500">
+                    {t('precheck.duration')}
+                  </span>
+                  <span>{formatNumber(precheckResult.meta?.duration_s)}s</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500">
+                    {t('precheck.sampleRate')}
+                  </span>
+                  <span>
+                    {formatInt(precheckResult.meta?.sample_rate_hz)}Hz
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500">{t('precheck.points')}</span>
+                  <span>{formatInt(precheckResult.meta?.points)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500">
+                    {t('precheck.segments')}
+                  </span>
+                  <span>{formatInt(precheckResult.meta?.segments_found)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500">{t('precheck.logs')}</span>
+                  <span>{formatInt(precheckResult.meta?.logs_found)}</span>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-gray-500">
+                    {t('precheck.firmware')}
+                  </span>
+                  <span
+                    className="text-gray-300 truncate max-w-[220px]"
+                    title={formatText(precheckResult.meta?.fw)}
+                  >
+                    {formatText(precheckResult.meta?.fw)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-gray-500">{t('precheck.board')}</span>
+                  <span
+                    className="text-gray-300 truncate max-w-[220px]"
+                    title={formatText(precheckResult.meta?.board)}
+                  >
+                    {formatText(precheckResult.meta?.board)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-gray-500">{t('precheck.craft')}</span>
+                  <span
+                    className="text-gray-300 truncate max-w-[220px]"
+                    title={formatText(precheckResult.meta?.craft)}
+                  >
+                    {formatText(precheckResult.meta?.craft)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {precheckResult?.issues?.length ? (
+            <ul className="mt-3 space-y-1 text-xs text-amber-200">
+              {precheckResult.issues.map((issue) => (
+                <li key={issue}>{issueLabel(issue)}</li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
+      )}
 
       <div className="bg-white/5 rounded-xl p-4 border border-white/10">
         <p className="text-sm text-gray-400">
@@ -970,7 +1323,7 @@ function StepHardware({
   const t = useTranslations('TunePage.wizard.hardware');
   const tFrames = useTranslations('TunePage.wizard.frames');
 
-  const batteryOptions = ['4s', '5s', '6s'];
+  const batteryOptions = ['1s', '2s', '3s', '4s', '5s', '6s', '8s'];
   const motorTempOptions = ['normal', 'warm', 'hot'];
 
   return (
@@ -1053,7 +1406,7 @@ function StepHardware({
         <label className="block text-sm font-medium text-white">
           {t('battery')} <span className="text-red-400">*</span>
         </label>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
           {batteryOptions.map((opt) => (
             <button
               key={opt}
@@ -1066,7 +1419,7 @@ function StepHardware({
                   : 'border-white/10 hover:border-white/20 hover:bg-white/5'
               )}
             >
-              <span className="text-white font-medium">
+              <span className="text-white font-medium text-sm">
                 {t(`batteryOptions.${opt}` as any)}
               </span>
             </button>
@@ -1080,7 +1433,10 @@ function StepHardware({
 
       {/* Propeller Input */}
       <div className="space-y-3">
-        <label htmlFor="propeller" className="block text-sm font-medium text-white">
+        <label
+          htmlFor="propeller"
+          className="block text-sm font-medium text-white"
+        >
           {t('propeller')} <span className="text-red-400">*</span>
         </label>
         <input
@@ -1129,7 +1485,10 @@ function StepHardware({
 
       {/* Weight Input (Optional) */}
       <div className="space-y-3">
-        <label htmlFor="weight" className="block text-sm font-medium text-white">
+        <label
+          htmlFor="weight"
+          className="block text-sm font-medium text-white"
+        >
           {t('weight')} <span className="text-gray-500">({t('optional')})</span>
         </label>
         <div className="relative">
@@ -1156,7 +1515,7 @@ function StepHardware({
   );
 }
 
-// Step 6: Payment
+// Step 6: Payment (Test Mode - Only Test Code)
 function StepPayment({
   formData,
   email,
@@ -1184,7 +1543,8 @@ function StepPayment({
   const tProblems = useTranslations('TunePage.wizard.problems.items');
   const tGoals = useTranslations('TunePage.wizard.goals.items');
   const tHardware = useTranslations('TunePage.wizard.hardware');
-  const [showTestCode, setShowTestCode] = useState(false);
+  // Test mode: always show test code input
+  const [showTestCode, setShowTestCode] = useState(true);
 
   const styleName = tStyles(`${formData.flyingStyle}.name` as any);
   const sizeName = tFrames(`${formData.frameSize}.name` as any);
@@ -1240,12 +1600,16 @@ function StepPayment({
           </div>
           <div className="p-4 flex justify-between">
             <span className="text-gray-400">{t('motor')}</span>
-            <span className="text-white">{formData.motorSize} {formData.motorKv}KV</span>
+            <span className="text-white">
+              {formData.motorSize} {formData.motorKv}KV
+            </span>
           </div>
           {formData.battery && (
             <div className="p-4 flex justify-between">
               <span className="text-gray-400">{t('battery')}</span>
-              <span className="text-white">{formData.battery.toUpperCase()}</span>
+              <span className="text-white">
+                {formData.battery.toUpperCase()}
+              </span>
             </div>
           )}
           {formData.propeller && (
@@ -1279,130 +1643,58 @@ function StepPayment({
         </div>
       </div>
 
-      {/* Price Card */}
-      <div className="bg-gradient-to-b from-blue-500/20 to-transparent border border-blue-500/30 rounded-2xl p-6">
-        <div className="flex justify-between items-start mb-4">
+      {/* Test Code Section - Test Mode Only */}
+      <div className="bg-gradient-to-b from-green-500/20 to-transparent border border-green-500/30 rounded-2xl p-6">
+        <div className="text-center mb-4">
+          <div className="inline-flex items-center gap-2 bg-green-500/20 text-green-400 text-sm font-semibold px-4 py-2 rounded-full mb-3">
+            <Zap className="w-4 h-4" />
+            {t('testMode') || '测试模式'}
+          </div>
+          <p className="text-gray-400 text-sm">{t('testModeHint') || '输入测试码免费获取调参结果'}</p>
+        </div>
+
+        <div className="space-y-4">
           <div>
-            <p className="text-sm text-gray-400 mb-1">{t('oneTimePayment')}</p>
-            <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-bold text-white">$9.99</span>
-              <span className="text-gray-500 line-through">$19.99</span>
-            </div>
-            <p className="text-sm text-green-400 mt-1">{t('launchDiscount')}</p>
-          </div>
-          <div className="bg-green-500/20 text-green-400 text-xs font-semibold px-3 py-1 rounded-full">
-            {t('limitedOffer')}
-          </div>
-        </div>
-
-        <div className="space-y-2 mb-6 text-sm">
-          <div className="flex items-center gap-2 text-gray-300">
-            <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-            <span>{t('features.pid')}</span>
-          </div>
-          <div className="flex items-center gap-2 text-gray-300">
-            <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-            <span>{t('features.filter')}</span>
-          </div>
-          <div className="flex items-center gap-2 text-gray-300">
-            <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-            <span>{t('features.feedforward')}</span>
-          </div>
-          <div className="flex items-center gap-2 text-gray-300">
-            <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-            <span>{t('features.cli')}</span>
-          </div>
-          <div className="flex items-center gap-2 text-gray-300">
-            <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-            <span>{t('features.report')}</span>
-          </div>
-        </div>
-
-        <div className="border-t border-white/10 pt-4">
-          <label
-            htmlFor="payment-email"
-            className="block text-sm font-medium text-white mb-2"
-          >
-            {t('emailAddress')}
-          </label>
-          <input
-            id="payment-email"
-            type="email"
-            value={email}
-            onChange={(e) => onEmailChange(e.target.value)}
-            placeholder={t('emailPlaceholder')}
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:border-blue-500"
-          />
-          <p className="text-xs text-gray-500 mt-2">{t('emailHint')}</p>
-        </div>
-      </div>
-
-      {/* Payment Button */}
-      <button
-        type="button"
-        onClick={onPayment}
-        disabled={!email || isProcessing}
-        className={cn(
-          'w-full flex items-center justify-center gap-2 py-4 rounded-xl font-semibold text-lg transition-all',
-          email && !isProcessing
-            ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700'
-            : 'bg-white/10 text-gray-500 cursor-not-allowed'
-        )}
-      >
-        {isProcessing ? (
-          <>
-            <Loader2 className="w-5 h-5 animate-spin" />
-            {t('analyzing')}
-          </>
-        ) : (
-          <>
-            <Lock className="w-5 h-5" />
-            {t('payButton')}
-          </>
-        )}
-      </button>
-
-      {/* Test Code Section */}
-      <div className="border-t border-white/10 pt-4">
-        <button
-          type="button"
-          onClick={() => setShowTestCode(!showTestCode)}
-          className="text-xs text-gray-500 hover:text-gray-400 transition-colors"
-        >
-          {showTestCode ? t('hideTestCode') : t('haveTestCode')}
-        </button>
-
-        {showTestCode && (
-          <div className="mt-3 space-y-3">
+            <label
+              htmlFor="test-code-input"
+              className="block text-sm font-medium text-white mb-2"
+            >
+              {t('testCodeLabel') || '测试码'}
+            </label>
             <input
+              id="test-code-input"
               type="text"
               value={testCode}
               onChange={(e) => onTestCodeChange(e.target.value)}
               placeholder={t('testCodePlaceholder')}
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white text-sm placeholder:text-gray-500 focus:outline-none focus:border-green-500"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:border-green-500"
             />
-            <button
-              type="button"
-              onClick={onTestCodeSubmit}
-              disabled={!testCode || !email || isProcessing}
-              className={cn(
-                'w-full flex items-center justify-center gap-2 py-3 rounded-lg font-medium text-sm transition-all',
-                testCode && email && !isProcessing
-                  ? 'bg-green-600 text-white hover:bg-green-700'
-                  : 'bg-white/10 text-gray-500 cursor-not-allowed'
-              )}
-            >
-              {isProcessing ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  {t('analyzing')}
-                </>
-              ) : (
-                t('useTestCode')
-              )}
-            </button>
           </div>
-        )}
+
+          <button
+            type="button"
+            onClick={onTestCodeSubmit}
+            disabled={!testCode || isProcessing}
+            className={cn(
+              'w-full flex items-center justify-center gap-2 py-4 rounded-xl font-semibold text-lg transition-all',
+              testCode && !isProcessing
+                ? 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700'
+                : 'bg-white/10 text-gray-500 cursor-not-allowed'
+            )}
+          >
+            {isProcessing ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                {t('analyzing')}
+              </>
+            ) : (
+              <>
+                <Zap className="w-5 h-5" />
+                {t('useTestCode')}
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Error Message */}
@@ -1414,10 +1706,6 @@ function StepPayment({
 
       {/* Trust Badges */}
       <div className="flex items-center justify-center gap-6 text-sm text-gray-500">
-        <div className="flex items-center gap-2">
-          <Shield className="w-4 h-4" />
-          <span>{t('securePayment')}</span>
-        </div>
         <div className="flex items-center gap-2">
           <Zap className="w-4 h-4" />
           <span>{t('instantDelivery')}</span>

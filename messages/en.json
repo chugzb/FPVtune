@@ -1154,9 +1154,13 @@
         "battery": "Battery Type",
         "batteryHint": "Select your battery configuration",
         "batteryOptions": {
+          "1s": "1S (3.7V)",
+          "2s": "2S (7.4V)",
+          "3s": "3S (11.1V)",
           "4s": "4S (14.8V)",
           "5s": "5S (18.5V)",
-          "6s": "6S (22.2V)"
+          "6s": "6S (22.2V)",
+          "8s": "8S (29.6V)"
         },
         "propeller": "Propeller",
         "propellerPlaceholder": "e.g. HQ 5043",
@@ -1184,7 +1188,31 @@
         "cliDumpHint": "Current configuration from Betaflight CLI",
         "howToExport": "How to export?",
         "tip": "Tip:",
-        "tipContent": "Record a 30+ second flight with blackbox logging enabled. Include hover, forward flight, and some maneuvers for best results."
+        "tipContent": "Record a 30+ second flight with blackbox logging enabled. Include hover, forward flight, and some maneuvers for best results.",
+        "precheck": {
+          "title": "Blackbox Quality Check",
+          "checking": "Analyzing your blackbox log...",
+          "statusOk": "Passed",
+          "statusWarn": "Needs attention",
+          "statusError": "Check failed",
+          "fileSize": "File size",
+          "duration": "Flight duration",
+          "sampleRate": "Sample rate",
+          "points": "Data points",
+          "segments": "Flight segments",
+          "logs": "Log sections",
+          "firmware": "Firmware",
+          "board": "Flight controller",
+          "craft": "Craft",
+          "issueShortDuration": "Flight duration is below {minSeconds}s. Record a longer flight for better accuracy.",
+          "issueLowSampleRate": "Sample rate below {minHz}Hz may reduce accuracy.",
+          "issueMultipleSegments": "Multiple flight segments detected; the longest segment will be used.",
+          "issueMultipleLogs": "Multiple logs detected; the longest log will be used.",
+          "issueDecoderFailed": "Failed to parse blackbox data. Results may be less accurate.",
+          "errorInvalidFormat": "Invalid blackbox format. Make sure it comes from Betaflight.",
+          "errorTooSmall": "Blackbox file is too small. At least {minKB}KB of flight data is required.",
+          "errorMissing": "No blackbox file found."
+        }
       },
       "problems": {
         "title": "What issues are you experiencing?",
@@ -1327,7 +1355,10 @@
         "haveTestCode": "Have a test code?",
         "hideTestCode": "Hide test code",
         "testCodePlaceholder": "Enter test code",
-        "useTestCode": "Use Test Code"
+        "useTestCode": "Use Test Code",
+        "testMode": "Test Mode",
+        "testModeHint": "Enter test code to get tuning results for free",
+        "testCodeLabel": "Test Code"
       },
       "results": {
         "title": "Your Tune is Ready",
@@ -1351,6 +1382,20 @@
         "copy": "Copy",
         "copied": "Copied!",
         "download": "Download",
+        "cliDiffTitle": "CLI Changes",
+        "cliDiffSubtitle": "Compared against your uploaded CLI dump",
+        "cliDiffSummary": "{changed} changed, {added} added",
+        "cliDiffKey": "Parameter",
+        "cliDiffBefore": "Before",
+        "cliDiffAfter": "After",
+        "cliDiffStatusChanged": "Changed",
+        "cliDiffStatusAdded": "Added",
+        "cliDiffEmpty": "No changes detected to apply",
+        "cliDiffWarnings": {
+          "missing_cli_dump": "Missing original CLI dump; diff unavailable.",
+          "missing_cli_commands": "Missing generated CLI commands; diff unavailable.",
+          "no_changes_detected": "No differences detected; may already match your config."
+        },
         "howToApply": "How to Apply",
         "applySteps": {
           "step1": "Connect your quad to Betaflight Configurator",

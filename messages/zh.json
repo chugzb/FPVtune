@@ -1155,9 +1155,13 @@
         "battery": "电池类型",
         "batteryHint": "选择你使用的电池规格",
         "batteryOptions": {
+          "1s": "1S (3.7V)",
+          "2s": "2S (7.4V)",
+          "3s": "3S (11.1V)",
           "4s": "4S (14.8V)",
           "5s": "5S (18.5V)",
-          "6s": "6S (22.2V)"
+          "6s": "6S (22.2V)",
+          "8s": "8S (29.6V)"
         },
         "propeller": "螺旋桨",
         "propellerPlaceholder": "例如 HQ 5043",
@@ -1185,7 +1189,31 @@
         "cliDumpHint": "来自 Betaflight CLI 的当前配置",
         "howToExport": "如何导出？",
         "tip": "提示：",
-        "tipContent": "录制 30 秒以上的飞行，启用黑盒记录。包含悬停、前飞和一些机动动作以获得最佳效果。"
+        "tipContent": "录制 30 秒以上的飞行，启用黑盒记录。包含悬停、前飞和一些机动动作以获得最佳效果。",
+        "precheck": {
+          "title": "黑盒质量预检",
+          "checking": "正在解析你的黑盒日志...",
+          "statusOk": "通过",
+          "statusWarn": "需要注意",
+          "statusError": "预检失败",
+          "fileSize": "文件大小",
+          "duration": "有效时长",
+          "sampleRate": "采样率",
+          "points": "采样点",
+          "segments": "飞行段数",
+          "logs": "日志段数",
+          "firmware": "固件",
+          "board": "飞控",
+          "craft": "机型",
+          "issueShortDuration": "飞行时长低于 {minSeconds}s，建议补录更长的飞行。",
+          "issueLowSampleRate": "采样率低于 {minHz}Hz，可能影响分析精度。",
+          "issueMultipleSegments": "检测到多个飞行段，已自动选择最长段落。",
+          "issueMultipleLogs": "检测到多个日志段，已自动选择最长日志。",
+          "issueDecoderFailed": "黑盒解析失败，可能影响分析结果。",
+          "errorInvalidFormat": "黑盒文件格式无效，请确认来源于 Betaflight。",
+          "errorTooSmall": "黑盒文件过小，至少需要 {minKB}KB 的飞行数据。",
+          "errorMissing": "未找到黑盒文件。"
+        }
       },
       "problems": {
         "title": "你遇到了什么问题？",
@@ -1328,7 +1356,10 @@
         "haveTestCode": "有测试码?",
         "hideTestCode": "隐藏测试码",
         "testCodePlaceholder": "输入测试码",
-        "useTestCode": "使用测试码"
+        "useTestCode": "使用测试码",
+        "testMode": "测试模式",
+        "testModeHint": "输入测试码免费获取调参结果",
+        "testCodeLabel": "测试码"
       },
       "results": {
         "title": "你的调参已就绪",
@@ -1352,6 +1383,20 @@
         "copy": "复制",
         "copied": "已复制！",
         "download": "下载",
+        "cliDiffTitle": "CLI 变更对比",
+        "cliDiffSubtitle": "对比你上传的 CLI 与推荐命令",
+        "cliDiffSummary": "修改 {changed} 项，新增 {added} 项",
+        "cliDiffKey": "参数",
+        "cliDiffBefore": "原始",
+        "cliDiffAfter": "调整后",
+        "cliDiffStatusChanged": "修改",
+        "cliDiffStatusAdded": "新增",
+        "cliDiffEmpty": "未检测到需要应用的变更",
+        "cliDiffWarnings": {
+          "missing_cli_dump": "缺少原始 CLI Dump，无法生成对比。",
+          "missing_cli_commands": "缺少生成的 CLI 命令，无法生成对比。",
+          "no_changes_detected": "未检测到变更项，可能与当前配置一致。"
+        },
         "howToApply": "如何应用",
         "applySteps": {
           "step1": "将飞机连接到 Betaflight 配置器",

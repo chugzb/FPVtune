@@ -1,6 +1,8 @@
 """
 BBL (Betaflight Blackbox Log) Decoder Service
 输出标准化 JSON 供 AI 分析，payload <= 100K chars
+支持多段飞行记录，自动选择最长的一段
+采样率优先使用 500Hz-200Hz（GPT 推荐的 PID 调参分析范围）
 """
 
 from fastapi import FastAPI, Request, HTTPException
@@ -9,10 +11,56 @@ import base64
 import json
 import math
 
+# Monkey-patch orangebox to handle errors gracefully
+def _patch_orangebox():
+    """Patch orangebox to skip unknown event types and invalid log end instead of crashing"""
+    try:
+        from orangebox import parser as ob_parser
+        from orangebox.events import event_map
+        from orangebox.types import EventType, Event
+        import logging
+        _log = logging.getLogger("orangebox.parser")
+
+        def patched_parse_event(self, reader):
+            byte = next(reader)
+            try:
+                event_type = EventType(byte)
+            except ValueError:
+                _log.warning(f"Unknown event type: {byte}")
+                return False
+
+            # Check if event_type is in event_map
+            if event_type not in event_map:
+                _log.warning(f"Unhandled event type: {event_type}")
+                return False
+
+            # Call parser with error handling
+            try:
+                parser_func = event_map[event_type]
+                event_data = parser_func(reader)
+                self.events.append(Event(event_type, event_data))
+                if event_type == EventType.LOG_END:
+                    self._end_of_log = True
+            except ValueError as e:
+                # Handle "Invalid 'End of log' message" and similar errors
+                _log.warning(f"Event parse error ({event_type}): {e}")
+                if event_type == EventType.LOG_END:
+                    self._end_of_log = True  # Still mark as end of log
+                return False
+            return True
+
+        ob_parser.Parser._parse_event_frame = patched_parse_event
+        print("[BBL Decoder] Orangebox patched for error handling")
+    except Exception as e:
+        print(f"[BBL Decoder] Failed to patch orangebox: {e}")
+
+_patch_orangebox()
+
 app = FastAPI()
 
-MAX_PAYLOAD_CHARS = 100000
-TARGET_HZ_LIST = [100, 80, 60, 50, 40, 30, 25]
+MAX_PAYLOAD_CHARS = 500000  # 测试极限：500K chars（约 125K tokens）
+# 采样率列表：最低 200Hz，保证 PID 调参分析精度
+TARGET_HZ_LIST = [1000, 500, 250, 200]
 
 
 def safe_int(val, default=0):
@@ -127,12 +175,141 @@ def build_cli_sections(headers):
     }
 
 
-def parse_bbl_to_json(bbl_bytes):
-    """解析 BBL 文件，输出 <= 100K chars 的 JSON"""
+def find_flight_segments(all_time_us, all_motor, sample_interval_us):
+    """
+    检测飞行记录中的多个段落（通过时间跳跃或电机停止来分割）
+    返回每个段落的 (start_idx, end_idx, duration_s)
+    """
+    if not all_time_us or len(all_time_us) < 10:
+        return [(0, len(all_time_us), 0)]
+
+    segments = []
+    segment_start = 0
+
+    # 时间跳跃阈值：超过 1 秒认为是新段落
+    time_gap_threshold_us = 1_000_000
+
+    for i in range(1, len(all_time_us)):
+        time_gap = all_time_us[i] - all_time_us[i-1]
+
+        # 检测时间跳跃（新的飞行段落）
+        is_time_gap = time_gap > time_gap_threshold_us or time_gap < 0
+
+        if is_time_gap:
+            # 保存当前段落
+            if i - segment_start >= 10:  # 至少 10 帧才算有效段落
+                duration = (all_time_us[i-1] - all_time_us[segment_start]) / 1_000_000
+                segments.append((segment_start, i, duration))
+            segment_start = i
+
+    # 保存最后一个段落
+    if len(all_time_us) - segment_start >= 10:
+        duration = (all_time_us[-1] - all_time_us[segment_start]) / 1_000_000
+        segments.append((segment_start, len(all_time_us), duration))
+
+    # 如果没有找到有效段落，返回整个数据
+    if not segments:
+        duration = (all_time_us[-1] - all_time_us[0]) / 1_000_000
+        segments = [(0, len(all_time_us), duration)]
+
+    return segments
+
+
+def find_all_logs(bbl_bytes):
+    """查找 BBL 文件中所有独立的飞行记录"""
+    import re
+    # 查找所有 header 位置
+    headers = list(re.finditer(b'H Product:Blackbox', bbl_bytes))
+    if not headers:
+        return [(0, len(bbl_bytes))]
+
+    logs = []
+    for i in range(len(headers)):
+        start = headers[i].start()
+        end = headers[i+1].start() if i+1 < len(headers) else len(bbl_bytes)
+        logs.append((start, end))
+    return logs
+
+
+def parse_single_log(bbl_bytes):
+    """解析单个 log 的数据"""
     from orangebox import Parser
     import tempfile
     import os
 
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.BBL') as tmp:
+        tmp.write(bbl_bytes)
+        tmp_path = tmp.name
+
+    try:
+        parser = Parser.load(tmp_path)
+        headers = parser.headers
+        field_names = parser.field_names
+        frames_list = list(parser.frames())
+        return headers, field_names, frames_list
+    finally:
+        os.unlink(tmp_path)
+
+
+def parse_bbl_to_json(bbl_bytes):
+    """解析 BBL 文件，输出 <= 500K chars 的 JSON
+    支持多 log 文件，自动选择最长的 log
+    """
+    from orangebox import Parser
+    import tempfile
+    import os
+
+    # 检测文件中所有 log
+    all_logs = find_all_logs(bbl_bytes)
+    total_logs = len(all_logs)
+    best_log_idx = 0  # 默认使用第一个 log
+
+    if total_logs > 1:
+        print(f"[BBL Decoder] Found {total_logs} logs in file, analyzing each...")
+
+        # 解析每个 log，找出最长的
+        best_log_idx = 0
+        best_duration = 0
+        log_durations = []
+
+        for i, (start, end) in enumerate(all_logs):
+            try:
+                log_bytes = bbl_bytes[start:end]
+                _, field_names, frames = parse_single_log(log_bytes)
+
+                if len(frames) < 10:
+                    log_durations.append(0)
+                    continue
+
+                # 计算时长
+                field_idx = {name: j for j, name in enumerate(field_names)}
+                time_idx = field_idx.get('time', -1)
+
+                if time_idx >= 0:
+                    first_time = frames[0].data[time_idx]
+                    last_time = frames[-1].data[time_idx]
+                    duration = (last_time - first_time) / 1_000_000
+                else:
+                    duration = len(frames) / 1000  # 估算
+
+                log_durations.append(duration)
+
+                if duration > best_duration:
+                    best_duration = duration
+                    best_log_idx = i
+
+            except Exception as e:
+                print(f"[BBL Decoder] Log {i+1} parse error: {e}")
+                log_durations.append(0)
+
+        print(f"[BBL Decoder] Log durations: {[round(d, 1) for d in log_durations]}s")
+        print(f"[BBL Decoder] Using log {best_log_idx + 1} ({round(best_duration, 1)}s)")
+
+        # 使用最长的 log
+        start, end = all_logs[best_log_idx]
+        bbl_bytes = bbl_bytes[start:end]
+
+    # 解析选中的 log
     with tempfile.NamedTemporaryFile(delete=False, suffix='.BBL') as tmp:
         tmp.write(bbl_bytes)
         tmp_path = tmp.name
@@ -214,10 +391,44 @@ def parse_bbl_to_json(bbl_bytes):
         if amperage_idx >= 0:
             all_amperage.append(safe_float(data[amperage_idx]))
 
+    # 检测多段飞行记录，选择最长的一段
+    segments = find_flight_segments(all_time_us, all_motor, sample_interval_us)
+
+    # 选择最长的段落
+    longest_segment = max(segments, key=lambda x: x[2])
+    seg_start, seg_end, seg_duration = longest_segment
+    total_segments = len(segments)
+
+    print(f"[BBL Decoder] Found {total_segments} flight segment(s)")
+    if total_segments > 1:
+        print(f"[BBL Decoder] Segment durations: {[round(s[2], 1) for s in segments]}s")
+        print(f"[BBL Decoder] Using longest segment: {round(seg_duration, 1)}s ({seg_end - seg_start} frames)")
+
+    # 截取最长段落的数据
+    def slice_data(data_list, start, end):
+        if isinstance(data_list, list) and len(data_list) > 0:
+            if isinstance(data_list[0], list):
+                return [d[start:end] for d in data_list]
+            return data_list[start:end]
+        return data_list
+
+    all_time_us = all_time_us[seg_start:seg_end]
+    all_vbat = all_vbat[seg_start:seg_end] if all_vbat else []
+    all_amperage = all_amperage[seg_start:seg_end] if all_amperage else []
+    all_rc = [rc[seg_start:seg_end] for rc in all_rc]
+    all_setpoint = [sp[seg_start:seg_end] for sp in all_setpoint]
+    all_gyro = [g[seg_start:seg_end] for g in all_gyro]
+    all_axis_p = [p[seg_start:seg_end] for p in all_axis_p]
+    all_axis_i = [i[seg_start:seg_end] for i in all_axis_i]
+    all_axis_d = [d[seg_start:seg_end] for d in all_axis_d]
+    all_axis_f = [f[seg_start:seg_end] for f in all_axis_f]
+    all_motor = [m[seg_start:seg_end] for m in all_motor]
+    all_erpm = [e[seg_start:seg_end] for e in all_erpm]
+
     total_frames = len(all_time_us)
     duration_s = (all_time_us[-1] - all_time_us[0]) / 1_000_000 if all_time_us else 0
 
-    # 统计特征（使用全部数据计算）
+    # 统计特征（使用选中段落的数据计算）
     gyro_rms = {
         'r': round(calculate_rms(all_gyro[0]), 1),
         'p': round(calculate_rms(all_gyro[1]), 1),
@@ -240,87 +451,59 @@ def parse_bbl_to_json(bbl_bytes):
     cli = build_cli_sections(headers)
 
     def build_frames(target_hz, use_delta_t=False):
-        """构建 frames 数据"""
+        """构建 frames 数据，优化格式减少体积"""
         step = max(1, int(original_sample_rate / target_hz))
         indices = list(range(0, total_frames, step))
         points = len(indices)
 
-        # t: 时间戳
-        if use_delta_t and points > 1:
+        # t: 时间戳（使用 delta_t 模式节省空间）
+        if points > 1:
             t0 = int(all_time_us[indices[0]] / 1000)
             t1 = int(all_time_us[indices[1]] / 1000) if len(indices) > 1 else t0
             dt = t1 - t0 if t1 > t0 else int(1000 / target_hz)
             t_data = {'t0': t0, 'dt': dt}
         else:
-            t_data = [int(all_time_us[i] / 1000) for i in indices if i < len(all_time_us)]
+            t_data = {'t0': 0, 'dt': int(1000 / target_hz)}
 
-        # rc: [r, p, y, thr] 整数
-        rc = []
-        for i in indices:
-            if i < len(all_rc[0]):
-                rc.append([int(all_rc[0][i]), int(all_rc[1][i]), int(all_rc[2][i]), int(all_rc[3][i])])
+        # rc: [thr] 只保留油门（最重要），整数
+        rc = [int(all_rc[3][i]) for i in indices if i < len(all_rc[3])]
 
-        # sp: [r, p, y] 1位小数
+        # sp: [r, p, y] setpoint，整数（减少小数）
         sp = []
         for i in indices:
             if i < len(all_setpoint[0]):
-                sp.append([round(all_setpoint[0][i], 1), round(all_setpoint[1][i], 1), round(all_setpoint[2][i], 1)])
+                sp.append([int(all_setpoint[0][i]), int(all_setpoint[1][i]), int(all_setpoint[2][i])])
 
-        # g: [r, p, y] 1位小数
+        # g: [r, p, y] gyro，整数
         g = []
         for i in indices:
             if i < len(all_gyro[0]):
-                g.append([round(all_gyro[0][i], 1), round(all_gyro[1][i], 1), round(all_gyro[2][i], 1)])
+                g.append([int(all_gyro[0][i]), int(all_gyro[1][i]), int(all_gyro[2][i])])
 
-        # p: [Pr, Ir, Dr, Fr, Pp, Ip, Dp, Fp] 整数
-        p = []
+        # pid: [Pr, Dr, Pp, Dp] 只保留 roll/pitch 的 P 和 D（最关键）
+        pid = []
         for i in indices:
             if i < len(all_axis_p[0]):
-                p.append([
+                pid.append([
                     int(all_axis_p[0][i]) if i < len(all_axis_p[0]) else 0,
-                    int(all_axis_i[0][i]) if i < len(all_axis_i[0]) else 0,
                     int(all_axis_d[0][i]) if i < len(all_axis_d[0]) else 0,
-                    int(all_axis_f[0][i]) if i < len(all_axis_f[0]) else 0,
                     int(all_axis_p[1][i]) if i < len(all_axis_p[1]) else 0,
-                    int(all_axis_i[1][i]) if i < len(all_axis_i[1]) else 0,
                     int(all_axis_d[1][i]) if i < len(all_axis_d[1]) else 0,
-                    int(all_axis_f[1][i]) if i < len(all_axis_f[1]) else 0,
                 ])
 
-        # m: [m1, m2, m3, m4] 整数
+        # m: [m1, m2, m3, m4] 电机输出，整数
         m = []
         for i in indices:
             if i < len(all_motor[0]):
                 m.append([int(all_motor[0][i]), int(all_motor[1][i]), int(all_motor[2][i]), int(all_motor[3][i])])
 
-        # rpm: [m1, m2, m3, m4] 整数
-        rpm = []
-        if all_erpm[0]:
-            for i in indices:
-                if i < len(all_erpm[0]):
-                    rpm.append([
-                        int(all_erpm[0][i]) if all_erpm[0] else 0,
-                        int(all_erpm[1][i]) if all_erpm[1] else 0,
-                        int(all_erpm[2][i]) if all_erpm[2] else 0,
-                        int(all_erpm[3][i]) if all_erpm[3] else 0,
-                    ])
-
-        # v: 2位小数
-        v = [round(all_vbat[i] / 100, 2) for i in indices if i < len(all_vbat)] if all_vbat else []
-
-        # a: 1位小数
-        a = [round(all_amperage[i] / 100, 1) for i in indices if i < len(all_amperage)] if all_amperage else []
-
         return {
             't': t_data,
-            'rc': rc,
+            'rc': rc,  # 只有油门
             'sp': sp,
             'g': g,
-            'p': p,
+            'pid': pid,  # 简化的 PID 输出
             'm': m,
-            'rpm': rpm,
-            'v': v,
-            'a': a,
         }, points, target_hz
 
     def build_result(target_hz, use_delta_t=False):
@@ -334,6 +517,10 @@ def parse_bbl_to_json(bbl_bytes):
                 'total_frames': total_frames,
                 'sample_rate_hz': hz,
                 'points': points,
+                'logs_found': total_logs,
+                'log_used': best_log_idx + 1,
+                'segments_found': total_segments,
+                'segment_used': 'longest',
             },
             'cli': cli,
             'stats': {
@@ -353,18 +540,38 @@ def parse_bbl_to_json(bbl_bytes):
         result = build_result(target_hz, use_delta_t=False)
         compact = json.dumps(result, ensure_ascii=False, separators=(',', ':'))
         if len(compact) <= MAX_PAYLOAD_CHARS:
+            print(f"[BBL Decoder] Output: {len(compact)} chars @ {target_hz}Hz, {result['meta']['points']} points")
             return result
 
     # 兜底：使用 delta_t 模式节省字符
     result = build_result(TARGET_HZ_LIST[-1], use_delta_t=True)
+    compact = json.dumps(result, ensure_ascii=False, separators=(',', ':'))
+    print(f"[BBL Decoder] Output (delta_t mode): {len(compact)} chars @ {TARGET_HZ_LIST[-1]}Hz")
     return result
 
 
 @app.post("/decode")
 async def decode_bbl(request: Request):
+    import traceback
+    import io
+    import sys
+
+    # 捕获所有 print 输出
+    log_buffer = io.StringIO()
+    debug_mode = request.headers.get('X-Debug', '').lower() == 'true'
+
     try:
         content_type = request.headers.get('content-type', '')
-        if 'application/json' in content_type:
+
+        # 处理 multipart/form-data (文件上传)
+        if 'multipart/form-data' in content_type:
+            form = await request.form()
+            file = form.get('file')
+            if file:
+                bbl_bytes = await file.read()
+            else:
+                raise HTTPException(status_code=400, detail="No file in form data")
+        elif 'application/json' in content_type:
             body = await request.json()
             bbl_base64 = body.get('bbl_base64')
             if not bbl_base64:
@@ -376,12 +583,40 @@ async def decode_bbl(request: Request):
         if not bbl_bytes:
             raise HTTPException(status_code=400, detail="Empty BBL data")
 
-        result = parse_bbl_to_json(bbl_bytes)
-        compact_json = json.dumps(result, ensure_ascii=False, separators=(',', ':'))
-        return Response(content=compact_json, media_type="application/json")
+        log_buffer.write(f"[DEBUG] Received {len(bbl_bytes)} bytes\n")
+
+        # 重定向 stdout 来捕获 print
+        old_stdout = sys.stdout
+        sys.stdout = log_buffer
+
+        try:
+            result = parse_bbl_to_json(bbl_bytes)
+        finally:
+            sys.stdout = old_stdout
+
+        log_buffer.write(f"[DEBUG] Parse complete: {result['meta']['points']} points\n")
+
+        if debug_mode:
+            # 调试模式：返回日志和结果
+            return {
+                "logs": log_buffer.getvalue(),
+                "result": result
+            }
+        else:
+            compact_json = json.dumps(result, ensure_ascii=False, separators=(',', ':'))
+            return Response(content=compact_json, media_type="application/json")
     except HTTPException:
         raise
     except Exception as e:
+        error_trace = traceback.format_exc()
+        log_buffer.write(f"[ERROR] {error_trace}\n")
+
+        if debug_mode:
+            return {
+                "logs": log_buffer.getvalue(),
+                "error": str(e),
+                "traceback": error_trace
+            }
         raise HTTPException(status_code=500, detail=f"Failed to decode BBL: {str(e)}")
 
 
@@ -414,6 +649,7 @@ if __name__ == "__main__":
     print(f"sample_rate_hz: {result['meta']['sample_rate_hz']}")
     print(f"points: {result['meta']['points']}")
     print(f"duration_s: {result['meta']['duration_s']}")
+    print(f"segments_found: {result['meta']['segments_found']}")
     print(f"<= 100K: {'YES' if len(compact) <= 100000 else 'NO'}")
 
     output_path = bbl_path.rsplit('.', 1)[0] + '_decoded.json'
