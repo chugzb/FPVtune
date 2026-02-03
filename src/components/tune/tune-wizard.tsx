@@ -75,7 +75,6 @@ type PrecheckResult = {
 };
 
 const TOTAL_STEPS = 6;
-const VALID_TEST_CODES = ['JB_VIP_TEST'];
 const problemIds = [
   'propwash',
   'hotmotors',
@@ -450,9 +449,9 @@ export function TuneWizard() {
   };
 
   const handleTestCodeSubmit = async () => {
-    // 验证测试码
-    if (!VALID_TEST_CODES.includes(testCode.toUpperCase())) {
-      setError('Invalid test code');
+    // 测试码验证由后端处理
+    if (!testCode.trim()) {
+      setError('Please enter a test code');
       return;
     }
 

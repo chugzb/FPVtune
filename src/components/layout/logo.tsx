@@ -6,7 +6,12 @@ import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
-export function Logo({ className }: { className?: string }) {
+interface LogoProps {
+  className?: string;
+  iconOnly?: boolean;
+}
+
+export function Logo({ className, iconOnly = false }: LogoProps) {
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const logoLight = websiteConfig.metadata.images?.logoLight ?? '/logo.png';
@@ -21,14 +26,29 @@ export function Logo({ className }: { className?: string }) {
     setMounted(true);
   }, []);
 
+  // Use square icon for sidebar/compact views
+  if (iconOnly) {
+    return (
+      <Image
+        src="/android-chrome-192x192.png"
+        alt="Logo"
+        title="Logo"
+        width={192}
+        height={192}
+        className={cn('size-5 rounded-md', className)}
+      />
+    );
+  }
+
+  // Use full horizontal logo
   return (
     <Image
       src={logo}
       alt="Logo"
       title="Logo"
-      width={96}
-      height={96}
-      className={cn('size-8 rounded-md', className)}
+      width={480}
+      height={80}
+      className={cn('h-5 w-auto', className)}
     />
   );
 }

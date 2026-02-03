@@ -3,6 +3,103 @@ import { tuneOrder } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { type NextRequest, NextResponse } from 'next/server';
 
+type CliDiffEntry = {
+  key: string;
+  before?: string;
+  after: string;
+  status: 'changed' | 'added';
+};
+
+type CliDiffSummary = {
+  changed: number;
+  added: number;
+  unchanged: number;
+};
+
+type CliDiffResult = {
+  entries: CliDiffEntry[];
+  summary: CliDiffSummary;
+  warnings: string[];
+};
+
+function parseCliSetLines(content: string): Map<string, string> {
+  const map = new Map<string, string>();
+  const lines = content.split(/\r?\n/);
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed.startsWith('set ')) continue;
+    const match = trimmed.match(/^set\s+([a-zA-Z0-9_]+)\s*=\s*(.+)$/);
+    if (!match) continue;
+    const key = match[1];
+    const value = match[2].trim();
+    if (key) {
+      map.set(key, value);
+    }
+  }
+  return map;
+}
+
+function buildCliDiff(
+  original: string | null | undefined,
+  updated: string | null | undefined
+): CliDiffResult {
+  const warnings: string[] = [];
+  if (!original) warnings.push('missing_cli_dump');
+  if (!updated) warnings.push('missing_cli_commands');
+
+  if (!original || !updated) {
+    return {
+      entries: [],
+      summary: { changed: 0, added: 0, unchanged: 0 },
+      warnings,
+    };
+  }
+
+  const originalMap = parseCliSetLines(original);
+  const updatedMap = parseCliSetLines(updated);
+
+  if (updatedMap.size === 0) {
+    warnings.push('no_changes_detected');
+    return {
+      entries: [],
+      summary: { changed: 0, added: 0, unchanged: 0 },
+      warnings,
+    };
+  }
+
+  const entries: CliDiffEntry[] = [];
+  let changed = 0;
+  let added = 0;
+  let unchanged = 0;
+
+  for (const [key, after] of updatedMap.entries()) {
+    const before = originalMap.get(key);
+    if (before === undefined) {
+      entries.push({ key, after, status: 'added' });
+      added += 1;
+      continue;
+    }
+    if (before !== after) {
+      entries.push({ key, before, after, status: 'changed' });
+      changed += 1;
+    } else {
+      unchanged += 1;
+    }
+  }
+
+  if (entries.length === 0) {
+    warnings.push('no_changes_detected');
+  }
+
+  entries.sort((a, b) => a.key.localeCompare(b.key));
+
+  return {
+    entries,
+    summary: { changed, added, unchanged },
+    warnings,
+  };
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ orderNumber: string }> }
@@ -29,6 +126,7 @@ export async function GET(
         additionalNotes: tuneOrder.additionalNotes,
         analysisResult: tuneOrder.analysisResult,
         cliCommands: tuneOrder.cliCommands,
+        cliDumpContent: tuneOrder.cliDumpContent,
         locale: tuneOrder.locale,
         createdAt: tuneOrder.createdAt,
         completedAt: tuneOrder.completedAt,
@@ -40,6 +138,17 @@ export async function GET(
     if (!order) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
+
+    const analysisResult = order.analysisResult as Record<
+      string,
+      unknown
+    > | null;
+    const analysisCliCommands =
+      typeof analysisResult?.cli_commands === 'string'
+        ? (analysisResult.cli_commands as string)
+        : null;
+    const cliCommands = order.cliCommands || analysisCliCommands || null;
+    const cliDiff = buildCliDiff(order.cliDumpContent, cliCommands);
 
     return NextResponse.json({
       success: true,
@@ -53,7 +162,8 @@ export async function GET(
         frameSize: order.frameSize,
         additionalNotes: order.additionalNotes,
         analysis: order.analysisResult,
-        cliCommands: order.cliCommands,
+        cliCommands,
+        cliDiff,
         locale: order.locale,
         createdAt: order.createdAt,
         completedAt: order.completedAt,

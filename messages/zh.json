@@ -554,6 +554,14 @@
           "save": "保存"
         }
       },
+      "orders": {
+        "title": "我的订单",
+        "description": "查看您的调参订单历史",
+        "empty": "暂无订单记录",
+        "emptyHint": "完成一次调参后，订单将显示在这里",
+        "viewResult": "查看结果",
+        "downloadPdf": "下载报告"
+      },
       "billing": {
         "title": "账单",
         "description": "管理您的订阅和账单信息",
@@ -641,6 +649,9 @@
           "success": "账号删除成功",
           "fail": "删除账号失败"
         }
+      },
+      "promo": {
+        "title": "测试码管理"
       }
     },
     "upgrade": {

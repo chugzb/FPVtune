@@ -36,7 +36,7 @@
     "OPENAI_MODEL": "gpt-5.1-2025-11-13",
 
     // BBL Decoder Service (Python Worker)
-    "BBL_DECODER_URL": "http://47.243.149.39:8080",
+    "BBL_DECODER_URL": "https://api.fpvtune.com",
 
     // Cloudflare R2 Storage
     "STORAGE_REGION": "auto",

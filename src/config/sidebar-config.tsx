@@ -3,26 +3,17 @@
 import { Routes } from '@/routes';
 import type { NestedMenuItem } from '@/types';
 import {
-  BellIcon,
   CircleUserRoundIcon,
-  CreditCardIcon,
   LayoutDashboardIcon,
   LockKeyholeIcon,
   Settings2Icon,
-  SettingsIcon,
-  UsersRoundIcon,
+  ClipboardListIcon,
+  TicketIcon,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 /**
  * Get sidebar config with translations
- *
- * NOTICE: used in client components only
- *
- * docs:
- * https://mksaas.com/docs/config/sidebar
- *
- * @returns The sidebar config with translated titles and descriptions
  */
 export function getSidebarLinks(): NestedMenuItem[] {
   const t = useTranslations('Dashboard');
@@ -35,19 +26,6 @@ export function getSidebarLinks(): NestedMenuItem[] {
       external: false,
     },
     {
-      title: t('admin.title'),
-      icon: <SettingsIcon className="size-4 shrink-0" />,
-      authorizeOnly: ['admin'],
-      items: [
-        {
-          title: t('admin.users.title'),
-          icon: <UsersRoundIcon className="size-4 shrink-0" />,
-          href: Routes.AdminUsers,
-          external: false,
-        },
-      ],
-    },
-    {
       title: t('settings.title'),
       icon: <Settings2Icon className="size-4 shrink-0" />,
       items: [
@@ -58,9 +36,9 @@ export function getSidebarLinks(): NestedMenuItem[] {
           external: false,
         },
         {
-          title: t('settings.billing.title'),
-          icon: <CreditCardIcon className="size-4 shrink-0" />,
-          href: Routes.SettingsBilling,
+          title: t('settings.orders.title'),
+          icon: <ClipboardListIcon className="size-4 shrink-0" />,
+          href: Routes.SettingsOrders,
           external: false,
         },
         {
@@ -70,10 +48,11 @@ export function getSidebarLinks(): NestedMenuItem[] {
           external: false,
         },
         {
-          title: t('settings.notification.title'),
-          icon: <BellIcon className="size-4 shrink-0" />,
-          href: Routes.SettingsNotifications,
+          title: t('settings.promo.title'),
+          icon: <TicketIcon className="size-4 shrink-0" />,
+          href: '/admin/promo',
           external: false,
+          authorizeOnly: ['admin'],
         },
       ],
     },

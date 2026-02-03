@@ -1,15 +1,98 @@
 import db from '@/db';
-import { tuneOrder } from '@/db/schema';
+import { tuneOrder, promoCode, promoCodeUsage } from '@/db/schema';
 import { isBBLFormat } from '@/lib/tune/bbl-parser';
 import { processOrder } from '@/lib/tune/process-order';
 import { uploadFile } from '@/storage';
+import { eq, and } from 'drizzle-orm';
 import { type NextRequest, NextResponse } from 'next/server';
 
 // 最小文件大小要求
 const MIN_BBL_FILE_SIZE = 50 * 1024; // 50KB
 
-// 有效的测试码
-const VALID_TEST_CODES = ['JB_VIP_TEST', 'FPVTUNE_BETA', 'DEV_TEST_2024'];
+// 硬编码的测试码（向后兼容）
+const LEGACY_TEST_CODES = ['JB_VIP_TEST', 'FPVTUNE_BETA', 'DEV_TEST_2024'];
+
+// 验证测试码（支持数据库和硬编码）
+async function validatePromoCode(code: string): Promise<{ valid: boolean; promoId?: string }> {
+  const normalizedCode = code.trim().toUpperCase();
+
+  // 先检查硬编码的测试码
+  if (LEGACY_TEST_CODES.includes(normalizedCode)) {
+    return { valid: true };
+  }
+
+  // 再检查数据库中的测试码
+  try {
+    const [promo] = await db
+      .select()
+      .from(promoCode)
+      .where(
+        and(
+          eq(promoCode.code, normalizedCode),
+          eq(promoCode.isActive, true)
+        )
+      )
+      .limit(1);
+
+    if (!promo) {
+      return { valid: false };
+    }
+
+    const now = new Date();
+
+    // 检查有效期
+    if (promo.validFrom && promo.validFrom > now) {
+      return { valid: false };
+    }
+    if (promo.validUntil && promo.validUntil < now) {
+      return { valid: false };
+    }
+
+    // 检查使用次数
+    if (promo.type === 'single' && promo.usedCount >= 1) {
+      return { valid: false };
+    }
+    if (promo.type === 'limited' && promo.maxUses && promo.usedCount >= promo.maxUses) {
+      return { valid: false };
+    }
+
+    return { valid: true, promoId: promo.id };
+  } catch (error) {
+    console.error('Error validating promo code:', error);
+    return { valid: false };
+  }
+}
+
+// 记录测试码使用
+async function recordPromoUsage(promoId: string, orderId: string, email: string) {
+  try {
+    // 更新使用次数
+    const [promo] = await db
+      .select()
+      .from(promoCode)
+      .where(eq(promoCode.id, promoId))
+      .limit(1);
+
+    if (promo) {
+      await db
+        .update(promoCode)
+        .set({
+          usedCount: promo.usedCount + 1,
+          updatedAt: new Date(),
+        })
+        .where(eq(promoCode.id, promoId));
+    }
+
+    // 记录使用历史
+    await db.insert(promoCodeUsage).values({
+      promoCodeId: promoId,
+      orderId,
+      customerEmail: email,
+    });
+  } catch (error) {
+    console.error('Error recording promo usage:', error);
+  }
+}
 
 function generateOrderNumber(): string {
   const date = new Date();
@@ -49,7 +132,12 @@ export async function POST(request: NextRequest) {
     const locale = (formData.get('locale') as string) || 'en';
 
     // 验证测试码
-    if (!testCode || !VALID_TEST_CODES.includes(testCode.toUpperCase())) {
+    if (!testCode) {
+      return NextResponse.json({ error: 'Test code is required' }, { status: 400 });
+    }
+
+    const promoValidation = await validatePromoCode(testCode);
+    if (!promoValidation.valid) {
       return NextResponse.json({ error: 'Invalid test code' }, { status: 400 });
     }
 
@@ -191,12 +279,19 @@ export async function POST(request: NextRequest) {
         currency: 'USD',
         status: 'paid', // 直接标记为已支付
         paidAt: new Date(),
+        promoCodeId: promoValidation.promoId || null,
       })
       .returning();
 
     console.log(
       `[${orderNumber}] Test order created: ${orderId}, blackboxUrl: ${blackboxUrl}`
     );
+
+    // 记录测试码使用（如果是数据库中的码）
+    if (promoValidation.promoId) {
+      await recordPromoUsage(promoValidation.promoId, orderId, email);
+      console.log(`[${orderNumber}] Promo code usage recorded`);
+    }
 
     // 同步处理订单（生成 PDF、发送邮件）
     try {

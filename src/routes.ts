@@ -32,9 +32,12 @@ export enum Routes {
   // dashboard routes
   Dashboard = '/dashboard',
   AdminUsers = '/admin/users',
+  AdminPromo = '/admin/promo',
   SettingsProfile = '/settings/profile',
-  SettingsBilling = '/settings/billing',
+  SettingsOrders = '/settings/orders',
   SettingsSecurity = '/settings/security',
+  // legacy routes (kept for compatibility)
+  SettingsBilling = '/settings/billing',
   SettingsNotifications = '/settings/notifications',
 
   // AI routes
@@ -75,9 +78,11 @@ export const routesNotAllowedByLoggedInUsers = [Routes.Login, Routes.Register];
 export const protectedRoutes = [
   Routes.Dashboard,
   Routes.AdminUsers,
+  Routes.AdminPromo,
   Routes.SettingsProfile,
-  Routes.SettingsBilling,
+  Routes.SettingsOrders,
   Routes.SettingsSecurity,
+  Routes.SettingsBilling,
   Routes.SettingsNotifications,
 ];
 

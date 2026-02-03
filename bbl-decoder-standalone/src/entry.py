@@ -620,6 +620,138 @@ async def decode_bbl(request: Request):
         raise HTTPException(status_code=500, detail=f"Failed to decode BBL: {str(e)}")
 
 
+@app.post("/meta")
+async def get_meta(request: Request):
+    """只返回元数据，不返回完整的 frames 数据，用于快速预检"""
+    import traceback
+
+    try:
+        content_type = request.headers.get('content-type', '')
+
+        if 'multipart/form-data' in content_type:
+            form = await request.form()
+            file = form.get('file')
+            if file:
+                bbl_bytes = await file.read()
+            else:
+                raise HTTPException(status_code=400, detail="No file in form data")
+        elif 'application/json' in content_type:
+            body = await request.json()
+            bbl_base64 = body.get('bbl_base64')
+            if not bbl_base64:
+                raise HTTPException(status_code=400, detail="Missing bbl_base64 field")
+            bbl_bytes = base64.b64decode(bbl_base64)
+        else:
+            bbl_bytes = await request.body()
+
+        if not bbl_bytes:
+            raise HTTPException(status_code=400, detail="Empty BBL data")
+
+        # 快速解析，只获取元数据
+        result = parse_bbl_meta_only(bbl_bytes)
+        return result
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        error_trace = traceback.format_exc()
+        raise HTTPException(status_code=500, detail=f"Failed to parse BBL meta: {str(e)}")
+
+
+def parse_bbl_meta_only(bbl_bytes):
+    """快速解析 BBL 文件，只返回元数据，不处理完整的 frames"""
+    from orangebox import Parser
+    import tempfile
+    import os
+
+    # 检测文件中所有 log
+    all_logs = find_all_logs(bbl_bytes)
+    total_logs = len(all_logs)
+    best_log_idx = 0
+    best_duration = 0
+
+    if total_logs > 1:
+        # 快速扫描每个 log 的时长
+        for i, (start, end) in enumerate(all_logs):
+            try:
+                log_bytes = bbl_bytes[start:end]
+                _, field_names, frames = parse_single_log(log_bytes)
+                if len(frames) < 10:
+                    continue
+                field_idx = {name: j for j, name in enumerate(field_names)}
+                time_idx = field_idx.get('time', -1)
+                if time_idx >= 0 and len(frames) > 0:
+                    first_time = frames[0].data[time_idx]
+                    last_time = frames[-1].data[time_idx]
+                    duration = (last_time - first_time) / 1_000_000
+                    if duration > best_duration:
+                        best_duration = duration
+                        best_log_idx = i
+            except:
+                pass
+
+        start, end = all_logs[best_log_idx]
+        bbl_bytes = bbl_bytes[start:end]
+
+    # 解析选中的 log
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.BBL') as tmp:
+        tmp.write(bbl_bytes)
+        tmp_path = tmp.name
+
+    try:
+        parser = Parser.load(tmp_path)
+    finally:
+        os.unlink(tmp_path)
+
+    headers = parser.headers
+    field_names = parser.field_names
+    frames_list = list(parser.frames())
+    field_idx = {name: i for i, name in enumerate(field_names)}
+
+    # 计算采样率
+    looptime = safe_int(headers.get('looptime'), 125)
+    pid_process_denom = safe_int(headers.get('pid_process_denom'), 1)
+    sample_interval_us = looptime * pid_process_denom
+    sample_rate = int(1_000_000 / sample_interval_us)
+
+    # 计算时长
+    time_idx = field_idx.get('time', -1)
+    total_frames = len(frames_list)
+
+    if time_idx >= 0 and total_frames > 1:
+        # 收集时间戳用于检测段落
+        all_time_us = []
+        for frame in frames_list:
+            try:
+                all_time_us.append(int(frame.data[time_idx]))
+            except:
+                pass
+
+        # 检测段落
+        segments = find_flight_segments(all_time_us, None, sample_interval_us)
+        longest_segment = max(segments, key=lambda x: x[2])
+        duration_s = longest_segment[2]
+        total_segments = len(segments)
+        points = longest_segment[1] - longest_segment[0]
+    else:
+        duration_s = total_frames * sample_interval_us / 1_000_000
+        total_segments = 1
+        points = total_frames
+
+    return {
+        'meta': {
+            'fw': headers.get('Firmware revision', ''),
+            'board': headers.get('Board information', ''),
+            'craft': headers.get('Craft name', ''),
+            'duration_s': round(duration_s, 1),
+            'sample_rate_hz': sample_rate,
+            'points': points,
+            'logs_found': total_logs,
+            'segments_found': total_segments,
+        }
+    }
+
+
 @app.get("/health")
 async def health():
     return {"status": "ok", "service": "bbl-decoder"}

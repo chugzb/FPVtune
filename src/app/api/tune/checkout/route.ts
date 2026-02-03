@@ -1,9 +1,9 @@
 import db from '@/db';
-import { tuneOrder } from '@/db/schema';
+import { tuneOrder, promoCode, promoCodeUsage } from '@/db/schema';
 import { CREEM_PRODUCT_ID, creem } from '@/lib/creem';
 import { isBBLFormat } from '@/lib/tune/bbl-parser';
 import { uploadFile } from '@/storage';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { type NextRequest, NextResponse } from 'next/server';
 
 // 最小文件大小要求（BBL 文件通常至少几百KB）
@@ -44,6 +44,7 @@ export async function POST(request: NextRequest) {
     const weight = formData.get('weight') as string;
     const additionalNotes = formData.get('additionalNotes') as string;
     const locale = (formData.get('locale') as string) || 'en';
+    const promoCodeInput = formData.get('promoCode') as string | null;
 
     if (!email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
@@ -195,6 +196,73 @@ export async function POST(request: NextRequest) {
     console.log(
       `[${orderNumber}] Order created: ${orderId}, blackboxUrl: ${blackboxUrl}`
     );
+
+    // 检查是否使用测试码
+    if (promoCodeInput) {
+      const normalizedCode = promoCodeInput.trim().toUpperCase();
+      const [promo] = await db
+        .select()
+        .from(promoCode)
+        .where(
+          and(
+            eq(promoCode.code, normalizedCode),
+            eq(promoCode.isActive, true)
+          )
+        )
+        .limit(1);
+
+      if (promo) {
+        const now = new Date();
+        const isValid =
+          (!promo.validFrom || promo.validFrom <= now) &&
+          (!promo.validUntil || promo.validUntil >= now) &&
+          (promo.type === 'unlimited' || promo.usedCount < (promo.maxUses || 1));
+
+        if (isValid) {
+          // 更新测试码使用次数
+          await db
+            .update(promoCode)
+            .set({
+              usedCount: promo.usedCount + 1,
+              updatedAt: new Date(),
+            })
+            .where(eq(promoCode.id, promo.id));
+
+          // 记录使用历史
+          await db.insert(promoCodeUsage).values({
+            promoCodeId: promo.id,
+            orderId: order.id,
+            customerEmail: email,
+          });
+
+          // 更新订单状态为已支付（跳过支付）
+          await db
+            .update(tuneOrder)
+            .set({
+              status: 'paid',
+              promoCodeId: promo.id,
+              amount: 0,
+              paidAt: new Date(),
+              updatedAt: new Date(),
+            })
+            .where(eq(tuneOrder.id, order.id));
+
+          console.log(`[${orderNumber}] Promo code ${normalizedCode} applied, skipping payment`);
+
+          const baseUrl =
+            process.env.APP_URL ||
+            process.env.NEXT_PUBLIC_APP_URL ||
+            'https://fpvtune.com';
+
+          return NextResponse.json({
+            success: true,
+            promoApplied: true,
+            orderNumber,
+            redirectUrl: `${baseUrl}/${locale}/tune?order=${orderNumber}`,
+          });
+        }
+      }
+    }
 
     const baseUrl =
       process.env.APP_URL ||

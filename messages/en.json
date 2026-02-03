@@ -553,6 +553,14 @@
           "save": "Save"
         }
       },
+      "orders": {
+        "title": "My Orders",
+        "description": "View your tuning order history",
+        "empty": "No orders yet",
+        "emptyHint": "Your orders will appear here after completing a tune",
+        "viewResult": "View Result",
+        "downloadPdf": "Download Report"
+      },
       "billing": {
         "title": "Billing",
         "description": "Manage your subscription and billing details",
@@ -640,6 +648,9 @@
           "success": "Account deleted successfully",
           "fail": "Failed to delete account"
         }
+      },
+      "promo": {
+        "title": "Promo Code Management"
       }
     },
     "upgrade": {

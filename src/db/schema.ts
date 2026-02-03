@@ -133,9 +133,38 @@ export const tuneOrder = pgTable("tune_order", {
 	amount: integer('amount'),
 	currency: text('currency').default('USD'),
 
+	// 测试码
+	promoCodeId: text('promo_code_id'),
+
 	// 时间戳
 	createdAt: timestamp('created_at').notNull().defaultNow(),
 	paidAt: timestamp('paid_at'),
 	completedAt: timestamp('completed_at'),
 	updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+// 测试码/优惠码表
+export const promoCode = pgTable("promo_code", {
+	id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+	code: text('code').notNull().unique(),
+	// single: 一次性码, unlimited: 永久码, limited: 限次码
+	type: text('type').notNull().default('single'),
+	maxUses: integer('max_uses').default(1),
+	usedCount: integer('used_count').notNull().default(0),
+	validFrom: timestamp('valid_from').defaultNow(),
+	validUntil: timestamp('valid_until'),
+	createdBy: text('created_by'),
+	note: text('note'),
+	isActive: boolean('is_active').notNull().default(true),
+	createdAt: timestamp('created_at').notNull().defaultNow(),
+	updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+// 测试码使用记录
+export const promoCodeUsage = pgTable("promo_code_usage", {
+	id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+	promoCodeId: text('promo_code_id').notNull().references(() => promoCode.id, { onDelete: 'cascade' }),
+	orderId: text('order_id').references(() => tuneOrder.id, { onDelete: 'set null' }),
+	customerEmail: text('customer_email').notNull(),
+	usedAt: timestamp('used_at').notNull().defaultNow(),
 });
