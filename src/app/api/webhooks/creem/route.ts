@@ -188,7 +188,7 @@ export async function POST(request: NextRequest) {
 
     console.log(`Order ${order.orderNumber} marked as paid`);
 
-    // 异步处理订单 (AI 分析, 发送邮件)
+    // 异步处理订单 (AI 分析)
     // 使用 waitUntil 确保后台任务完成，但不阻塞 webhook 响应
     // 这样可以避免 Creem 15秒超时问题
     const processPromise = processOrder(order.id)

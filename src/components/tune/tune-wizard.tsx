@@ -8,10 +8,11 @@ import {
   ArrowRight,
   Check,
   CheckCircle,
+  ChevronDown,
+  CreditCard,
   FileText,
   Loader2,
   Lock,
-  Mail,
   Shield,
   Terminal,
   Upload,
@@ -246,7 +247,7 @@ export function TuneWizard() {
           formData.motorTemp !== ''
         );
       case 6:
-        return formData.email !== '';
+        return true;
       default:
         return false;
     }
@@ -696,10 +697,6 @@ export function TuneWizard() {
           {currentStep === 6 && (
             <StepPayment
               formData={formData}
-              email={formData.email}
-              onEmailChange={(email) =>
-                setFormData((prev) => ({ ...prev, email }))
-              }
               onPayment={handlePayment}
               isProcessing={isProcessing}
               error={error}
@@ -1514,11 +1511,9 @@ function StepHardware({
   );
 }
 
-// Step 6: Payment (Test Mode - Only Test Code)
+// Step 6: Payment
 function StepPayment({
   formData,
-  email,
-  onEmailChange,
   onPayment,
   isProcessing,
   error,
@@ -1527,8 +1522,6 @@ function StepPayment({
   onTestCodeSubmit,
 }: {
   formData: FormData;
-  email: string;
-  onEmailChange: (email: string) => void;
   onPayment: () => void;
   isProcessing: boolean;
   error: string | null;
@@ -1542,7 +1535,7 @@ function StepPayment({
   const tProblems = useTranslations('TunePage.wizard.problems.items');
   const tGoals = useTranslations('TunePage.wizard.goals.items');
   const tHardware = useTranslations('TunePage.wizard.hardware');
-  // Test mode: always show test code input
+  const [showSummary, setShowSummary] = useState(false);
   const [showTestCode, setShowTestCode] = useState(true);
 
   const styleName = tStyles(`${formData.flyingStyle}.name` as any);
@@ -1554,142 +1547,141 @@ function StepPayment({
   const allGoals = formData.customGoal
     ? [...goalNames, formData.customGoal]
     : goalNames;
-
-  // 获取电机温度的翻译文本
   const motorTempName = formData.motorTemp
     ? tHardware(`motorTempOptions.${formData.motorTemp}` as any)
     : '';
 
+  const summaryRows = [
+    { label: t('blackboxLog'), value: formData.blackboxFile?.name },
+    { label: t('problemsToFix'), value: problemNames.join(', ') },
+    { label: t('tuningGoals'), value: allGoals.join(', ') },
+    { label: t('flyingStyle'), value: styleName },
+    { label: t('frameSize'), value: sizeName },
+    { label: t('motor'), value: `${formData.motorSize} ${formData.motorKv}KV` },
+    formData.battery ? { label: t('battery'), value: formData.battery.toUpperCase() } : null,
+    formData.propeller ? { label: t('propeller'), value: formData.propeller } : null,
+    formData.motorTemp ? { label: t('motorTemp'), value: motorTempName } : null,
+    formData.weight ? { label: t('weight'), value: `${formData.weight} g` } : null,
+  ].filter(Boolean) as { label: string; value: string }[];
+
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-3">{t('title')}</h1>
-        <p className="text-gray-400">{t('description')}</p>
+    <div className="space-y-4">
+      {/* Collapsible Order Summary */}
+      <button
+        type="button"
+        onClick={() => setShowSummary(!showSummary)}
+        className="w-full flex items-center justify-between px-4 py-3.5 bg-white/[0.03] border border-white/[0.06] rounded-xl hover:bg-white/[0.05] transition-colors"
+      >
+        <div className="flex items-center gap-2 text-sm text-gray-400">
+          <FileText className="w-4 h-4" />
+          <span>{t('orderSummary')}</span>
+        </div>
+        <ChevronDown className={cn('w-4 h-4 text-gray-500 transition-transform', showSummary && 'rotate-180')} />
+      </button>
+      {showSummary && (
+        <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl overflow-hidden">
+          {summaryRows.map((row, i) => (
+            <div key={i} className={cn('flex justify-between px-4 py-2.5 text-[13px]', i < summaryRows.length - 1 && 'border-b border-white/[0.04]')}>
+              <span className="text-gray-500">{row.label}</span>
+              <span className="text-gray-300 text-right max-w-[200px]">{row.value}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Price Hero */}
+      <div className="text-center py-8">
+        <h2 className="text-lg font-medium text-gray-400 mb-3">{t('title')}</h2>
+        <div className="flex items-baseline justify-center gap-1">
+          <span className="text-2xl font-semibold text-gray-400 self-start mt-2">$</span>
+          <span className="text-[64px] font-bold tracking-tight leading-none bg-gradient-to-b from-white to-gray-300 bg-clip-text text-transparent">9.90</span>
+        </div>
+        <p className="text-sm text-gray-500 mt-2">{t('description')}</p>
       </div>
 
-      {/* Order Summary */}
-      <div className="bg-white/5 rounded-xl border border-white/10 overflow-hidden">
-        <div className="p-4 border-b border-white/10 bg-white/5">
-          <h3 className="font-semibold text-white">{t('orderSummary')}</h3>
-        </div>
-        <div className="divide-y divide-white/5 text-sm">
-          <div className="p-4 flex justify-between">
-            <span className="text-gray-400">{t('blackboxLog')}</span>
-            <span className="text-white truncate max-w-[200px]">
-              {formData.blackboxFile?.name}
-            </span>
-          </div>
-          <div className="p-4 flex justify-between">
-            <span className="text-gray-400">{t('problemsToFix')}</span>
-            <span className="text-white text-right">
-              {problemNames.join(', ')}
-            </span>
-          </div>
-          <div className="p-4 flex justify-between">
-            <span className="text-gray-400">{t('tuningGoals')}</span>
-            <span className="text-white text-right">{allGoals.join(', ')}</span>
-          </div>
-          <div className="p-4 flex justify-between">
-            <span className="text-gray-400">{t('flyingStyle')}</span>
-            <span className="text-white">{styleName}</span>
-          </div>
-          <div className="p-4 flex justify-between">
-            <span className="text-gray-400">{t('frameSize')}</span>
-            <span className="text-white">{sizeName}</span>
-          </div>
-          <div className="p-4 flex justify-between">
-            <span className="text-gray-400">{t('motor')}</span>
-            <span className="text-white">
-              {formData.motorSize} {formData.motorKv}KV
-            </span>
-          </div>
-          {formData.battery && (
-            <div className="p-4 flex justify-between">
-              <span className="text-gray-400">{t('battery')}</span>
-              <span className="text-white">
-                {formData.battery.toUpperCase()}
-              </span>
-            </div>
-          )}
-          {formData.propeller && (
-            <div className="p-4 flex justify-between">
-              <span className="text-gray-400">{t('propeller')}</span>
-              <span className="text-white">{formData.propeller}</span>
-            </div>
-          )}
-          {formData.motorTemp && (
-            <div className="p-4 flex justify-between">
-              <span className="text-gray-400">{t('motorTemp')}</span>
-              <span className="text-white">{motorTempName}</span>
-            </div>
-          )}
-          {formData.weight && (
-            <div className="p-4 flex justify-between">
-              <span className="text-gray-400">{t('weight')}</span>
-              <span className="text-white">{formData.weight} g</span>
-            </div>
-          )}
-          {formData.additionalNotes && (
-            <div className="p-4">
-              <span className="text-gray-400 block mb-1">
-                {t('additionalNotes')}
-              </span>
-              <span className="text-white text-sm">
-                {formData.additionalNotes}
-              </span>
-            </div>
-          )}
-        </div>
+      {/* Pay Button */}
+      <button
+        type="button"
+        onClick={onPayment}
+        disabled={isProcessing}
+        className={cn(
+          'w-full flex items-center justify-center gap-2 py-4 rounded-xl font-semibold text-base transition-all',
+          isProcessing
+            ? 'bg-white/10 text-gray-500 cursor-not-allowed'
+            : 'bg-white text-black hover:bg-gray-100 hover:-translate-y-0.5'
+        )}
+      >
+        {isProcessing ? (
+          <>
+            <Loader2 className="w-[18px] h-[18px] animate-spin" />
+            {t('analyzing')}
+          </>
+        ) : (
+          <>
+            <CreditCard className="w-[18px] h-[18px]" />
+            {`${t('payButton') || 'Pay'} $9.90`}
+          </>
+        )}
+      </button>
+
+      {/* Trust Badges */}
+      <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
+        <span className="flex items-center gap-1">
+          <Lock className="w-3 h-3" />
+          {t('securePayment') || 'Secure payment'}
+        </span>
+        <span className="flex items-center gap-1">
+          <Zap className="w-3 h-3" />
+          {t('instantDelivery')}
+        </span>
+        <span className="flex items-center gap-1">
+          <Shield className="w-3 h-3" />
+          {t('moneyBack') || 'Money-back guarantee'}
+        </span>
       </div>
 
-      {/* Test Code Section - Coupon Style */}
-      <div className="relative border-2 border-dashed border-amber-500/20 rounded-2xl p-8 text-center bg-amber-500/[0.03]">
-        {/* Decorative corner cuts */}
-        <div className="absolute -left-[9px] top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#030304]" />
-        <div className="absolute -right-[9px] top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#030304]" />
+      {/* Divider */}
+      <div className="flex items-center gap-4 text-xs text-gray-600 uppercase tracking-wider">
+        <div className="flex-1 h-px bg-white/[0.06]" />
+        <span>{t('or') || 'or'}</span>
+        <div className="flex-1 h-px bg-white/[0.06]" />
+      </div>
 
-        <div className="inline-flex items-center justify-center w-11 h-11 rounded-full bg-amber-500/10 mb-4">
-          <Zap className="w-5 h-5 text-amber-400" />
-        </div>
-        <h3 className="text-base font-semibold text-white mb-1">{t('testMode') || 'Test Mode'}</h3>
-        <p className="text-sm text-gray-500 mb-6">{t('testModeHint') || 'Enter test code to get tuning results for free'}</p>
-
-        <div className="max-w-sm mx-auto space-y-3">
-          <label htmlFor="test-code-input" className="sr-only">
-            {t('testCodeLabel') || 'Test Code'}
-          </label>
-          <input
-            id="test-code-input"
-            type="text"
-            value={testCode}
-            onChange={(e) => onTestCodeChange(e.target.value)}
-            placeholder={t('testCodePlaceholder')}
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white text-center text-sm font-mono tracking-widest uppercase placeholder:text-gray-600 placeholder:tracking-normal placeholder:font-sans focus:outline-none focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/10 transition-all"
-          />
-          <button
-            type="button"
-            onClick={onTestCodeSubmit}
-            disabled={!testCode || isProcessing}
-            className={cn(
-              'w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-sm transition-all',
-              testCode && !isProcessing
-                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-black hover:from-amber-400 hover:to-orange-400 shadow-lg shadow-amber-500/20'
-                : 'bg-white/5 text-gray-600 cursor-not-allowed'
-            )}
-          >
-            {isProcessing ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                {t('analyzing')}
-              </>
-            ) : (
-              <>
-                <Zap className="w-4 h-4" />
-                {t('useTestCode')}
-              </>
-            )}
-          </button>
-        </div>
+      {/* Test Code Section */}
+      <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-5">
+        <button
+          type="button"
+          onClick={() => setShowTestCode(!showTestCode)}
+          className="w-full flex items-center gap-2"
+        >
+          <Zap className="w-4 h-4 text-amber-500" />
+          <span className="text-sm font-medium text-gray-300">{t('testMode') || 'Have a test code?'}</span>
+          <ChevronDown className={cn('w-4 h-4 text-gray-500 ml-auto transition-transform', showTestCode && 'rotate-180')} />
+        </button>
+        {showTestCode && (
+          <div className="flex gap-2 mt-4">
+            <input
+              type="text"
+              value={testCode}
+              onChange={(e) => onTestCodeChange(e.target.value)}
+              placeholder={t('testCodePlaceholder')}
+              className="flex-1 bg-white/5 border border-white/10 rounded-[10px] px-3.5 py-3 text-white text-sm font-mono tracking-widest uppercase placeholder:text-gray-600 placeholder:tracking-normal placeholder:font-sans focus:outline-none focus:border-amber-500/40 transition-colors"
+            />
+            <button
+              type="button"
+              onClick={onTestCodeSubmit}
+              disabled={!testCode || isProcessing}
+              className={cn(
+                'px-5 py-3 rounded-[10px] text-sm font-semibold whitespace-nowrap transition-all',
+                testCode && !isProcessing
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-black hover:brightness-110'
+                  : 'bg-white/5 text-gray-600 cursor-not-allowed'
+              )}
+            >
+              {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : (t('useTestCode') || 'Apply')}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Error Message */}
@@ -1698,14 +1690,6 @@ function StepPayment({
           {error}
         </div>
       )}
-
-      {/* Trust Badges */}
-      <div className="flex items-center justify-center gap-6 text-sm text-gray-500">
-        <div className="flex items-center gap-2">
-          <Zap className="w-4 h-4" />
-          <span>{t('instantDelivery')}</span>
-        </div>
-      </div>
     </div>
   );
 }
