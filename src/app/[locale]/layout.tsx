@@ -41,6 +41,14 @@ export default async function LocaleLayout({
 
   return (
     <html suppressHydrationWarning lang={locale}>
+      <head>
+        {/* Polyfill for __name function used by esbuild keepNames in Cloudflare Workers */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if(typeof __name==="undefined"){window.__name=function(e,n){return Object.defineProperty(e,"name",{value:n,configurable:true}),e}}`,
+          }}
+        />
+      </head>
       <body
         suppressHydrationWarning
         className={cn(

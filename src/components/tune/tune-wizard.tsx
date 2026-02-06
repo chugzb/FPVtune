@@ -1642,53 +1642,49 @@ function StepPayment({
         </div>
       </div>
 
-      {/* Test Code Section - Test Mode Only */}
-      <div className="bg-gradient-to-b from-green-500/20 to-transparent border border-green-500/30 rounded-2xl p-6">
-        <div className="text-center mb-4">
-          <div className="inline-flex items-center gap-2 bg-green-500/20 text-green-400 text-sm font-semibold px-4 py-2 rounded-full mb-3">
-            <Zap className="w-4 h-4" />
-            {t('testMode') || '测试模式'}
-          </div>
-          <p className="text-gray-400 text-sm">{t('testModeHint') || '输入测试码免费获取调参结果'}</p>
+      {/* Test Code Section - Coupon Style */}
+      <div className="relative border-2 border-dashed border-amber-500/20 rounded-2xl p-8 text-center bg-amber-500/[0.03]">
+        {/* Decorative corner cuts */}
+        <div className="absolute -left-[9px] top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#030304]" />
+        <div className="absolute -right-[9px] top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#030304]" />
+
+        <div className="inline-flex items-center justify-center w-11 h-11 rounded-full bg-amber-500/10 mb-4">
+          <Zap className="w-5 h-5 text-amber-400" />
         </div>
+        <h3 className="text-base font-semibold text-white mb-1">{t('testMode') || 'Test Mode'}</h3>
+        <p className="text-sm text-gray-500 mb-6">{t('testModeHint') || 'Enter test code to get tuning results for free'}</p>
 
-        <div className="space-y-4">
-          <div>
-            <label
-              htmlFor="test-code-input"
-              className="block text-sm font-medium text-white mb-2"
-            >
-              {t('testCodeLabel') || '测试码'}
-            </label>
-            <input
-              id="test-code-input"
-              type="text"
-              value={testCode}
-              onChange={(e) => onTestCodeChange(e.target.value)}
-              placeholder={t('testCodePlaceholder')}
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:border-green-500"
-            />
-          </div>
-
+        <div className="max-w-sm mx-auto space-y-3">
+          <label htmlFor="test-code-input" className="sr-only">
+            {t('testCodeLabel') || 'Test Code'}
+          </label>
+          <input
+            id="test-code-input"
+            type="text"
+            value={testCode}
+            onChange={(e) => onTestCodeChange(e.target.value)}
+            placeholder={t('testCodePlaceholder')}
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white text-center text-sm font-mono tracking-widest uppercase placeholder:text-gray-600 placeholder:tracking-normal placeholder:font-sans focus:outline-none focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/10 transition-all"
+          />
           <button
             type="button"
             onClick={onTestCodeSubmit}
             disabled={!testCode || isProcessing}
             className={cn(
-              'w-full flex items-center justify-center gap-2 py-4 rounded-xl font-semibold text-lg transition-all',
+              'w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-sm transition-all',
               testCode && !isProcessing
-                ? 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700'
-                : 'bg-white/10 text-gray-500 cursor-not-allowed'
+                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-black hover:from-amber-400 hover:to-orange-400 shadow-lg shadow-amber-500/20'
+                : 'bg-white/5 text-gray-600 cursor-not-allowed'
             )}
           >
             {isProcessing ? (
               <>
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin" />
                 {t('analyzing')}
               </>
             ) : (
               <>
-                <Zap className="w-5 h-5" />
+                <Zap className="w-4 h-4" />
                 {t('useTestCode')}
               </>
             )}
@@ -1852,27 +1848,6 @@ function ProcessingModal({
                 order?.status === 'completed' || order?.status === 'failed'
               }
               isFailed={order?.status === 'failed'}
-            />
-            <ProcessingStatusCard
-              icon={
-                order?.status === 'completed' ? (
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                ) : (
-                  <Mail className="w-5 h-5 text-gray-400" />
-                )
-              }
-              title={
-                order?.status === 'completed'
-                  ? tSuccess('emailSent')
-                  : tSuccess('status.sendingEmail')
-              }
-              hint={
-                order?.status === 'completed'
-                  ? tSuccess('emailSentHint')
-                  : tSuccess('status.sendingEmailHint')
-              }
-              isActive={false}
-              isCompleted={order?.status === 'completed'}
             />
           </div>
 

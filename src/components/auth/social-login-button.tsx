@@ -5,7 +5,6 @@ import { GitHubIcon } from '@/components/icons/github';
 import { GoogleIcon } from '@/components/icons/google';
 import { Button } from '@/components/ui/button';
 import { websiteConfig } from '@/config/website';
-import { authClient } from '@/lib/auth-client';
 import { getUrlWithLocaleInCallbackUrl } from '@/lib/urls/urls';
 import { DEFAULT_LOGIN_REDIRECT, Routes } from '@/routes';
 import { Loader2Icon } from 'lucide-react';
@@ -20,20 +19,12 @@ interface SocialLoginButtonProps {
 /**
  * social login buttons
  */
-export const SocialLoginButton = ({
+export function SocialLoginButton({
   callbackUrl: propCallbackUrl,
-}: SocialLoginButtonProps) => {
-  if (
-    !websiteConfig.auth.enableGoogleLogin &&
-    !websiteConfig.auth.enableGithubLogin
-  ) {
-    return null;
-  }
-
+}: SocialLoginButtonProps) {
   const t = useTranslations('AuthPage.login');
   const searchParams = useSearchParams();
   const paramCallbackUrl = searchParams.get('callbackUrl');
-  // Use prop callback URL or param callback URL if provided, otherwise use the default login redirect
   const locale = useLocale();
   const defaultCallbackUrl = getUrlWithLocaleInCallbackUrl(
     DEFAULT_LOGIN_REDIRECT,
@@ -41,54 +32,40 @@ export const SocialLoginButton = ({
   );
   const callbackUrl = propCallbackUrl || paramCallbackUrl || defaultCallbackUrl;
   const [isLoading, setIsLoading] = useState<'google' | 'github' | null>(null);
-  console.log('social login button, callbackUrl', callbackUrl);
 
-  const onClick = async (provider: 'google' | 'github') => {
-    await authClient.signIn.social(
-      {
-        /**
-         * The social provider id
-         * @example "github", "google"
-         */
-        provider: provider,
-        /**
-         * a url to redirect after the user authenticates with the provider
-         * @default "/"
-         */
-        callbackURL: callbackUrl,
-        /**
-         * a url to redirect if an error occurs during the sign in process
-         */
-        errorCallbackURL: Routes.AuthError,
-        /**
-         * a url to redirect if the user is newly registered
-         */
-        // newUserCallbackURL: "/auth/welcome",
-        /**
-         * disable the automatic redirect to the provider.
-         * @default false
-         */
-        // disableRedirect: true,
-      },
-      {
-        onRequest: (ctx) => {
-          // console.log("onRequest", ctx);
-          setIsLoading(provider);
-        },
-        onResponse: (ctx) => {
-          // console.log("onResponse", ctx.response);
-          setIsLoading(null);
-        },
-        onSuccess: (ctx) => {
-          // console.log("onSuccess", ctx.data);
-          setIsLoading(null);
-        },
-        onError: (ctx) => {
-          console.log('social login error', ctx.error.message);
-          setIsLoading(null);
-        },
+  if (
+    !websiteConfig.auth.enableGoogleLogin &&
+    !websiteConfig.auth.enableGithubLogin
+  ) {
+    return null;
+  }
+
+  const handleSocialLogin = async (provider: 'google' | 'github') => {
+    setIsLoading(provider);
+    try {
+      // Directly call the API instead of using authClient to ensure redirect works
+      const response = await fetch('/api/auth/sign-in/social', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          provider,
+          callbackURL: callbackUrl,
+          errorCallbackURL: Routes.AuthError,
+        }),
+      });
+      const data = await response.json();
+
+      if (data.url) {
+        // Use location.assign for more reliable cross-origin redirect
+        window.location.assign(data.url);
+      } else {
+        console.error('No redirect URL in response:', data);
+        setIsLoading(null);
       }
-    );
+    } catch (error) {
+      console.error('Social login error:', error);
+      setIsLoading(null);
+    }
   };
 
   return (
@@ -99,8 +76,8 @@ export const SocialLoginButton = ({
           size="lg"
           className="w-full cursor-pointer"
           variant="outline"
-          onClick={() => onClick('google')}
           disabled={isLoading === 'google'}
+          onClick={() => handleSocialLogin('google')}
         >
           {isLoading === 'google' ? (
             <Loader2Icon className="mr-2 size-4 animate-spin" />
@@ -115,8 +92,8 @@ export const SocialLoginButton = ({
           size="lg"
           className="w-full cursor-pointer"
           variant="outline"
-          onClick={() => onClick('github')}
           disabled={isLoading === 'github'}
+          onClick={() => handleSocialLogin('github')}
         >
           {isLoading === 'github' ? (
             <Loader2Icon className="mr-2 size-4 animate-spin" />
@@ -128,4 +105,4 @@ export const SocialLoginButton = ({
       )}
     </div>
   );
-};
+}

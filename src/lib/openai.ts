@@ -7,7 +7,7 @@ export const getOpenAI = () => {
   if (!_openai) {
     _openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
-      baseURL: process.env.OPENAI_BASE_URL || 'https://gemini-api.cn/v1',
+      baseURL: process.env.OPENAI_BASE_URL || 'https://api.ruxa.ai/v1',
     });
   }
   return _openai;
@@ -20,10 +20,71 @@ export const openai = new Proxy({} as OpenAI, {
   },
 });
 
-// 默认模型
-export const DEFAULT_MODEL = process.env.OPENAI_MODEL || 'gpt-5.2-codex';
+// 模型轮询列表 - 按优先级排序
+export const MODEL_FALLBACK_LIST = [
+  'gpt-5.1-2025-11-13',
+  'gpt-5.1',
+];
 
-// Blackbox 分析 Prompt - 直接输出 CLI 命令格式
+// 默认模型
+export const DEFAULT_MODEL = process.env.OPENAI_MODEL || 'gpt-5.1-2025-11-13';
+
+// 带轮询的 chat completion 调用
+export async function chatCompletionWithFallback(
+  messages: OpenAI.Chat.ChatCompletionMessageParam[],
+  options?: {
+    temperature?: number;
+    max_tokens?: number;
+  }
+): Promise<OpenAI.Chat.ChatCompletion> {
+  const client = getOpenAI();
+  const models = [DEFAULT_MODEL, ...MODEL_FALLBACK_LIST.filter(m => m !== DEFAULT_MODEL)];
+
+  let lastError: Error | null = null;
+  const startTime = Date.now();
+
+  console.log(`[OpenAI] ========== API Call Start ==========`);
+  console.log(`[OpenAI] Base URL: ${process.env.OPENAI_BASE_URL || 'https://api.ruxa.ai/v1'}`);
+  console.log(`[OpenAI] Models to try: ${models.join(' -> ')}`);
+  console.log(`[OpenAI] Temperature: ${options?.temperature ?? 0.3}`);
+  console.log(`[OpenAI] Max tokens: ${options?.max_tokens ?? 4000}`);
+
+  for (const model of models) {
+    const modelStartTime = Date.now();
+    try {
+      console.log(`[OpenAI] Trying model: ${model}...`);
+      const completion = await client.chat.completions.create({
+        model,
+        messages,
+        temperature: options?.temperature ?? 0.3,
+        max_tokens: options?.max_tokens ?? 4000,
+      });
+      const duration = Date.now() - modelStartTime;
+      const totalDuration = Date.now() - startTime;
+
+      console.log(`[OpenAI] ✓ Success with model: ${model}`);
+      console.log(`[OpenAI] Response time: ${duration}ms`);
+      console.log(`[OpenAI] Total time: ${totalDuration}ms`);
+      console.log(`[OpenAI] Usage: prompt=${completion.usage?.prompt_tokens}, completion=${completion.usage?.completion_tokens}, total=${completion.usage?.total_tokens}`);
+      console.log(`[OpenAI] ========== API Call End ==========`);
+
+      return completion;
+    } catch (error) {
+      const duration = Date.now() - modelStartTime;
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      console.error(`[OpenAI] ✗ Model ${model} failed after ${duration}ms: ${errorMsg}`);
+      lastError = error instanceof Error ? error : new Error(String(error));
+      // 继续尝试下一个模型
+    }
+  }
+
+  const totalDuration = Date.now() - startTime;
+  console.error(`[OpenAI] ✗ All models failed after ${totalDuration}ms`);
+  console.log(`[OpenAI] ========== API Call End (Failed) ==========`);
+  throw lastError || new Error('All models failed');
+}
+
+// Blackbox 分析 Prompt - 输出分析说明 + CLI 命令
 export const getBlackboxAnalysisPrompt = (locale: string) => {
   const isZh = locale === 'zh';
 
@@ -32,7 +93,21 @@ export const getBlackboxAnalysisPrompt = (locale: string) => {
 
 **核心要求：你必须根据黑盒数据分析结果调整参数值，不能简单复制用户的原始值！**
 
-输出格式（必须严格遵守，不要输出任何解释）：
+输出格式（必须严格按以下结构输出）：
+
+## 分析结果
+
+### 发现的问题
+- **[问题标题]**: [具体描述，基于黑盒数据的实际发现]
+- **[问题标题]**: [具体描述]
+（列出2-4个从黑盒数据中发现的实际问题）
+
+### 调参建议
+- **[建议标题]**: [具体建议内容和预期效果]
+- **[建议标题]**: [具体建议内容和预期效果]
+（列出2-4条针对性建议）
+
+## CLI 命令
 
 # PID Settings
 set p_roll = [优化后的值]
@@ -99,9 +174,10 @@ save
 {currentOther}
 
 输出要求:
-1. 只输出 CLI 命令，从 "# PID Settings" 开始，以 "save" 结束
-2. 不要输出任何解释、分析或其他文字
-3. 用户可以直接复制粘贴到 Betaflight Configurator`;
+1. 先输出"## 分析结果"部分，包含发现的问题和建议
+2. 问题和建议必须基于黑盒数据的实际分析，不要使用通用模板
+3. 然后输出"## CLI 命令"部分，以 "save" 结束
+4. CLI 命令部分用户可以直接复制粘贴到 Betaflight Configurator`;
   }
 
   // English version
@@ -109,7 +185,21 @@ save
 
 **CRITICAL: You MUST adjust parameter values based on blackbox data analysis. Do NOT simply copy the user's original values!**
 
-Output format (must follow strictly, no explanations):
+Output format (must follow this structure strictly):
+
+## Analysis Results
+
+### Issues Found
+- **[Issue Title]**: [Specific description based on actual blackbox data findings]
+- **[Issue Title]**: [Specific description]
+(List 2-4 actual issues found from blackbox data)
+
+### Tuning Recommendations
+- **[Recommendation Title]**: [Specific recommendation and expected effect]
+- **[Recommendation Title]**: [Specific recommendation and expected effect]
+(List 2-4 targeted recommendations)
+
+## CLI Commands
 
 # PID Settings
 set p_roll = [optimized value]
@@ -176,7 +266,8 @@ Current Other:
 {currentOther}
 
 Output requirements:
-1. Output CLI commands ONLY, starting with "# PID Settings" and ending with "save"
-2. No explanations or analysis
-3. User can copy-paste directly into Betaflight Configurator`;
+1. First output "## Analysis Results" section with issues found and recommendations
+2. Issues and recommendations must be based on actual blackbox data analysis, not generic templates
+3. Then output "## CLI Commands" section, ending with "save"
+4. CLI commands section can be directly copy-pasted into Betaflight Configurator`;
 };

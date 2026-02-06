@@ -53,7 +53,6 @@ export async function GET(request: NextRequest) {
       order: {
         orderNumber: order.orderNumber,
         status: order.status,
-        emailSentAt: order.emailSentAt,
         pdfHash: order.pdfHash,
         analysisResult: order.analysisResult,
         cliCommands: order.cliCommands,
@@ -132,7 +131,6 @@ export async function POST(request: NextRequest) {
       order: {
         orderNumber: updatedOrder?.orderNumber,
         status: updatedOrder?.status,
-        emailSentAt: updatedOrder?.emailSentAt,
         pdfHash: updatedOrder?.pdfHash,
         analysisResult: updatedOrder?.analysisResult,
         cliCommands: updatedOrder?.cliCommands,

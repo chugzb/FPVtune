@@ -30,9 +30,9 @@
     "NEXT_PUBLIC_GOOGLE_ANALYTICS_ID": "G-R1FDJM2H4C",
     "NEXT_PUBLIC_R2_PUBLIC_URL": "https://pub-a43dfa5ee4c84353a038f71491cecbd9.r2.dev",
 
-    // OpenAI / Future API
-    "OPENAI_API_KEY": "sk-fJfxnb96RtsJLJO7oNAW5VQ5rUijYl1byPxQwVkM56Mu1mzz",
-    "OPENAI_BASE_URL": "https://future-api.vodeshop.com/v1",
+    // OpenAI / Future API (api.ruxa.ai with model fallback)
+    "OPENAI_API_KEY": "sk-e2aPJ9psztyghWTIxewYEhIunUgAOFJqyVniWAp48lZGFMjU",
+    "OPENAI_BASE_URL": "https://api.ruxa.ai/v1",
     "OPENAI_MODEL": "gpt-5.1-2025-11-13",
 
     // BBL Decoder Service (Python Worker)
@@ -46,15 +46,26 @@
     "STORAGE_ENDPOINT": "https://3dd3c1beb6f00ab66adfa6990affd459.r2.cloudflarestorage.com",
     "STORAGE_PUBLIC_URL": "https://pub-a43dfa5ee4c84353a038f71491cecbd9.r2.dev",
 
-    // Creem (Tune Payment)
-    "CREEM_API_KEY": "creem_test_2Y7IFtLzabnvVckcFUswOr",
-    "CREEM_WEBHOOK_SECRET": "whsec_4tJRvil55Rs8pVgLbmUtc5",
-    "CREEM_PRODUCT_ID": "prod_IipfdsDGNCrMrLL0tq04v",
+    // Creem (Tune Payment) - Production
+    "CREEM_API_KEY": "creem_2tH9vlUyBkXtp5Rz68q606",
+    "CREEM_WEBHOOK_SECRET": "whsec_4I6EwKsvyiJFOX5Pz2OJIM",
+    "CREEM_PRODUCT_ID": "prod_6IOG6iky42mmiMrJE2Xsph",
 
     // Resend (Email)
     "RESEND_API_KEY": "re_XBUBzXpa_B8XSacJ4dYvv4mzRvaqdgA7k",
 
     // Database
-    "DATABASE_URL": "postgresql://neondb_owner:npg_peUWi1b8YFDx@ep-lucky-shape-ae14enhf-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require"
+    "DATABASE_URL": "postgresql://neondb_owner:npg_peUWi1b8YFDx@ep-lucky-shape-ae14enhf-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require",
+
+    // Better Auth
+    "BETTER_AUTH_SECRET": "fpvtune-production-secret-2026-secure-key",
+    "BETTER_AUTH_URL": "https://fpvtune.com",
+
+    // Google OAuth
+    "GOOGLE_CLIENT_ID": "",
+    "GOOGLE_CLIENT_SECRET": "",
+
+    // Admin
+    "ADMIN_API_KEY": "test-admin-key-2026"
   }
 }

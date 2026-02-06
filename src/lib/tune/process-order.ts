@@ -855,6 +855,118 @@ async function runAIAnalysis(
     let other = parsed.other as Record<string, unknown> | undefined;
     let cliCommands = parsed.cli_commands as string | undefined;
 
+    // 兼容中文 JSON 格式: { "分析结果": { "发现的问题": [...], "调参建议": [...] } }
+    const zhAnalysis = parsed['分析结果'] as Record<string, unknown> | undefined;
+    if (zhAnalysis && !analysis) {
+      console.log('[runAIAnalysis] Found Chinese format: 分析结果');
+      const zhIssues = zhAnalysis['发现的问题'] as Array<Record<string, string>> | undefined;
+      const zhRecs = zhAnalysis['调参建议'] as Array<Record<string, string>> | undefined;
+
+      const issues: string[] = [];
+      const recommendations: string[] = [];
+
+      // 解析发现的问题
+      if (zhIssues && Array.isArray(zhIssues)) {
+        for (const item of zhIssues) {
+          if (typeof item === 'string') {
+            issues.push(item);
+          } else if (item && typeof item === 'object') {
+            // 格式: { "问题标题": "...", "具体描述": "..." }
+            const title = item['问题标题'] || item.title || '';
+            const desc = item['具体描述'] || item.description || '';
+            if (title && desc) {
+              issues.push(`${title}: ${desc}`);
+            } else if (title) {
+              issues.push(title);
+            } else if (desc) {
+              issues.push(desc);
+            }
+          }
+        }
+      }
+
+      // 解析调参建议
+      if (zhRecs && Array.isArray(zhRecs)) {
+        for (const item of zhRecs) {
+          if (typeof item === 'string') {
+            recommendations.push(item);
+          } else if (item && typeof item === 'object') {
+            // 格式: { "建议标题": "...", "具体建议": "..." }
+            const title = item['建议标题'] || item['建议'] || item.title || '';
+            const desc = item['具体建议'] || item['预期效果'] || item.description || '';
+            if (title && desc) {
+              recommendations.push(`${title}: ${desc}`);
+            } else if (title) {
+              recommendations.push(title);
+            } else if (desc) {
+              recommendations.push(desc);
+            }
+          }
+        }
+      }
+
+      if (issues.length > 0 || recommendations.length > 0) {
+        analysis = {
+          issues,
+          recommendations,
+          summary: issues.length > 0 ? `主要发现: ${issues[0].split(':')[0]}` : '已完成黑盒数据分析',
+        };
+        console.log('[runAIAnalysis] Converted Chinese analysis:', JSON.stringify(analysis));
+      }
+    }
+
+    // 兼容英文 JSON 格式: { "analysis_results": { "issues_found": [...], "recommendations": [...] } }
+    const enAnalysis = parsed['analysis_results'] as Record<string, unknown> | undefined;
+    if (enAnalysis && !analysis) {
+      console.log('[runAIAnalysis] Found English format: analysis_results');
+      const enIssues = (enAnalysis['issues_found'] || enAnalysis['issues']) as Array<Record<string, string>> | undefined;
+      const enRecs = enAnalysis['recommendations'] as Array<Record<string, string>> | undefined;
+
+      const issues: string[] = [];
+      const recommendations: string[] = [];
+
+      if (enIssues && Array.isArray(enIssues)) {
+        for (const item of enIssues) {
+          if (typeof item === 'string') {
+            issues.push(item);
+          } else if (item && typeof item === 'object') {
+            const title = item.title || item.issue || '';
+            const desc = item.description || item.details || '';
+            if (title && desc) {
+              issues.push(`${title}: ${desc}`);
+            } else if (title) {
+              issues.push(title);
+            }
+          }
+        }
+      }
+
+      if (enRecs && Array.isArray(enRecs)) {
+        for (const item of enRecs) {
+          if (typeof item === 'string') {
+            recommendations.push(item);
+          } else if (item && typeof item === 'object') {
+            const title = item.title || item.recommendation || '';
+            const desc = item.description || item.effect || '';
+            if (title && desc) {
+              recommendations.push(`${title}: ${desc}`);
+            } else if (title) {
+              recommendations.push(title);
+            }
+          }
+        }
+      }
+
+      if (issues.length > 0 || recommendations.length > 0) {
+        analysis = {
+          issues,
+          recommendations,
+          summary: issues.length > 0 ? `Primary finding: ${issues[0].split(':')[0]}` : 'Blackbox analysis completed',
+        };
+        console.log('[runAIAnalysis] Converted English analysis:', JSON.stringify(analysis));
+      }
+    }
+
     // 如果没有直接的 pid 字段，递归搜索
     if (!pid) {
       const foundPid = findPidStructure(parsed);
@@ -1882,213 +1994,6 @@ async function runAIAnalysis(
   }
 }
 
-async function sendResultEmail(
-  to: string,
-  orderNumber: string,
-  analysis: AnalysisResult,
-  problems: string,
-  goals: string,
-  flyingStyle: string,
-  frameSize: string,
-  locale: string,
-  resultUrl: string
-): Promise<{ messageId?: string }> {
-  const isZh = locale === 'zh';
-
-  // 获取可读名称
-  const problemNames = mapIdsToNames(problems, PROBLEM_NAMES, locale);
-  const goalNames = mapIdsToNames(goals, GOAL_NAMES, locale);
-  const styleName = getNameById(flyingStyle, STYLE_NAMES, locale);
-  const frameName = getNameById(frameSize, FRAME_NAMES, locale);
-
-  const subject = isZh
-    ? `[FPVtune] 您的 PID 调参报告已准备好 - ${orderNumber}`
-    : `[FPVtune] Your PID Tuning Report is Ready - ${orderNumber}`;
-
-  const html = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1a1a1a; margin: 0; padding: 0; background: #f5f5f5; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .card { background: white; border-radius: 12px; padding: 32px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    .header { text-align: center; padding: 24px 0; border-bottom: 1px solid #e5e7eb; margin-bottom: 24px; }
-    .logo { font-size: 28px; font-weight: bold; color: #3b82f6; }
-    .order-badge { display: inline-block; background: #eff6ff; padding: 8px 16px; border-radius: 8px; font-family: monospace; font-size: 14px; color: #1e40af; margin: 16px 0; }
-    .section { margin: 24px 0; }
-    .section-title { font-size: 16px; font-weight: 600; color: #111; margin-bottom: 12px; border-bottom: 2px solid #3b82f6; padding-bottom: 8px; display: inline-block; }
-    .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: #f9fafb; padding: 16px; border-radius: 8px; }
-    .config-item { }
-    .config-label { font-size: 12px; color: #6b7280; margin-bottom: 2px; }
-    .config-value { font-size: 14px; color: #111; font-weight: 500; }
-    .summary-box { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 16px; border-radius: 8px; margin: 16px 0; }
-    .issues-list { background: #fef3c7; border: 1px solid #fcd34d; padding: 16px; border-radius: 8px; margin: 16px 0; }
-    .issues-list ul { margin: 8px 0 0 0; padding-left: 20px; }
-    .issues-list li { margin: 4px 0; color: #92400e; }
-    .recommendations-list { background: #eff6ff; border: 1px solid #93c5fd; padding: 16px; border-radius: 8px; margin: 16px 0; }
-    .recommendations-list ul { margin: 8px 0 0 0; padding-left: 20px; }
-    .recommendations-list li { margin: 4px 0; color: #1e40af; }
-    .cli-box { background: #1f2937; color: #e5e7eb; padding: 16px; border-radius: 8px; font-family: monospace; font-size: 11px; white-space: pre-wrap; overflow-x: auto; max-height: 300px; overflow-y: auto; }
-    .steps { background: #f9fafb; padding: 16px; border-radius: 8px; }
-    .steps ol { margin: 0; padding-left: 20px; }
-    .steps li { margin: 8px 0; color: #374151; }
-    .footer { text-align: center; padding: 24px 0; color: #6b7280; font-size: 12px; }
-    .footer a { color: #3b82f6; text-decoration: none; }
-    .view-btn { display: inline-block; background: #3b82f6; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px; margin: 16px 0; }
-    .view-btn:hover { background: #2563eb; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="card">
-      <div class="header">
-        <div class="logo">FPVtune</div>
-        <p style="color: #6b7280; margin: 8px 0 0 0;">${isZh ? '神经网络驱动的 PID 调参' : 'Neural Network-Powered PID Tuning'}</p>
-      </div>
-
-      <h2 style="text-align: center; margin: 0;">${isZh ? '您的 PID 调参报告已准备好!' : 'Your PID Tuning Report is Ready!'}</h2>
-      <p style="text-align: center;"><span class="order-badge">${isZh ? '订单号' : 'Order'}: ${orderNumber}</span></p>
-
-      <div style="text-align: center; margin: 24px 0;">
-        <a href="${resultUrl}" class="view-btn" style="color: white;">${isZh ? '查看完整报告' : 'View Full Report'}</a>
-        <p style="font-size: 12px; color: #6b7280; margin-top: 8px;">${isZh ? '此链接 7 天内有效，请注意保存' : 'This link is valid for 7 days, please save it'}</p>
-      </div>
-
-      <div class="section">
-        <div class="section-title">${isZh ? '您的配置' : 'Your Configuration'}</div>
-        <div class="config-grid">
-          <div class="config-item">
-            <div class="config-label">${isZh ? '需要解决的问题' : 'Problems to Fix'}</div>
-            <div class="config-value">${problemNames}</div>
-          </div>
-          <div class="config-item">
-            <div class="config-label">${isZh ? '调参目标' : 'Tuning Goals'}</div>
-            <div class="config-value">${goalNames}</div>
-          </div>
-          <div class="config-item">
-            <div class="config-label">${isZh ? '飞行风格' : 'Flying Style'}</div>
-            <div class="config-value">${styleName}</div>
-          </div>
-          <div class="config-item">
-            <div class="config-label">${isZh ? '机架尺寸' : 'Frame Size'}</div>
-            <div class="config-value">${frameName}</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="section-title">${isZh ? '分析摘要' : 'Analysis Summary'}</div>
-        <div class="summary-box">
-          <p style="margin: 0;">${analysis.analysis.summary}</p>
-        </div>
-      </div>
-
-      ${
-        analysis.analysis.issues?.length
-          ? `
-      <div class="section">
-        <div class="section-title">${isZh ? '发现的问题' : 'Issues Identified'}</div>
-        <div class="issues-list">
-          <ul>
-            ${analysis.analysis.issues.map((issue) => `<li>${issue}</li>`).join('')}
-          </ul>
-        </div>
-      </div>
-      `
-          : ''
-      }
-
-      ${
-        analysis.analysis.recommendations?.length
-          ? `
-      <div class="section">
-        <div class="section-title">${isZh ? '优化建议' : 'Recommendations'}</div>
-        <div class="recommendations-list">
-          <ul>
-            ${analysis.analysis.recommendations.map((rec) => `<li>${rec}</li>`).join('')}
-          </ul>
-        </div>
-      </div>
-      `
-          : ''
-      }
-
-      <div class="section">
-        <div class="section-title">${isZh ? 'CLI 命令' : 'CLI Commands'}</div>
-        <p style="font-size: 14px; color: #6b7280;">${isZh ? '复制以下命令到 Betaflight 配置器的 CLI 标签页：' : 'Copy the following commands into Betaflight Configurator CLI tab:'}</p>
-        <div class="cli-box">${analysis.cli_commands}</div>
-      </div>
-
-      <div class="section">
-        <div class="section-title">${isZh ? '如何应用设置' : 'How to Apply'}</div>
-        <div class="steps">
-          <ol>
-            <li>${isZh ? '通过 USB 连接飞控' : 'Connect your flight controller via USB'}</li>
-            <li>${isZh ? '打开 Betaflight 配置器' : 'Open Betaflight Configurator'}</li>
-            <li>${isZh ? '进入 CLI 标签页' : 'Go to the CLI tab'}</li>
-            <li>${isZh ? '粘贴上述命令并按回车' : 'Paste the commands above and press Enter'}</li>
-            <li>${isZh ? '输入 "save" 保存设置' : 'Type "save" to save settings'}</li>
-            <li>${isZh ? '安全试飞!' : 'Test fly safely!'}</li>
-          </ol>
-        </div>
-      </div>
-
-      <p style="text-align: center; margin-top: 24px; padding: 16px; background: #f0f9ff; border-radius: 8px; color: #1e40af;">
-        ${isZh ? '附件包含 TXT 命令文件，可直接复制粘贴到 Betaflight CLI' : 'Attachment includes TXT commands file, ready to copy & paste into Betaflight CLI'}
-      </p>
-    </div>
-
-    <div class="footer">
-      <p>FPVtune - Neural Network-Powered Betaflight PID Tuning</p>
-      <p>${isZh ? '如有问题，请联系' : 'Questions? Contact'} <a href="mailto:support@fpvtune.com">support@fpvtune.com</a></p>
-    </div>
-  </div>
-</body>
-</html>
-  `;
-
-  const { Resend } = await import('resend');
-  const resend = new Resend(process.env.RESEND_API_KEY);
-
-  // 生成 CLI 命令的 TXT 文件内容
-  const cliTxtContent = `# FPVtune CLI Commands - ${orderNumber}
-# Generated: ${new Date().toISOString().split('T')[0]}
-#
-# ${isZh ? '使用方法：复制以下所有命令，粘贴到 Betaflight Configurator CLI 标签页' : 'Usage: Copy all commands below and paste into Betaflight Configurator CLI tab'}
-# ${isZh ? '粘贴后输入 "save" 保存设置' : 'After pasting, type "save" to save settings'}
-#
-# ============================================================
-
-${analysis.cli_commands || '# No CLI commands generated'}
-`;
-
-  const { data, error } = await resend.emails.send({
-    from: 'FPVtune <onboarding@resend.dev>',
-    to,
-    subject,
-    html,
-    attachments: [
-      {
-        content: Buffer.from(cliTxtContent, 'utf-8').toString('base64'),
-        filename: `FPVtune-CLI-${orderNumber}.txt`,
-      },
-    ],
-  });
-
-  if (error) {
-    console.error('Email send error:', error);
-    throw new Error(
-      typeof error === 'object' && error !== null && 'message' in error
-        ? String(error.message)
-        : JSON.stringify(error)
-    );
-  }
-
-  return { messageId: data?.id };
-}
-
 export async function processOrder(orderId: string): Promise<void> {
   const startTime = Date.now();
   console.log(`[processOrder] Starting order processing: ${orderId}`);
@@ -2270,46 +2175,8 @@ export async function processOrder(orderId: string): Promise<void> {
       .where(eq(tuneOrder.id, orderId));
 
     console.log(
-      `[processOrder] Analysis saved for order ${order.orderNumber}, now sending email...`
+      `[processOrder] Analysis saved for order ${order.orderNumber}`
     );
-
-    // 尝试发送邮件，失败不影响订单状态
-    try {
-      const emailStartTime = Date.now();
-      const { messageId } = await sendResultEmail(
-        order.customerEmail,
-        order.orderNumber,
-        analysis,
-        order.problems || '',
-        order.goals || '',
-        order.flyingStyle || 'freestyle',
-        order.frameSize || '5',
-        order.locale || 'en',
-        resultUrl
-      );
-      console.log(
-        `[processOrder] Email sent in ${Date.now() - emailStartTime}ms, messageId: ${messageId}`
-      );
-
-      // 更新邮件发送状态
-      await db
-        .update(tuneOrder)
-        .set({
-          emailSentAt: new Date(),
-          emailMessageId: messageId,
-          updatedAt: new Date(),
-        })
-        .where(eq(tuneOrder.id, orderId));
-    } catch (emailError) {
-      // 邮件发送失败，记录错误但不影响订单状态
-      console.error(
-        `[processOrder] Email send failed for order ${order.orderNumber}:`,
-        emailError
-      );
-      console.log(
-        `[processOrder] Order ${order.orderNumber} completed but email not sent`
-      );
-    }
 
     const totalTime = Date.now() - startTime;
     console.log(

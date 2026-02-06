@@ -1,4 +1,4 @@
-import { DEFAULT_MODEL, getBlackboxAnalysisPrompt, openai } from '@/lib/openai';
+import { chatCompletionWithFallback, DEFAULT_MODEL, getBlackboxAnalysisPrompt } from '@/lib/openai';
 import {
   FRAME_NAMES,
   GOAL_NAMES,
@@ -18,78 +18,59 @@ function extractAnalysisFromResponse(response: string): {
   const issues: string[] = [];
   const recommendations: string[] = [];
 
-  // 提取问题/发现 - 查找带 ** 的要点
-  const bulletPointPattern = /[-•]\s*\*\*([^*]+)\*\*[:：]?\s*([^\n]+)/g;
-  const bulletMatches = response.matchAll(bulletPointPattern);
-  for (const match of bulletMatches) {
-    const title = match[1].trim();
-    const desc = match[2].trim();
-    if (title && desc && desc.length > 10) {
-      const cleaned = `${title}: ${desc}`
-        .replace(/`[^`]+`/g, '')
-        .substring(0, 200);
-      if (!issues.some(i => i.includes(title))) {
-        issues.push(cleaned);
+  // 提取"发现的问题"部分
+  const issuesMatch = response.match(/###\s*(?:发现的问题|Issues Found)\s*\n([\s\S]*?)(?=###|##\s*CLI|$)/i);
+  if (issuesMatch) {
+    const issuesContent = issuesMatch[1];
+    // 匹配 - **标题**: 描述 格式
+    const issuePattern = /-\s*\*\*([^*]+)\*\*[:：]?\s*([^\n]+)/g;
+    const matches = issuesContent.matchAll(issuePattern);
+    for (const match of matches) {
+      const title = match[1].trim();
+      const desc = match[2].trim();
+      if (title && desc) {
+        issues.push(`${title}: ${desc}`);
       }
     }
   }
 
-  // 提取 "Why" 解释作为建议
-  const whyPattern = /Why[:：]?\s*\n?([-•]\s*[^\n]+(?:\n[-•]\s*[^\n]+)*)/gi;
-  const whyMatches = response.matchAll(whyPattern);
-  for (const match of whyMatches) {
-    const content = match[1].trim();
-    const lines = content.split('\n').filter(l => l.trim().startsWith('-') || l.trim().startsWith('•'));
-    for (const line of lines.slice(0, 3)) {
-      const cleaned = line.replace(/^[-•]\s*/, '').replace(/`[^`]+`/g, '').trim();
-      if (cleaned.length > 20 && !recommendations.some(r => r.includes(cleaned.substring(0, 30)))) {
-        recommendations.push(cleaned);
+  // 提取"调参建议"部分
+  const recsMatch = response.match(/###\s*(?:调参建议|Tuning Recommendations)\s*\n([\s\S]*?)(?=##\s*CLI|$)/i);
+  if (recsMatch) {
+    const recsContent = recsMatch[1];
+    // 匹配 - **标题**: 描述 格式
+    const recPattern = /-\s*\*\*([^*]+)\*\*[:：]?\s*([^\n]+)/g;
+    const matches = recsContent.matchAll(recPattern);
+    for (const match of matches) {
+      const title = match[1].trim();
+      const desc = match[2].trim();
+      if (title && desc) {
+        recommendations.push(`${title}: ${desc}`);
       }
     }
   }
 
-  // 提取验证方法作为建议
-  const validatePattern = /How to validate[^:]*[:：]?\s*\n?([^\n]+(?:\n[-•\d][^\n]+)*)/gi;
-  const validateMatches = response.matchAll(validatePattern);
-  for (const match of validateMatches) {
-    const content = match[1].trim();
-    const lines = content.split('\n').filter(l => l.trim());
-    for (const line of lines.slice(0, 3)) {
-      const cleaned = line.replace(/^\d+\)\s*/, '').replace(/^[-•]\s*/, '').replace(/`[^`]+`/g, '').trim();
-      if (cleaned.length > 20 && cleaned.length < 150 && !recommendations.some(r => r.includes(cleaned.substring(0, 30)))) {
-        recommendations.push(cleaned);
-      }
-    }
-  }
-
-  // 提取 Rationale 作为建议
-  const rationalePattern = /Rationale[:：]?\s*([^\n]+)/gi;
-  const rationaleMatches = response.matchAll(rationalePattern);
-  for (const match of rationaleMatches) {
-    const content = match[1].trim();
-    if (content.length > 30 && content.length < 200) {
-      const cleaned = content.replace(/`[^`]+`/g, '').trim();
-      if (!recommendations.some(r => r.includes(cleaned.substring(0, 30)))) {
-        recommendations.push(cleaned);
+  // 如果新格式没提取到，尝试旧格式（兼容）
+  if (issues.length === 0) {
+    const bulletPointPattern = /-\s*\*\*([^*]+)\*\*[:：]?\s*([^\n]+)/g;
+    const bulletMatches = response.matchAll(bulletPointPattern);
+    for (const match of bulletMatches) {
+      const title = match[1].trim();
+      const desc = match[2].trim();
+      if (title && desc && desc.length > 10) {
+        const cleaned = `${title}: ${desc}`.replace(/`[^`]+`/g, '').substring(0, 200);
+        if (!issues.some(i => i.includes(title))) {
+          issues.push(cleaned);
+        }
       }
     }
   }
 
   // 生成摘要
   let summary = '基于黑盒数据分析，已针对您的飞行问题优化 PID、滤波器和相关参数。';
-
-  // 尝试从响应中提取关键发现作为摘要
-  const standOutMatch = response.match(/\*\*What stands out[^*]*\*\*\s*\n?([\s\S]*?)(?=\n\n|Given that|Below are)/i);
-  if (standOutMatch) {
-    const findings = standOutMatch[1]
-      .split('\n')
-      .filter(l => l.trim().startsWith('-'))
-      .slice(0, 2)
-      .map(l => l.replace(/^[-•]\s*\*\*([^*]+)\*\*.*/, '$1').trim())
-      .filter(l => l.length > 5);
-    if (findings.length > 0) {
-      summary = `主要发现: ${findings.join('、')}。已针对这些问题优化参数。`;
-    }
+  if (issues.length > 0) {
+    const firstIssue = issues[0].split(':')[0];
+    summary = `主要发现: ${firstIssue}。已针对这些问题优化参数。`;
   }
 
   // 如果没有提取到有效内容，使用默认值
@@ -683,10 +664,9 @@ export async function POST(request: NextRequest) {
     console.log('OpenAI Request - CLI Dump included:', !!cliDumpContent);
     console.log('OpenAI Request - Decoded BBL JSON length:', decodedBBLJson.length, 'chars');
 
-    // 调用 GPT-5.1 分析
-    const completion = await openai.chat.completions.create({
-      model: DEFAULT_MODEL,
-      messages: [
+    // 调用 GPT 分析（带模型轮询）
+    const completion = await chatCompletionWithFallback(
+      [
         {
           role: 'system',
           content: prompt,
@@ -696,9 +676,11 @@ export async function POST(request: NextRequest) {
           content: userMessage,
         },
       ],
-      temperature: 0.3,
-      max_tokens: 4000,
-    });
+      {
+        temperature: 0.3,
+        max_tokens: 4000,
+      }
+    );
 
     const result = completion.choices[0]?.message?.content;
 

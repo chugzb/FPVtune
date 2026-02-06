@@ -78,7 +78,6 @@ export async function POST(request: NextRequest) {
         orderNumber: updatedOrder?.orderNumber,
         status: updatedOrder?.status,
         hasAnalysis: !!updatedOrder?.analysisResult,
-        emailSentAt: updatedOrder?.emailSentAt,
         completedAt: updatedOrder?.completedAt,
       },
     });
