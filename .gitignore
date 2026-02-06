@@ -53,3 +53,12 @@ next-env.d.ts
 # Python virtual environment
 .venv
 __pycache__
+
+# Claude skills node_modules
+.claude/skills/**/node_modules
+
+# Playwright MCP
+.playwright-mcp/
+
+# Temp files
+.claude/skills/**/.temp-execution-*
