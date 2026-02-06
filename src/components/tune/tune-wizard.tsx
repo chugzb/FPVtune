@@ -1648,7 +1648,7 @@ function StepPayment({
       </div>
 
       {/* Test Code Section */}
-      <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-5">
+      <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-4 sm:p-5">
         <button
           type="button"
           onClick={() => setShowTestCode(!showTestCode)}
@@ -1672,7 +1672,7 @@ function StepPayment({
               onClick={onTestCodeSubmit}
               disabled={!testCode || isProcessing}
               className={cn(
-                'px-5 py-3 rounded-[10px] text-sm font-semibold whitespace-nowrap transition-all',
+                'px-4 py-3 rounded-[10px] text-sm font-semibold whitespace-nowrap transition-all shrink-0',
                 testCode && !isProcessing
                   ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-black hover:brightness-110'
                   : 'bg-white/5 text-gray-600 cursor-not-allowed'

@@ -25,8 +25,8 @@ type OrderStatus = 'pending' | 'paid' | 'processing' | 'completed' | 'failed';
 interface AnalysisResult {
   analysis: {
     summary: string;
-    issues: string[];
-    recommendations: string[];
+    issues: (string | { title: string; detail: string })[];
+    recommendations: (string | { title: string; detail: string })[];
   };
   pid: {
     roll: { p: number; i: number; d: number; f?: number; ff?: number };
@@ -386,7 +386,14 @@ function SuccessPageContent() {
                         </span>
                         <span className="text-xs text-white/45">#{i + 1}</span>
                       </div>
-                      <div className="whitespace-pre-wrap">{issue}</div>
+                      <div className="whitespace-pre-wrap">
+                        {typeof issue === 'string' ? issue : (
+                          <>
+                            {(issue as any).title && <div className="font-medium text-white mb-1">{(issue as any).title}</div>}
+                            {(issue as any).detail && <div>{(issue as any).detail}</div>}
+                          </>
+                        )}
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -433,7 +440,14 @@ function SuccessPageContent() {
                       key={i}
                       className="rounded-lg bg-black/20 p-3 text-sm leading-relaxed text-white/80"
                     >
-                      <div className="whitespace-pre-wrap">{rec}</div>
+                      <div className="whitespace-pre-wrap">
+                        {typeof rec === 'string' ? rec : (
+                          <>
+                            {(rec as any).title && <div className="font-medium text-white mb-1">{(rec as any).title}</div>}
+                            {(rec as any).detail && <div>{(rec as any).detail}</div>}
+                          </>
+                        )}
+                      </div>
                       <div className="mt-2 text-xs text-white/55">
                         {isZh ? '预期效果：' : 'Expected: '}
                         {expectedEffects[i] ||

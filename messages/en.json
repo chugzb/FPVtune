@@ -1365,13 +1365,13 @@
         "instantDelivery": "Instant delivery",
         "moneyBack": "Money-back guarantee",
         "or": "or",
-        "haveTestCode": "Have a test code?",
-        "hideTestCode": "Hide test code",
-        "testCodePlaceholder": "Enter test code",
-        "useTestCode": "Use Test Code",
-        "testMode": "Test Mode",
-        "testModeHint": "Enter test code to get tuning results for free",
-        "testCodeLabel": "Test Code"
+        "haveTestCode": "Have an activation code?",
+        "hideTestCode": "Hide activation code",
+        "testCodePlaceholder": "Enter activation code",
+        "useTestCode": "Activate",
+        "testMode": "Activation Code",
+        "testModeHint": "Enter your activation code to unlock tuning results",
+        "testCodeLabel": "Activation Code"
       },
       "results": {
         "title": "Your Tune is Ready",

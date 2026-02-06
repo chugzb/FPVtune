@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
 
-    const email = formData.get('email') as string;
+    const email = (formData.get('email') as string) || '';
     const blackboxFile = formData.get('blackbox') as File | null;
     const cliDumpFile = formData.get('cliDump') as File | null;
     const problems = formData.get('problems') as string;
@@ -45,10 +45,6 @@ export async function POST(request: NextRequest) {
     const additionalNotes = formData.get('additionalNotes') as string;
     const locale = (formData.get('locale') as string) || 'en';
     const promoCodeInput = formData.get('promoCode') as string | null;
-
-    if (!email) {
-      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
-    }
 
     if (!blackboxFile) {
       return NextResponse.json(
@@ -269,18 +265,20 @@ export async function POST(request: NextRequest) {
       process.env.NEXT_PUBLIC_APP_URL ||
       'https://fpvtune.com';
 
-    const checkout = await creem.checkouts.create({
+    const checkoutParams: any = {
       productId: CREEM_PRODUCT_ID,
       successUrl: `${baseUrl}/${locale}/tune?order=${orderNumber}`,
-      customer: {
-        email,
-      },
       metadata: {
         orderId: order.id,
         orderNumber,
         locale,
       },
-    });
+    };
+    if (email) {
+      checkoutParams.customer = { email };
+    }
+
+    const checkout = await creem.checkouts.create(checkoutParams);
 
     await db
       .update(tuneOrder)

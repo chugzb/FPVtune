@@ -1366,13 +1366,13 @@
         "instantDelivery": "即时交付",
         "moneyBack": "退款保障",
         "or": "或",
-        "haveTestCode": "有测试码?",
-        "hideTestCode": "隐藏测试码",
-        "testCodePlaceholder": "输入测试码",
-        "useTestCode": "使用测试码",
-        "testMode": "测试模式",
-        "testModeHint": "输入测试码免费获取调参结果",
-        "testCodeLabel": "测试码"
+        "haveTestCode": "有激活码?",
+        "hideTestCode": "隐藏激活码",
+        "testCodePlaceholder": "输入激活码",
+        "useTestCode": "激活",
+        "testMode": "激活码",
+        "testModeHint": "输入激活码解锁调参结果",
+        "testCodeLabel": "激活码"
       },
       "results": {
         "title": "你的调参已就绪",

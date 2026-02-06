@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "creem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-server-creem"
+      ],
+      "env": {
+        "CREEM_API_KEY": "creem_2tH9vlUyBkXtp5Rz68q606"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "search_products",
+        "get_product",
+        "get_checkout",
+        "search_transactions",
+        "list_customers",
+        "create_checkout"
+      ]
+    }
+  }
+}
